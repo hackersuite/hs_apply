@@ -10,13 +10,13 @@ test:
 
 # builds the docker image
 build-docker:
-	@echo "=============building hs_hub============="
-	docker build -f docker/prod/Dockerfile -t hs_hub .
+	@echo "=============building hs_application============="
+	docker build -f docker/prod/Dockerfile -t hs_application .
 
 # builds the docker image for dev environment
 build-docker-dev:
-	@echo "=============building hs_hub (dev)============="
-	docker build -f docker/dev/Dockerfile -t hs_hub .
+	@echo "=============building hs_application (dev)============="
+	docker build -f docker/dev/Dockerfile -t hs_application .
 
 # sets up the hacker suite docker network
 setup-network:
@@ -25,12 +25,12 @@ setup-network:
 
 # starts the app and MySQL in docker containers
 up: build-docker setup-network
-	@echo "=============starting hs_hub============="
+	@echo "=============starting hs_application============="
 	docker-compose up -d
 
 # starts the app and MySQL in docker containers for dev environment
 up-dev: build-docker-dev setup-network
-	@echo "=============starting hs_hub (dev)============="
+	@echo "=============starting hs_application (dev)============="
 	docker-compose up -d
 
 # prints the logs from all containers
@@ -39,7 +39,7 @@ logs:
 
 # prints the logs only from the go app
 logs-app:
-	docker-compose logs -f hs_hub
+	docker-compose logs -f hs_application
 
 # prints the logs only from the database
 logs-db:
@@ -52,7 +52,7 @@ down:
 # cleans up unused images, networks and containers
 clean: down
 	@echo "=============cleaning up============="
-	rm -f hs_hub
+	rm -f hs_application
 	docker container prune -f
 	docker network prune -f
 	docker system prune -f
