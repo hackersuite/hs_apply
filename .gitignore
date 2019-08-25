@@ -1,0 +1,15 @@
+#Environment variables
+.env
+*.log
+
+#Compiled code
+dist
+
+#External libraries
+node_modules
+
+#Tests coverage reports
+coverage
+
+#OSX directory files
+.DS_Store

@@ -1,0 +1,45 @@
+{
+  "name": "hs-application",
+  "version": "0.0.1",
+  "description": "Application system for hackathons",
+  "main": "app.ts",
+  "engines": {
+    "node": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "npx jest",
+    "start": "ts-node src/server.ts",
+    "start:watch": "node ./node_modules/nodemon/bin/nodemon.js"
+  },
+  "repository": {
+    "type": "GitHub",
+    "url": "https://github.com/unicsmcr/hs_application/tree/master"
+  },
+  "keywords": [
+    "hackathon",
+    "application",
+    "registration"
+  ],
+  "author": "UniCS",
+  "license": "MIT",
+  "dependencies": {
+    "@types/express": "^4.17.1",
+    "@types/express-session": "^1.15.14",
+    "@types/morgan": "^1.7.37",
+    "cookie-parser": "^1.4.4",
+    "dotenv": "^8.1.0",
+    "ejs": "^2.6.2",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "morgan": "^1.9.1",
+    "passport": "^0.4.0",
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1",
+    "tslint": "^5.18.0"
+  }
+}
