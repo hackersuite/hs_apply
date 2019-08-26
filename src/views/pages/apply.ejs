@@ -3,6 +3,7 @@
 
 <head>
   <% include ../partials/head.ejs %>
+  <link type="text/css" href="/css/apply.css" rel="stylesheet" />
   <title>Applications</title>
 </head>
 
@@ -13,15 +14,67 @@
       <div class="content">
         <div class="container-fluid">
           <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-6">
-              <div class="card">
-                <div class="card-header card-header-tabs card-header-primary">
-                  <h4 class="card-title">Application</h4>
+            <div class="col-md-8 col-lg-8">
+
+              <ul id="progressbar">
+                <% sections.forEach((section, index) => { %>
+                <% if (index == 0) { %>
+                <li class="active"><%- section.name -%> </li>
+                <% } else { %>
+                <li><%- section.name -%> </li>
+                <% } %>
+                <% }) %>
+              </ul>
+
+              <form id="applyForm">
+                <% sections.forEach((section, index) => { %>
+                <div class="card apply-form-card">
+                  <div class="card-header card-header-tabs card-header-primary">
+                    <h2 class="card-title text-center"><%- section.name -%></h2>
+                  </div>
+                  <div class="card-body">
+                    <div class="apply-form-section">
+                      <% section.questions.forEach(question => { %>
+                        <% if (question.answerType === "short") { %>
+                        <div class="form-group">
+                          <label class="bmd-label-floating" for=""><%- question.questionText %></label>
+                          <input autocomplete="username" spellcheck="false" type="email" class="form-control" id="" placeholder="">
+                        </div>
+                        <% } else if (question.answerType == "long") { %>
+                        <div class="form-group">
+                          <label class="bmd-label-floating" for=""><%- question.questionText %></label>
+                          <textarea class="form-control" id="" rows="3" placeholder=""></textarea>
+                        </div>
+                        <% } else if (question.answerType == "number") { %>
+                        <div class="form-group">
+                          <label class="bmd-label-floating" for=""><%- question.questionText %></label>
+                          <input type="number" class="form-control" id="" placeholder="" min="0">
+                        </div>
+                        <% } else if (question.answerType == "tick") { %>
+                        <div class="form-check">
+                          <label class="form-check-label">
+                            <input class="form-check-input" type="checkbox" value="">
+                            <%- question.questionText -%>
+                            <span class="form-check-sign">
+                              <span class="check"></span>
+                            </span>
+                          </label>
+                        </div>
+                        <% } %>
+                      <% }) %>
+                      <% if (index > 0 && index < sections.length) { %>
+                        <input type="button" name="previous" class="btn btn-danger previous-form-stage" value="Previous" />
+                      <% } %>
+                      <% if (index == sections.length - 1) { %>
+                        <input type="button" name="submit" class="btn btn-success submit-form" value="Submit" />
+                      <% } else { %>
+                        <input type="button" name="next" class="btn btn-primary next-form-stage" value="Next" />
+                      <% } %>
+                    </div>
+                  </div>
                 </div>
-                <div class="card-body text-center">
-                  <h2></h2>
-                </div>
-              </div>
+                <% }) %>
+              </form>
             </div>
           </div>
         </div>
@@ -29,6 +82,9 @@
       <% include ../partials/footer.ejs %>
     </div>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"
+    integrity="sha256-tw5/wId1F+4LyUF2ZJnpRoHNXJ66jrK3IGhfq4LhLjY=" crossorigin="anonymous"></script>
+  <script src="/js/apply.js"></script>
 </body>
 
 </html>

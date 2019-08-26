@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import * as fs from "fs";
 import * as express from "express";
 import * as dotenv from "dotenv";
 import * as path from "path";
@@ -6,16 +7,21 @@ import * as morgan from "morgan";
 import * as passport from "passport";
 import * as expressSession from "express-session";
 import * as cookieParser from "cookie-parser";
+import { IApplicationSection } from "./settings";
 import { Express, Request, Response, NextFunction } from "express";
 import { mainRouter } from "./routes";
+import { Cache } from "./util/cache";
+import { promisify } from "util";
+import { Sections } from "./models/sections";
 
 // Load environment variables from .env file
 dotenv.config({ path: ".env" });
-
+const readFileAsync = promisify(fs.readFile);
 
 // codebeat:disable[LOC]
-export function buildApp(callback: (app: Express, err?: Error) => void): void {
+export async function buildApp(callback: (app: Express, err?: Error) => void): Promise<void> {
   const app: Express = expressSetup();
+  const cache: Cache = new Cache();
 
   middlewareSetup(app);
 
@@ -25,7 +31,10 @@ export function buildApp(callback: (app: Express, err?: Error) => void): void {
   passportSetup(app);
 
   // Routes set up
-  app.use("/", mainRouter());
+  app.use("/", mainRouter(cache));
+
+  // Load the hackathon application settings from disk
+  await loadApplicationSettings(cache);
 
   return callback(app);
 }
@@ -95,6 +104,32 @@ const passportSetup = (app: Express): void => {
   app.use(passport.initialize());
   app.use(passport.session());
   // passport.use(passportLocalStrategy(userService));
+};
+
+/**
+ * Loads the applications settings into Cache
+ * Questions are stored under the name `Questions`
+ * Hackathon settings are stored under `Hackathon`
+ */
+const loadApplicationSettings = async (cache: Cache): Promise<void> => {
+  // Check if the file exists in the current directory, and if it is writable.
+  console.log("Loading hackathon application settings...");
+
+  let sections: Array<IApplicationSection>;
+  try {
+    const fileBuffer: string = await readFileAsync("src/settings/questions.json", { encoding: "utf8" });
+    sections = JSON.parse(fileBuffer).sections;
+    // Handle non-exception-throwing cases
+    if (!sections && typeof sections !== "object") {
+      throw "Failed to parse JSON";
+    }
+  } catch (err) {
+    throw "Failed to load questions";
+  }
+  const applicationSections: Sections = new Sections(sections);
+  cache.set(Sections.name, applicationSections);
+
+  console.log("Done loading settings!");
 };
 
 const getSessionOptions = (app: Express): any => {

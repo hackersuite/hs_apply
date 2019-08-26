@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { homeRouter } from "./";
+import { Cache } from "../util/cache";
 
 /**
  * Top-level router for the app
  */
-export const mainRouter = (): Router => {
+export const mainRouter = (cache: Cache): Router => {
   const router = Router();
 
   router.use((req, res, next) => {
@@ -16,7 +17,7 @@ export const mainRouter = (): Router => {
   });
 
   // Requests to /*
-  router.use("/", homeRouter());
+  router.use("/", homeRouter(cache));
 
   return router;
 };

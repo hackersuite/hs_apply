@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { ApplicationController } from "../controllers";
+import { Cache } from "../util/cache";
 
-export const homeRouter = (): Router => {
+export const homeRouter = (cache: Cache): Router => {
 
   const router = Router();
-  const applicationController = new ApplicationController();
+  const applicationController = new ApplicationController(cache);
 
   router.get("/apply",
     applicationController.apply);
