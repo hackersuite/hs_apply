@@ -27,28 +27,41 @@
               </ul>
 
               <form id="applyForm">
-                <% sections.forEach((section, index) => { %>
+                <% sections.forEach((section, sectionIndex) => { %>
                 <div class="card apply-form-card">
                   <div class="card-header card-header-tabs card-header-primary">
                     <h2 class="card-title text-center"><%- section.name -%></h2>
                   </div>
                   <div class="card-body">
                     <div class="apply-form-section">
-                      <% section.questions.forEach(question => { %>
+                      <% section.questions.forEach((question, questionIndex) => { %>
+                        <% var currentID = `section${sectionIndex}-question${questionIndex}`; %>
                         <% if (question.answerType === "short") { %>
                         <div class="form-group">
-                          <label class="bmd-label-floating" for=""><%- question.questionText %></label>
-                          <input autocomplete="username" spellcheck="false" type="email" class="form-control" id="" placeholder="">
+                          <label class="bmd-label-floating" for="<%- currentID -%>"><%- question.questionText -%></label>
+                          <input autocomplete="username" spellcheck="false" type="text" class="form-control" id="<%- currentID -%>" placeholder="">
                         </div>
                         <% } else if (question.answerType == "long") { %>
                         <div class="form-group">
-                          <label class="bmd-label-floating" for=""><%- question.questionText %></label>
-                          <textarea class="form-control" id="" rows="3" placeholder=""></textarea>
+                          <label class="bmd-label-floating" for="<%- currentID -%>"><%- question.questionText -%></label>
+                          <textarea class="form-control" id="<%- currentID -%>" rows="3" placeholder=""></textarea>
                         </div>
                         <% } else if (question.answerType == "number") { %>
                         <div class="form-group">
-                          <label class="bmd-label-floating" for=""><%- question.questionText %></label>
-                          <input type="number" class="form-control" id="" placeholder="" min="0">
+                          <label class="bmd-label-floating" for="<%- currentID -%>"><%- question.questionText -%></label>
+                          <input type="number" class="form-control" id="<%- currentID -%>" placeholder="" min="0">
+                        </div>
+                        <% } else if (question.answerType == "dropdown") { %>
+                        <div class="form-group">
+                          <label for="<%- currentID -%>"><%- question.questionText -%></label>
+                          <select class="form-control selectpicker" data-style="btn btn-link" id="<%- currentID -%>">
+                            <option value="" selected disabled hidden></option>
+                            <% if (question.hasOwnProperty('answerOptions')) { %>
+                              <% question.answerOptions.forEach(multioption => { %>
+                              <option><%- multioption -%></option>
+                              <% }) %>
+                            <% } %>
+                          </select>
                         </div>
                         <% } else if (question.answerType == "tick") { %>
                         <div class="form-check">
@@ -62,10 +75,10 @@
                         </div>
                         <% } %>
                       <% }) %>
-                      <% if (index > 0 && index < sections.length) { %>
+                      <% if (sectionIndex > 0 && sectionIndex < sections.length) { %>
                         <input type="button" name="previous" class="btn btn-danger previous-form-stage" value="Previous" />
                       <% } %>
-                      <% if (index == sections.length - 1) { %>
+                      <% if (sectionIndex == sections.length - 1) { %>
                         <input type="button" name="submit" class="btn btn-success submit-form" value="Submit" />
                       <% } else { %>
                         <input type="button" name="next" class="btn btn-primary next-form-stage" value="Next" />
