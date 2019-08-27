@@ -127,26 +127,16 @@
   color: white;
 }
 
-
-/* Not relevant to this form */
-.dme_link {
-  margin-top: 30px;
-  text-align: center;
+/* Override the default colour styling for bootstrap dropdown - on show we make the text white*/
+.show>.btn.dropdown-toggle {
+  color: white !important;
 }
 
-.dme_link a {
-  background: #FFF;
-  font-weight: bold;
-  color: #ee0979;
-  border: 0 none;
-  border-radius: 25px;
-  cursor: pointer;
-  padding: 5px 25px;
-  font-size: 12px;
+.apply-form-radio-label {
+  display: block;
+  position: relative !important;
 }
 
-.dme_link a:hover,
-.dme_link a:focus {
-  background: #C5C5F1;
-  text-decoration: none;
+.apply-form-radio-input-other {
+  top: -7px;
 }
