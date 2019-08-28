@@ -92,6 +92,22 @@ $(".previous-form-stage").click(function () {
   });
 });
 
-$(".submit").click(function () {
-  return false;
+function checkFormStageInputs() {
+  var isValid = true;
+  $('input').filter('[required]').each(function () {
+    if ($(this).val() === '') {
+      $('#confirm').prop('disabled', true)
+      isValid = false;
+      return false;
+    }
+  });
+  if (isValid) {
+    $('#confirm').prop('disabled', false)
+  }
+  return isValid;
+}
+
+$(".next-form-stage").click(function () {
+  // Verify that the data has been filled in for the required fields
+
 })

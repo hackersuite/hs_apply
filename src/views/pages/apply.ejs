@@ -40,22 +40,22 @@
                         <% if (question.answerType === "short") { %>
                         <div class="form-group">
                           <label class="bmd-label-floating" for="<%- currentID -%>"><%- question.questionText -%></label>
-                          <input autocomplete="username" spellcheck="false" type="text" class="form-control" id="<%- currentID -%>" placeholder="">
+                          <input autocomplete="username" spellcheck="false" type="text" class="form-control" id="<%- currentID -%>" placeholder="" <%= question.required ? "required" : "" %>>
                         </div>
                         <% } else if (question.answerType == "long") { %>
                         <div class="form-group">
                           <label class="bmd-label-floating" for="<%- currentID -%>"><%- question.questionText -%></label>
-                          <textarea class="form-control" id="<%- currentID -%>" rows="3" placeholder=""></textarea>
+                          <textarea class="form-control" id="<%- currentID -%>" rows="3" placeholder="" <%= question.required ? "required" : "" %>></textarea>
                         </div>
                         <% } else if (question.answerType == "number") { %>
                         <div class="form-group">
                           <label class="bmd-label-floating" for="<%- currentID -%>"><%- question.questionText -%></label>
-                          <input type="number" class="form-control" id="<%- currentID -%>" placeholder="" min="0">
+                          <input type="number" class="form-control" id="<%- currentID -%>" placeholder="" min="0" <%= question.required ? "required" : "" %>>
                         </div>
                         <% } else if (question.answerType == "dropdown") { %>
                         <div class="form-group bmd-form-group">
                           <label for="<%- currentID -%>"><%- question.questionText -%></label>
-                          <select class="form-control selectpicker" id="<%- currentID -%>" data-style="btn btn-link" data-live-search="true" title="Choose one of the following...">
+                          <select class="form-control selectpicker" id="<%- currentID -%>" data-style="btn btn-link" data-live-search="true" title="Choose one of the following..." <%= question.required ? "required" : "" %>>
                             <% if (question.hasOwnProperty('answerOptions')) { %>
                               <% question.answerOptions.forEach(multioption => { %>
                               <option><%- multioption -%></option>
@@ -70,7 +70,7 @@
                             <% question.answerOptions.forEach((multiradio, index) => { %>
                               <div class="form-check form-check-radio">
                                 <label class="form-check-label">
-                                    <input class="form-check-input" type="radio" name="<%- currentID -%>">
+                                    <input class="form-check-input" type="radio" name="<%- currentID -%>" <%= question.required ? "required" : "" %>>
                                     <%- multiradio -%>
                                     <span class="circle">
                                         <span class="check"></span>
@@ -99,7 +99,7 @@
                         <% } else if (question.answerType == "tick") { %>
                         <div class="form-check">
                           <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" value="">
+                            <input class="form-check-input" type="checkbox" value="" <%= question.required ? "required" : "" %>>
                             <%- question.questionText -%>
                             <span class="form-check-sign">
                               <span class="check"></span>
