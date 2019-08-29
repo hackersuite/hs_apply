@@ -10,5 +10,8 @@ export const homeRouter = (cache: Cache): Router => {
   router.get("/apply",
     applicationController.apply);
 
+  router.post("/submitApplication",
+    applicationController.submitApplication);
+
   return router;
 };

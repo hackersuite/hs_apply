@@ -20,18 +20,18 @@
               <ul id="progressbar">
                 <% sections.forEach((section, index) => { %>
                 <% if (index == 0) { %>
-                <li class="active"><%- section.name -%> </li>
+                <li class="active"><%= section.name %> </li>
                 <% } else { %>
-                <li><%- section.name -%> </li>
+                <li><%= section.name %> </li>
                 <% } %>
                 <% }) %>
               </ul>
 
-              <form id="applyForm">
+              <form id="applyForm" action="/submitApplication" method="post">
                 <% sections.forEach((section, sectionIndex) => { %>
                 <div class="card apply-form-card">
                   <div class="card-header card-header-tabs card-header-primary">
-                    <h2 class="card-title text-center"><%- section.name -%></h2>
+                    <h2 class="card-title text-center"><%= section.name %></h2>
                   </div>
                   <div class="card-body">
                     <div class="apply-form-section">
@@ -39,41 +39,41 @@
                         <% var currentID = `section${sectionIndex}-question${questionIndex}`; %>
                         <% if (question.answerType === "short") { %>
                         <div class="form-group">
-                          <label class="bmd-label-floating" for="<%- currentID -%>"><%- question.questionText -%></label>
-                          <input autocomplete="username" spellcheck="false" type="text" class="form-control" id="<%- currentID -%>" placeholder="" <%= question.required ? "required" : "" %>>
+                          <label class="bmd-label-floating" for="<%= currentID %>"><%= question.questionText %></label>
+                          <input autocomplete="false" spellcheck="false" type="text" class="form-control" for="<%= currentID %>" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
                         </div>
                         <% } else if (question.answerType == "long") { %>
                         <div class="form-group">
-                          <label class="bmd-label-floating" for="<%- currentID -%>"><%- question.questionText -%></label>
-                          <textarea class="form-control" id="<%- currentID -%>" rows="3" placeholder="" <%= question.required ? "required" : "" %>></textarea>
+                          <label class="bmd-label-floating" for="<%= currentID %>"><%= question.questionText %></label>
+                          <textarea class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" rows="3" <%= question.required ? "required" : "" %>></textarea>
                         </div>
                         <% } else if (question.answerType == "number") { %>
                         <div class="form-group">
-                          <label class="bmd-label-floating" for="<%- currentID -%>"><%- question.questionText -%></label>
-                          <input type="number" class="form-control" id="<%- currentID -%>" placeholder="" min="0" <%= question.required ? "required" : "" %>>
+                          <label class="bmd-label-floating" for="<%= currentID %>"><%= question.questionText %></label>
+                          <input type="number" class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" min="0" <%= question.required ? "required" : "" %>>
                         </div>
                         <% } else if (question.answerType == "dropdown") { %>
                         <div class="form-group bmd-form-group">
-                          <label for="<%- currentID -%>"><%- question.questionText -%></label>
-                          <select class="form-control selectpicker" id="<%- currentID -%>" data-style="btn btn-link" data-live-search="true" title="Choose one of the following..." <%= question.required ? "required" : "" %>>
+                          <label for="<%= currentID %>"><%= question.questionText %></label>
+                          <select class="form-control selectpicker" id="<%= currentID %>" name="<%= question.questionName %>" data-style="btn btn-link" data-live-search="true" title="Choose one of the following..." <%= question.required ? "required" : "" %>>
                             <% if (question.hasOwnProperty('answerOptions')) { %>
                               <% question.answerOptions.forEach(multioption => { %>
-                              <option><%- multioption -%></option>
+                              <option><%= multioption %></option>
                               <% }) %>
                             <% } %>
                           </select>
                         </div>
                         <% } else if (question.answerType == "radio") { %>
                           <div class="form-group bmd-form-group">
-                            <label class="apply-form-radio-label"><%- question.questionText -%></label>
+                            <label class="apply-form-radio-label"><%= question.questionText %></label>
                           <% if (question.hasOwnProperty('answerOptions')) { %>
                             <% question.answerOptions.forEach((multiradio, index) => { %>
                               <div class="form-check form-check-radio">
                                 <label class="form-check-label">
-                                    <input class="form-check-input" type="radio" name="<%- currentID -%>" <%= question.required ? "required" : "" %>>
-                                    <%- multiradio -%>
+                                    <input class="form-check-input" type="radio" name="<%= question.questionName %>" value="<%= multiradio %>" <%= question.required ? "required" : "" %>>
+                                    <%= multiradio %>
                                     <span class="circle">
-                                        <span class="check"></span>
+                                      <span class="check"></span>
                                     </span>
                                 </label>
                               </div>
@@ -82,7 +82,7 @@
                               <div class="form-row">
                                 <div class="col-auto">
                                   <label class="form-check-label">
-                                      <input class="form-check-input" type="radio" name="<%- currentID -%>" id="<%- `${currentID}` -%>-radio-other">
+                                      <input class="form-check-input" type="radio" name="<%= question.questionName %>" id="<%= `${currentID}` %>-radio-other">
                                       Other
                                       <span class="circle">
                                           <span class="check"></span>
@@ -90,7 +90,7 @@
                                   </label>
                                 </div>
                                 <div class="col-auto apply-form-radio-input-other">
-                                  <input class="form-control" type="text" name="<%- currentID -%>-radio-other-input" placeholder="Please specify"/>
+                                  <input class="form-control" type="text" name="<%= question.questionName %>" placeholder="Please specify"/>
                                 </div>
                               </div>
                             </div>
@@ -99,8 +99,8 @@
                         <% } else if (question.answerType == "tick") { %>
                         <div class="form-check">
                           <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" value="" <%= question.required ? "required" : "" %>>
-                            <%- question.questionText -%>
+                            <input class="form-check-input" type="checkbox" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
+                            <%= question.questionText %>
                             <span class="form-check-sign">
                               <span class="check"></span>
                             </span>
@@ -112,7 +112,7 @@
                         <input type="button" name="previous" class="btn btn-danger previous-form-stage" value="Previous" />
                       <% } %>
                       <% if (sectionIndex == sections.length - 1) { %>
-                        <input type="button" name="submit" class="btn btn-success submit-form" value="Submit" />
+                        <input type="submit" name="submit" class="btn btn-success submit-form" value="Submit" />
                       <% } else { %>
                         <input type="button" name="next" class="btn btn-primary next-form-stage" value="Next" />
                       <% } %>

@@ -2,16 +2,19 @@
   "sections": [{
       "name": "Basic Information",
       "questions": [{
-          "questionText": "Tell us your name",
+          "questionName": "applicantName",
+          "questionText": "What is your name?",
           "answerType": "short",
           "required": true
         },
         {
+          "questionName": "applicantAge",
           "questionText": "How old are you?",
           "answerType": "number",
           "required": true
         },
         {
+          "questionName": "applicantGender",
           "questionText": "What gender do you identify as?",
           "answerType": "radio",
           "answerOptions": [
@@ -21,6 +24,7 @@
           "required": true
         },
         {
+          "questionName": "applicantNationality",
           "questionText": "What’s your nationality?",
           "answerType": "dropdown",
           "answerOptions": [
@@ -221,6 +225,7 @@
           "required": false
         },
         {
+          "questionName": "applicantCountry",
           "questionText": "What country are you traveling from?",
           "answerType": "dropdown",
           "answerOptions": [
@@ -471,21 +476,25 @@
           "required": true
         },
         {
+          "questionName": "applicantCity",
           "questionText": "What city are you traveling from?",
           "answerType": "short",
           "required": true
         },
         {
+          "questionName": "applicantUniversity",
           "questionText": "What university will you represent?",
           "answerType": "short",
           "required": true
         },
         {
+          "questionName": "applicantStudyYear",
           "questionText": "Which year of study are you in?",
           "answerType": "short",
           "required": true
         },
         {
+          "questionName": "applicantCV",
           "questionText": "Attach your CV here",
           "answerType": "file",
           "required": false
@@ -495,6 +504,7 @@
     {
       "name": "Your past experience",
       "questions": [{
+          "questionName": "applicantWorkArea",
           "questionText": "Which of the following define you best?",
           "answerType": "radio",
           "answerOptions": [
@@ -506,26 +516,31 @@
           "required": false
         },
         {
+          "questionName": "applicantSkills",
           "questionText": "List down your top 3 skills",
           "answerType": "short",
           "required": false
         },
         {
+          "questionName": "applicantHackathonCount",
           "questionText": "How many hackathons have you participated in?",
           "answerType": "number",
           "required": false
         },
         {
+          "questionName": "applicantWhyChoose",
           "questionText": "Why do you want to come and why should we choose you?",
           "answerType": "long",
           "required": false
         },
         {
+          "questionName": "applicantPastProj",
           "questionText": "Tell us about any projects you have worked on (they need not be technical/CS related)",
           "answerType": "long",
           "required": false
         },
         {
+          "questionName": "applicantHardwareReq",
           "questionText": "What hardware would you like to have available at the hackathon?",
           "answerType": "long",
           "required": false
@@ -535,6 +550,7 @@
     {
       "name": "Help us make it better!",
       "questions": [{
+          "questionName": "applicantHearAbout",
           "questionText": "How did you hear about <hackathon-name>?",
           "answerType": "multi",
           "answerOptions": [
@@ -547,9 +563,11 @@
           "required": false
         },
         {
+          "questionName": "applicantDietaryRequirements",
           "questionText": "Dietary Requirements",
           "answerType": "radio",
           "answerOptions": [
+            "None",
             "Vegan",
             "Vegetarian",
             "Lactose-free",
@@ -559,6 +577,7 @@
           "required": true
         },
         {
+          "questionName": "applicantTShirt",
           "questionText": "T-shirt Size (Unisex Sizing)",
           "answerType": "dropdown",
           "answerOptions": [
@@ -572,13 +591,16 @@
           "required": true
         },
         {
+          "questionName": "applicantAcceptDataSharing",
           "questionText": "Acceptance of Data sharing with Companies",
           "answerType": "tick",
           "required": true
         },
         {
+          "questionName": "applicantCodeConduct",
           "questionText": "Code of conduct",
-          "answerType": "tick"
+          "answerType": "tick",
+          "required": true
         }
       ]
     }

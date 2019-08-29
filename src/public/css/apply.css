@@ -74,6 +74,7 @@
   overflow: hidden;
   /*CSS counters to number the steps*/
   counter-reset: step;
+  padding-inline-start: 0;
 }
 
 #progressbar li {

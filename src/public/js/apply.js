@@ -109,5 +109,9 @@ function checkFormStageInputs() {
 
 $(".next-form-stage").click(function () {
   // Verify that the data has been filled in for the required fields
-
+  $(this).parent().find("input").filter("[required]").each(function () {
+    if (!$(this).checkValidity()) {
+      return false;
+    }
+  });
 })
