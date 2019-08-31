@@ -1,17 +1,27 @@
 import { Router } from "express";
 import { ApplicationController } from "../controllers";
-import { Cache } from "../util/cache";
+import { injectable, inject } from "inversify";
+import { IRouter } from "./registerableRouter";
+import { TYPES } from "../types";
 
-export const homeRouter = (cache: Cache): Router => {
+@injectable()
+export class HomeRouter implements IRouter {
+  @inject(TYPES.ApplicationController)
+  private applicationController: ApplicationController;
 
-  const router = Router();
-  const applicationController = new ApplicationController(cache);
+  public getPathRoot(): string {
+    return "/";
+  }
 
-  router.get("/apply",
-    applicationController.apply);
+  public register(): Router {
+    const router: Router = Router();
 
-  router.post("/submitApplication",
-    applicationController.submitApplication);
+    router.get("/apply",
+      this.applicationController.apply);
 
-  return router;
-};
+    router.post("/submitApplication",
+      this.applicationController.submitApplication);
+
+    return router;
+  }
+}

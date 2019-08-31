@@ -1,17 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import { IApplicationSection } from "../settings";
 import { Cache } from "../util/cache";
 import { Sections } from "../models/sections";
+import { inject, injectable } from "inversify";
+import { TYPES } from "../types";
 
 /**
  * A controller for application methods
  */
+@injectable()
 export class ApplicationController {
+  @inject(TYPES.Cache)
   private cache: Cache;
-
-  constructor(_cache: Cache) {
-    this.cache = _cache;
-  }
 
   public apply = (req: Request, res: Response, next: NextFunction) => {
     const cachedSections: Array<Sections> = this.cache.getAll(Sections.name);

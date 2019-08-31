@@ -1,2 +1,2 @@
 export * from "./homeRouter";
-export * from "./mainRouter";
+export * from "./registerableRouter";

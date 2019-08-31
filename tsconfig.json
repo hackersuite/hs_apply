@@ -2,8 +2,10 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2016",
+    "lib": ["es2016"],
     "noImplicitAny": false,
     "outDir": "dist",
+    "types": ["reflect-metadata"],
     "inlineSourceMap": true,
     "inlineSources": true,
     "emitDecoratorMetadata": true,
