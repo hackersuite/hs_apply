@@ -1,6 +1,8 @@
-export interface IApplicationRepository {
+import { Applicant } from "../models/db";
+import { BaseRepository } from "./baseRepository";
+import { injectable } from "inversify";
 
-}
-
-export class ApplicationRepository implements IApplicationRepository {
+@injectable()
+export class ApplicationRepository extends BaseRepository<Applicant> {
+  constructor() { super(Applicant); }
 }

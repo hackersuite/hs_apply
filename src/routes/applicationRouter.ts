@@ -5,22 +5,27 @@ import { IRouter } from "./registerableRouter";
 import { TYPES } from "../types";
 
 @injectable()
-export class HomeRouter implements IRouter {
-  @inject(TYPES.ApplicationController)
-  private applicationController: ApplicationController;
+export class ApplicationRouter implements IRouter {
+  private _applicationController: ApplicationController;
+
+  public constructor(
+    @inject(TYPES.ApplicationController) applicationController: ApplicationController
+  ) {
+    this._applicationController = applicationController;
+  }
 
   public getPathRoot(): string {
-    return "/";
+    return "/apply";
   }
 
   public register(): Router {
     const router: Router = Router();
 
-    router.get("/apply",
-      this.applicationController.apply);
+    router.get("/",
+      this._applicationController.apply);
 
-    router.post("/submitApplication",
-      this.applicationController.submitApplication);
+    router.post("/",
+      this._applicationController.submitApplication);
 
     return router;
   }

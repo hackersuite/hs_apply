@@ -3,20 +3,28 @@ import { TYPES } from "./types";
 
 // Applicants
 import { IApplicationService, ApplicationService } from "./services";
-import { IApplicationRepository, ApplicationRepository } from "./repositories";
+import { IApplicationController, ApplicationController } from "./controllers";
+import { ApplicationRepository } from "./repositories";
 
-import { IRouter, HomeRouter } from "./routes";
+// Dashboard
+import { IDashboardController, DashboardController } from "./controllers";
 
+import { IRouter, ApplicationRouter, DashboardRouter } from "./routes";
 import { ICache, Cache } from "./util/cache";
-import { ApplicationController } from "./controllers";
 
 const container = new Container();
-container.bind<IRouter>(TYPES.Router).to(HomeRouter);
 
+// Routers
+container.bind<IRouter>(TYPES.Router).to(ApplicationRouter);
+container.bind<IRouter>(TYPES.Router).to(DashboardRouter);
+
+// Applications
 container.bind<IApplicationService>(TYPES.ApplicationService).to(ApplicationService);
-container.bind<IApplicationRepository>(TYPES.ApplicationRepository).to(ApplicationRepository);
+container.bind<IApplicationController>(TYPES.ApplicationController).to(ApplicationController);
+container.bind<ApplicationRepository>(TYPES.ApplicationRepository).to(ApplicationRepository);
 
-container.bind<ApplicationController>(TYPES.ApplicationController).to(ApplicationController);
+// Dashboard
+container.bind<IDashboardController>(TYPES.DashboardController).to(DashboardController);
 
 container.bind<ICache>(TYPES.Cache).toConstantValue(new Cache());
 

@@ -27,7 +27,7 @@
                 <% }) %>
               </ul>
 
-              <form id="applyForm" action="/submitApplication" method="post">
+              <form id="applyForm" action="/apply" method="post">
                 <% sections.forEach((section, sectionIndex) => { %>
                 <div class="card apply-form-card">
                   <div class="card-header card-header-tabs card-header-primary">
@@ -82,7 +82,7 @@
                               <div class="form-row">
                                 <div class="col-auto">
                                   <label class="form-check-label">
-                                      <input class="form-check-input" type="radio" name="<%= question.questionName %>" id="<%= `${currentID}` %>-radio-other">
+                                      <input class="form-check-input" type="radio" name="<%= question.questionName %>" value="Other" id="<%= `${currentID}` %>-radio-other">
                                       Other
                                       <span class="circle">
                                           <span class="check"></span>
@@ -90,7 +90,7 @@
                                   </label>
                                 </div>
                                 <div class="col-auto apply-form-radio-input-other">
-                                  <input class="form-control" type="text" name="<%= question.questionName %>" placeholder="Please specify"/>
+                                  <input class="form-control" type="text" name="<%= question.questionName %>Other" placeholder="Please specify"/>
                                 </div>
                               </div>
                             </div>

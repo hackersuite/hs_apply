@@ -1,1 +1,1 @@
-export * from "./applicationRepository";
+export * from "./repositories";

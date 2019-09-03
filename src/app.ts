@@ -9,12 +9,14 @@ import * as expressSession from "express-session";
 import * as cookieParser from "cookie-parser";
 import { IApplicationSection } from "./settings";
 import { Express, Request, Response, NextFunction } from "express";
+import { ConnectionOptions, createConnections, Connection } from "typeorm";
 import { IRouter } from "./routes";
 import { Cache } from "./util/cache";
 import { promisify } from "util";
 import { Sections } from "./models/sections";
 import { TYPES } from "./types";
 import container from "./inversify.config";
+import { error404Handler, errorHandler } from "./util/errorHandling";
 
 // Load environment variables from .env file
 dotenv.config({ path: ".env" });
@@ -26,23 +28,40 @@ export class App {
   public async buildApp(callback: (app: Express, err?: Error) => void): Promise<void> {
     const app: Express = this.expressSetup();
 
+    // Set up express middleware for request routing
     this.middlewareSetup(app);
-
     this.devMiddlewareSetup(app);
-
-    // Set up passport
-    this.passportSetup(app);
-
-    // Routes set up
-    const routers: IRouter[] = container.getAll(TYPES.Router);
-    routers.forEach((router) => {
-      app.use(router.getPathRoot(), router.register());
-    });
 
     // Load the hackathon application settings from disk
     await this.loadApplicationSettings();
 
-    return callback(app);
+    // Connecting to database
+    const databaseConnectionSettings: ConnectionOptions[] = this.createDatabaseSettings();
+    createConnections(databaseConnectionSettings).then(async (connections: Connection[]) => {
+      connections.forEach(element => {
+        console.log("  Connection to database (" + element.name + ") established.");
+      });
+
+      // Routes set up for express, resolving dependencies
+      // This is performed after successful DB connection since some routers use TypeORM repositories in their DI
+      const routers: IRouter[] = container.getAll(TYPES.Router);
+      routers.forEach((router) => {
+        app.use(router.getPathRoot(), router.register());
+      });
+
+      // Setting up error handlers
+      app.use(error404Handler);
+      app.use(errorHandler);
+
+      // Set up passport for authentication
+      this.passportSetup(app);
+
+      return callback(app);
+    }).catch((err: any) => {
+      console.error("  Could not connect to database");
+      console.error(err);
+      return callback(app, err);
+    });
   }
 
   /**
@@ -156,6 +175,22 @@ export class App {
         maxAge: 2419200000
       }
     };
+  };
+
+  private createDatabaseSettings = (): ConnectionOptions[] => {
+    return [{
+      name: "applications",
+      type: "mysql",
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      entities: [
+        __dirname + "/models/db/*{.js,.ts}"
+      ],
+      synchronize: true
+    }];
   };
 
 }
