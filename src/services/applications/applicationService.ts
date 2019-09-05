@@ -19,7 +19,7 @@ export class ApplicationService implements IApplicationService {
   public constructor(
     @inject(TYPES.ApplicationRepository) applicationRepository: ApplicationRepository
   ) {
-    this._applicationRepository = applicationRepository.repository;
+    this._applicationRepository = applicationRepository.getRepository();
   }
 
   public getAll = async (): Promise<Applicant[]> => {
@@ -29,11 +29,11 @@ export class ApplicationService implements IApplicationService {
     return await this._applicationRepository.findOne(id);
   }
   public save = async (newApplicants: Applicant[]): Promise<Applicant[]> => {
-    let savedApplicants: Applicant[];
     try {
-      savedApplicants = await this._applicationRepository.save(newApplicants);
-    } catch {}
-    return savedApplicants;
+      return await this._applicationRepository.save(newApplicants);
+    } catch (err) {
+      throw new Error("Failed to save applicant");
+    }
   }
 
 }
