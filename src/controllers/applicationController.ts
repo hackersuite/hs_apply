@@ -76,10 +76,9 @@ export class ApplicationController {
     newApplication.dietaryRequirements = applicantDietaryRequirements === "Other" ? applicantDietaryRequirementsOther : applicantDietaryRequirements;
     newApplication.tShirtSize = applicantTShirt;
 
-    // Validate the new applicant using class-validation and fail if there is an error
-    // Hide the target in the report for nicer error messages
+    let createdApplication: Applicant;
     try {
-      await validateOrReject(newApplication, { validationError: { target: false } });
+      createdApplication = await this._applicationService.save(newApplication);
     } catch (errors) {
       return res.status(HttpResponseCode.BAD_REQUEST)
         .send({
@@ -87,7 +86,6 @@ export class ApplicationController {
           message: "Could not create application!"
         });
     }
-    const createdApplication = await this._applicationService.save([newApplication]);
     res.send(createdApplication);
   };
 }
