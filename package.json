@@ -22,6 +22,14 @@
       "ts-node/register"
     ]
   },
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "check-coverage": true,
+    "reporter": [
+      "text",
+      "lcov"
+    ]
+  },
   "repository": {
     "type": "GitHub",
     "url": "https://github.com/unicsmcr/hs_application/tree/master"
