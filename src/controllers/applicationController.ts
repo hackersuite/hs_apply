@@ -5,7 +5,6 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { ApplicationService } from "../services";
 import { Applicant } from "../models/db";
-import { validateOrReject } from "class-validator";
 import { HttpResponseCode } from "../util/errorHandling";
 
 export interface IApplicationController {

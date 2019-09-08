@@ -25,7 +25,7 @@ export class App {
   private readonly readFileAsync = promisify(fs.readFile);
   private readonly cache: Cache = container.get(TYPES.Cache);
 
-  public async buildApp(callback: (app: Express, err?: Error) => void): Promise<void> {
+  public async buildApp(callback: (app: Express, err?: Error) => void, connectionOptions?: ConnectionOptions[]): Promise<void> {
     const app: Express = this.expressSetup();
 
     // Set up express middleware for request routing
@@ -36,7 +36,8 @@ export class App {
     await this.loadApplicationSettings();
 
     // Connecting to database
-    const databaseConnectionSettings: ConnectionOptions[] = this.createDatabaseSettings();
+    const databaseConnectionSettings: ConnectionOptions[] = connectionOptions || this.createDatabaseSettings();
+
     createConnections(databaseConnectionSettings).then(async (connections: Connection[]) => {
       connections.forEach(element => {
         console.log("  Connection to database (" + element.name + ") established.");

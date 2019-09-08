@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/unicsmcr/hs_application.svg?branch=master)](https://travis-ci.org/unicsmcr/hs_hub)
 ![GitHub](https://img.shields.io/github/license/unicsmcr/hs_application.svg)
+[![codecov](https://codecov.io/gh/unicsmcr/hs_application/branch/master/graph/badge.svg)](https://codecov.io/gh/unicsmcr/hs_application)
 
 ## Dependencies
 
