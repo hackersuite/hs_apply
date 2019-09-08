@@ -4,18 +4,10 @@ import { App } from "../../src/app";
 import { Express } from "express";
 import { initEnv, getTestDatabaseOptions } from "../util/testUtils";
 import { HttpResponseCode } from "../../src/util/errorHandling";
-import { instance, mock, when, reset, anything } from "ts-mockito";
 import container from "../../src/inversify.config";
-import { TYPES } from "../../src/types";
-import { Cache } from "../../src/util/cache";
-import { ApplicationService } from "../../src/services";
-import { Sections } from "../../src/models/sections";
 import { Applicant } from "../../src/models/db";
 
 let bApp: Express;
-let mockCache: Cache;
-let mockApplicationService: ApplicationService;
-
 const newApplicantRequest: any = {
   applicantName: "test",
   applicantAge: 20,
@@ -52,16 +44,12 @@ const testApplicant: Applicant = {
   yearOfStudy: "Foundation",
   workArea: "This",
   hackathonCount: 0,
-  dietaryRequirements: "None",
+  dietaryRequirements: "Test",
   tShirtSize: "M"
 };
 
 test.before.cb(t => {
   initEnv();
-  mockCache = mock(Cache);
-  mockApplicationService = mock(ApplicationService);
-  container.rebind(TYPES.Cache).toConstantValue(instance(mockCache));
-  container.rebind(TYPES.ApplicationService).toConstantValue(instance(mockApplicationService));
 
   new App().buildApp(async (builtApp: Express, err: Error): Promise<void> => {
     if (err) {
@@ -79,52 +67,20 @@ test.beforeEach(t => {
 });
 
 test.afterEach(t => {
-  // Reset the mocks
-  reset(mockCache);
-  reset(mockApplicationService);
-
   // Restore to last snapshot so each unit test takes a clean copy of the application container
   container.restore();
 });
 
-test("Test that the application page loads", async t => {
-  // Mock out the cache -- dont load in the real questions
-  when(mockCache.getAll(Sections.name))
-    .thenReturn([new Sections([])]);
-
+test("Test 404 page provided when invalid URL", async t => {
   // Perform the request along .../apply
   const response = await request(bApp)
-    .get("/apply");
+    .get("/invalidpage-url-123");
 
   // Check that we get a OK (200) response code
   t.is(response.status, HttpResponseCode.OK);
 });
 
-test.serial("Test applicant created with valid request", async t => {
-  when(mockApplicationService.save(anything()))
-    .thenResolve(testApplicant);
-
-  // Perform the request along .../apply
-  const response = await request(bApp)
-    .post("/apply")
-    .send({
-      ...newApplicantRequest,
-      applicantWorkArea: "Work Area",
-      applicantWorkAreaOther: "",
-      applicantGender: "Gender",
-      applicantGenderOther: "",
-      applicantDietaryRequirements: "Other",
-      applicantDietaryRequirementsOther: "Dietary Req"
-    });
-
-  // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
-});
-
-test.serial("Test applicant created with valid request (using Other input options)", async t => {
-  when(mockApplicationService.save(anything()))
-    .thenResolve(testApplicant);
-
+test("Test applicant created with valid request", async t => {
   // Perform the request along .../apply
   const response = await request(bApp)
     .post("/apply")
@@ -132,18 +88,7 @@ test.serial("Test applicant created with valid request (using Other input option
 
   // Check that we get a OK (200) response code
   t.is(response.status, HttpResponseCode.OK);
-});
-
-test.serial("Test applicant not created with invalid input", async t => {
-  when(mockApplicationService.save(anything()))
-    .thenReject(new Error(""));
-
-  // Perform the request along .../apply
-  const response = await request(bApp)
-    .post("/apply")
-    .send(newApplicantRequest);
-
-  // Check that we get a BAD_REQUEST (400) response code
-  t.is(response.status, HttpResponseCode.BAD_REQUEST);
-  t.is(response.body.error, true);
+  t.truthy(response.body.id);
+  testApplicant.id = response.body.id;
+  t.deepEqual(response.body, testApplicant);
 });

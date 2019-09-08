@@ -1,13 +1,13 @@
 import test from "ava";
 import * as request from "supertest";
-import { App } from "../../../src/app";
+import { App } from "../../src/app";
 import { Express } from "express";
-import { initEnv, getTestDatabaseOptions } from "../../util/testUtils";
-import { HttpResponseCode } from "../../../src/util/errorHandling";
+import { initEnv, getTestDatabaseOptions } from "../util/testUtils";
+import { HttpResponseCode } from "../../src/util/errorHandling";
 import { instance, mock, reset } from "ts-mockito";
-import container from "../../../src/inversify.config";
-import { TYPES } from "../../../src/types";
-import { Cache } from "../../../src/util/cache";
+import container from "../../src/inversify.config";
+import { TYPES } from "../../src/types";
+import { Cache } from "../../src/util/cache";
 
 let bApp: Express;
 let mockCache: Cache;
