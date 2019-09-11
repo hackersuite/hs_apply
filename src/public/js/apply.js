@@ -107,11 +107,41 @@ function checkFormStageInputs() {
   return isValid;
 }
 
-$(".next-form-stage").click(function () {
-  // Verify that the data has been filled in for the required fields
-  $(this).parent().find("input").filter("[required]").each(function () {
-    if (!$(this).checkValidity()) {
-      return false;
+// $(".next-form-stage").click(function () {
+//   // Verify that the data has been filled in for the required fields
+//   $(this).parent().find("input").filter("[required]").each(function () {
+//     if (!$(this).checkValidity()) {
+//       return false;
+//     }
+//   });
+// });
+
+// $(".custom-file").on("change", function() {
+//   var fileName = $(this).val().split("\\").pop();
+//   $(this).siblings(".custom-file").addClass("selected").html(fileName);
+// });
+
+function fileChanged() {
+  if (this.files[0].size > 5 * (1 << 20)) {
+    // Notify the user the file chosen is invalid
+
+    $.notify({
+      message: "Maximum file size is 5 MB"
+    }, {
+      type: "danger"
+    });
+
+    // Remove the file from the input
+    $(this).val('');
+  } else {
+    // Add the file name to the input label
+    if ($(this).val()) {
+      var label = $(this).val().replace(/\\/g, '/').replace(/.*\//, '');
+      $('.custom-file-label').text(label);
     }
-  });
-})
+  }
+
+  // Reset the input value so a new file can be chosen (even with same name)
+  $(this).attr("value", "");
+}
+$(".custom-file-input").change(fileChanged);
