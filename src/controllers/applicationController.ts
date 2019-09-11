@@ -57,6 +57,7 @@ export class ApplicationController {
       applicantTShirt
     } = req.body;
 
+    // TODO: Rewrite this to make it easier to add more attributes
     const newApplication: Applicant = new Applicant();
     newApplication.name = applicantName;
     newApplication.age = Number(applicantAge);
@@ -68,16 +69,24 @@ export class ApplicationController {
     newApplication.yearOfStudy = applicantStudyYear;
     newApplication.workArea = applicantWorkArea === "Other" ? applicantWorkAreaOther : applicantWorkArea;
     newApplication.skills = applicantSkills;
-    newApplication.hackathonCount = Number(applicantHackathonCount);
+    newApplication.hackathonCount = Number.isInteger(applicantHackathonCount) ? Number.parseInt(applicantHackathonCount) : undefined;
     newApplication.whyChooseHacker = applicantWhyChoose;
     newApplication.pastProjects = applicantPastProj;
     newApplication.hardwareRequests = applicantHardwareReq;
     newApplication.dietaryRequirements = applicantDietaryRequirements === "Other" ? applicantDietaryRequirementsOther : applicantDietaryRequirements;
     newApplication.tShirtSize = applicantTShirt;
 
+    // Handling the CV file
+    let cvFile: Buffer;
+    if (req.files && req.files.length === 1 && req.files[0].fieldname === "applicantCV") {
+      // TODO: Change to <name>-<email>.<ext> when linked to hs_auth
+      newApplication.cv = `${newApplication.name}-${req.files[0].originalname}`;
+      cvFile = req.files[0].buffer;
+    }
+
     let createdApplication: Applicant;
     try {
-      createdApplication = await this._applicationService.save(newApplication);
+      createdApplication = await this._applicationService.save(newApplication, cvFile);
     } catch (errors) {
       return res.status(HttpResponseCode.BAD_REQUEST)
         .send({

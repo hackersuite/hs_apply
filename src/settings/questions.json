@@ -495,7 +495,7 @@
         },
         {
           "questionName": "applicantCV",
-          "questionText": "Attach your CV here",
+          "questionText": "Attach your CV (Maximum 5 MB file)",
           "answerType": "file",
           "required": false
         }
