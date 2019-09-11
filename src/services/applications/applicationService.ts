@@ -72,14 +72,9 @@ export class ApplicationService implements IApplicationService {
     }
   };
 
-  private saveToDropbox = async (
-    fileName: string,
-    file: Buffer
-  ): Promise<string> => {
+  private saveToDropbox = async (fileName: string, file: Buffer): Promise<string> => {
     if (!process.env.DROPBOX_API_TOKEN)
-      throw new Error(
-        "Failed to upload CV to Dropbox, set DROPBOX_API_TOKEN env correctly."
-      );
+      throw new Error("Failed to upload CV to Dropbox, set dropbox envs correctly");
 
     const result = await request.post("https://content.dropboxapi.com/2/files/upload", {
       headers: {

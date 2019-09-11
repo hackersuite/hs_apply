@@ -17,36 +17,27 @@ const newApplicantRequest: any = {
   applicantCountry: "UK",
   applicantCity: "Manchester",
   applicantUniversity: "UoM",
-  applicantSkills: "",
-  applicantWhyChoose: "",
-  applicantPastProj: "",
-  applicantHardwareReq: "",
   applicantStudyYear: "Foundation",
   applicantWorkArea: "Other",
   applicantWorkAreaOther: "This",
   applicantHackathonCount: 0,
-  applicantDietaryRequirements: "Test",
+  applicantDietaryRequirements: "None",
   applicantTShirt: "M"
 };
-const testApplicant: Applicant = {
-  id: undefined,
-  name: "test",
-  age: 20,
-  gender: "Test",
-  nationality: "UK",
-  country: "UK",
-  city: "Manchester",
-  university: "UoM",
-  skills: "",
-  whyChooseHacker: "",
-  pastProjects: "",
-  hardwareRequests: "",
-  yearOfStudy: "Foundation",
-  workArea: "This",
-  hackathonCount: 0,
-  dietaryRequirements: "Test",
-  tShirtSize: "M"
-};
+
+const testApplicant: Applicant = new Applicant();
+testApplicant.name = "test";
+testApplicant.age = 20;
+testApplicant.gender = "Test";
+testApplicant.nationality = "UK";
+testApplicant.country = "UK";
+testApplicant.city = "Manchester";
+testApplicant.university = "UoM";
+testApplicant.yearOfStudy = "Foundation";
+testApplicant.workArea = "This";
+testApplicant.hackathonCount = 0;
+testApplicant.dietaryRequirements = "None";
+testApplicant.tShirtSize = "M";
 
 test.before.cb(t => {
   initEnv();
@@ -90,5 +81,9 @@ test("Test applicant created with valid request", async t => {
   t.is(response.status, HttpResponseCode.OK);
   t.truthy(response.body.id);
   testApplicant.id = response.body.id;
-  t.deepEqual(response.body, testApplicant);
+
+  // Remove all null properties before comparison
+  Object.keys(response.body).forEach((key) => (response.body[key] == null) && delete response.body[key]);
+
+  t.deepEqual(response.body, { ...testApplicant });
 });

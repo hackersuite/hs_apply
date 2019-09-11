@@ -25,36 +25,27 @@ const newApplicantRequest: any = {
   applicantCountry: "UK",
   applicantCity: "Manchester",
   applicantUniversity: "UoM",
-  applicantSkills: "",
-  applicantWhyChoose: "",
-  applicantPastProj: "",
-  applicantHardwareReq: "",
   applicantStudyYear: "Foundation",
   applicantWorkArea: "Other",
   applicantWorkAreaOther: "This",
   applicantHackathonCount: 0,
-  applicantDietaryRequirements: "Test",
+  applicantDietaryRequirements: "Other",
+  applicantDietaryRequirementsOther: "Test",
   applicantTShirt: "M"
 };
-const testApplicant: Applicant = {
-  id: undefined,
-  name: "test",
-  age: 20,
-  gender: "Test",
-  nationality: "UK",
-  country: "UK",
-  city: "Manchester",
-  university: "UoM",
-  skills: "",
-  whyChooseHacker: "",
-  pastProjects: "",
-  hardwareRequests: "",
-  yearOfStudy: "Foundation",
-  workArea: "This",
-  hackathonCount: 0,
-  dietaryRequirements: "None",
-  tShirtSize: "M"
-};
+const testApplicant: Applicant = new Applicant();
+testApplicant.name = "test";
+testApplicant.age = 20;
+testApplicant.gender = "Test";
+testApplicant.nationality = "UK";
+testApplicant.country = "UK";
+testApplicant.city = "Manchester";
+testApplicant.university = "UoM";
+testApplicant.yearOfStudy = "Foundation";
+testApplicant.workArea = "This";
+testApplicant.hackathonCount = 0;
+testApplicant.dietaryRequirements = "Test";
+testApplicant.tShirtSize = "M";
 
 test.before.cb(t => {
   initEnv();
@@ -101,7 +92,7 @@ test("Test that the application page loads", async t => {
 });
 
 test.serial("Test applicant created with valid request", async t => {
-  when(mockApplicationService.save(anything()))
+  when(mockApplicationService.save(anything(), anything()))
     .thenResolve(testApplicant);
 
   // Perform the request along .../apply
@@ -113,8 +104,8 @@ test.serial("Test applicant created with valid request", async t => {
       applicantWorkAreaOther: "",
       applicantGender: "Gender",
       applicantGenderOther: "",
-      applicantDietaryRequirements: "Other",
-      applicantDietaryRequirementsOther: "Dietary Req"
+      applicantDietaryRequirements: "Dietary Req",
+      applicantDietaryRequirementsOther: ""
     });
 
   // Check that we get a OK (200) response code
@@ -122,7 +113,7 @@ test.serial("Test applicant created with valid request", async t => {
 });
 
 test.serial("Test applicant created with valid request (using Other input options)", async t => {
-  when(mockApplicationService.save(anything()))
+  when(mockApplicationService.save(anything(), anything()))
     .thenResolve(testApplicant);
 
   // Perform the request along .../apply
@@ -135,7 +126,7 @@ test.serial("Test applicant created with valid request (using Other input option
 });
 
 test.serial("Test applicant not created with invalid input", async t => {
-  when(mockApplicationService.save(anything()))
+  when(mockApplicationService.save(anything(), anything()))
     .thenReject(new Error(""));
 
   // Perform the request along .../apply
@@ -146,4 +137,73 @@ test.serial("Test applicant not created with invalid input", async t => {
   // Check that we get a BAD_REQUEST (400) response code
   t.is(response.status, HttpResponseCode.BAD_REQUEST);
   t.is(response.body.error, true);
+  t.log(response.body.message);
+});
+
+test.serial("Test applicant not created with cv too large", async t => {
+  // Perform the request along .../apply
+  const response = await request(bApp)
+    .post("/apply")
+    .attach("applicantCV", Buffer.alloc(5 * (1 << 21)), "cv.pdf") // Create buffer of >5MB
+    .field(newApplicantRequest);
+
+  // Check that we get a BAD_REQUEST (400) response code
+  t.is(response.status, HttpResponseCode.BAD_REQUEST);
+  t.is(response.body.error, true);
+});
+
+
+test.serial("Test applicant not created with unsupported cv format", async t => {
+  // Perform the request along .../apply
+  const response = await request(bApp)
+    .post("/apply")
+    .attach("applicantCV", Buffer.from(""), "cv.txt")
+    .field(newApplicantRequest);
+
+  // Check that we get a BAD_REQUEST (400) response code
+  t.is(response.status, HttpResponseCode.BAD_REQUEST);
+  t.is(response.body.error, true);
+  t.log(response.body);
+});
+
+test.serial("Test applicant created with doc cv", async t => {
+  when(mockApplicationService.save(anything(), anything()))
+    .thenResolve(testApplicant);
+
+  // Perform the request along .../apply
+  const response = await request(bApp)
+    .post("/apply")
+    .attach("applicantCV", Buffer.from(""), "cv.doc")
+    .field(newApplicantRequest);
+
+  // Check that we get a OK (200) response code
+  t.is(response.status, HttpResponseCode.OK);
+});
+
+test.serial("Test applicant created with pdf cv", async t => {
+  when(mockApplicationService.save(anything(), anything()))
+    .thenResolve(testApplicant);
+
+  // Perform the request along .../apply
+  const response = await request(bApp)
+    .post("/apply")
+    .attach("applicantCV", Buffer.from(""), "cv.pdf")
+    .field(newApplicantRequest);
+
+  // Check that we get a OK (200) response code
+  t.is(response.status, HttpResponseCode.OK);
+});
+
+test.serial("Test applicant created with docx cv", async t => {
+  when(mockApplicationService.save(anything(), anything()))
+    .thenResolve(testApplicant);
+
+  // Perform the request along .../apply
+  const response = await request(bApp)
+    .post("/apply")
+    .attach("applicantCV", Buffer.from(""), "cv.docx")
+    .field(newApplicantRequest);
+
+  // Check that we get a OK (200) response code
+  t.is(response.status, HttpResponseCode.OK);
 });

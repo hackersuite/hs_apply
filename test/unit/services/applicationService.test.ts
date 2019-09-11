@@ -37,31 +37,21 @@ testApplicantFemale.country = "UK";
 testApplicantFemale.city = "Manchester";
 testApplicantFemale.university = "University of Manchester";
 testApplicantFemale.yearOfStudy = "1";
-testApplicantFemale.workArea = "";
-testApplicantFemale.skills = "";
 testApplicantFemale.hackathonCount = 0;
-testApplicantFemale.whyChooseHacker = "";
-testApplicantFemale.pastProjects = "";
-testApplicantFemale.hardwareRequests = "";
 testApplicantFemale.dietaryRequirements = "Halal";
 testApplicantFemale.tShirtSize = "M";
 
 const testApplicantInvalid: Applicant = new Applicant();
 testApplicantInvalid.id = "7479a451-e826-4271-8073-929ccef522ee";
 testApplicantInvalid.name = "Test";
-testApplicantInvalid.age = 0;
+testApplicantInvalid.age = -1;
 testApplicantInvalid.gender = "Female";
 testApplicantInvalid.nationality = "British";
 testApplicantInvalid.country = "UK";
 testApplicantInvalid.city = "Manchester";
 testApplicantInvalid.university = "University of Manchester";
 testApplicantInvalid.yearOfStudy = "1";
-testApplicantInvalid.workArea = "";
-testApplicantInvalid.skills = "";
 testApplicantInvalid.hackathonCount = 0;
-testApplicantInvalid.whyChooseHacker = "";
-testApplicantInvalid.pastProjects = "";
-testApplicantInvalid.hardwareRequests = "";
 testApplicantInvalid.dietaryRequirements = "Halal";
 testApplicantInvalid.tShirtSize = "M";
 
@@ -159,20 +149,28 @@ test("Test a single applicant can be created", async t => {
 });
 
 test("Test that error thrown when save fails", async t => {
-  const testApplicant: Applicant = testApplicantMale;
-
   // Simulate an error occuring in the database which causes an error to be thrown
-  when(mockApplicationRepository.save(testApplicant))
+  when(mockApplicationRepository.save(testApplicantMale))
     .thenReject(new Error());
 
-  const error: Error = await t.throwsAsync(applicationService.save(testApplicant));
+  const error: Error = await t.throwsAsync(applicationService.save(testApplicantMale));
   // Check the error actually is defined
   t.truthy(error);
-  verify(mockApplicationRepository.save(testApplicant)).once();
+  verify(mockApplicationRepository.save(testApplicantMale)).once();
 });
+
 test("Test that error thrown when applicant invalid", async t => {
   // Try and create the applicant and check for error
   const errors: Error = await t.throwsAsync(applicationService.save(testApplicantInvalid));
+
+  // Check the error actually is defined
+  t.truthy(errors);
+  verify(mockApplicationRepository.save(testApplicantInvalid)).never();
+});
+
+test("Test that error thrown when ENV not set for file upload", async t => {
+  // Try and create the applicant and check for error
+  const errors: Error = await t.throwsAsync(applicationService.save(testApplicantMale, Buffer.from("")));
 
   // Check the error actually is defined
   t.truthy(errors);
