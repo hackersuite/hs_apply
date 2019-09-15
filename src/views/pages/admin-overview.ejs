@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <% include ../partials/head.ejs %>
+  <link type="text/css" href="/css/admin.css" rel="stylesheet" />
+  <title>Applications | Admin</title>
+</head>
+
+<body>
+  <div class="wrapper">
+    <% include ../partials/navbar.ejs %>
+    <div class="main-panel">
+      <div class="content">
+        <div class="container-fluid">
+          <div class="row justify-content-center">
+            <h1>Applications Overview</h1>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card card-chart">
+              <div class="card-header card-header-tabs card-header-primary">
+                <div class="ct-chart" id="applicants-chart">
+
+                </div>
+              </div>
+              <div class="card-body">
+                <h4 class="card-title text-center">Currently  <%= totalApplications %> applications</h4>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <% include ../partials/footer.ejs %>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.11.4/chartist.min.js" integrity="sha256-xNhpuwaNiVdna6L8Wy3GNuQz1z+SCmo4NY1c7cJ9Vdc=" crossorigin="anonymous"></script>
+</body>
+
+</html>
