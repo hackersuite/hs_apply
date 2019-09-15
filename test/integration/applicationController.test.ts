@@ -8,13 +8,13 @@ import { instance, mock, when, reset, anything } from "ts-mockito";
 import container from "../../src/inversify.config";
 import { TYPES } from "../../src/types";
 import { Cache } from "../../src/util/cache";
-import { ApplicationService } from "../../src/services";
+import { ApplicantService } from "../../src/services";
 import { Sections } from "../../src/models/sections";
 import { Applicant } from "../../src/models/db";
 
 let bApp: Express;
 let mockCache: Cache;
-let mockApplicationService: ApplicationService;
+let mockApplicantService: ApplicantService;
 
 const newApplicantRequest: any = {
   applicantName: "test",
@@ -50,9 +50,9 @@ testApplicant.tShirtSize = "M";
 test.before.cb(t => {
   initEnv();
   mockCache = mock(Cache);
-  mockApplicationService = mock(ApplicationService);
+  mockApplicantService = mock(ApplicantService);
   container.rebind(TYPES.Cache).toConstantValue(instance(mockCache));
-  container.rebind(TYPES.ApplicationService).toConstantValue(instance(mockApplicationService));
+  container.rebind(TYPES.ApplicantService).toConstantValue(instance(mockApplicantService));
 
   new App().buildApp(async (builtApp: Express, err: Error): Promise<void> => {
     if (err) {
@@ -72,7 +72,7 @@ test.beforeEach(t => {
 test.afterEach(t => {
   // Reset the mocks
   reset(mockCache);
-  reset(mockApplicationService);
+  reset(mockApplicantService);
 
   // Restore to last snapshot so each unit test takes a clean copy of the application container
   container.restore();
@@ -92,7 +92,7 @@ test("Test that the application page loads", async t => {
 });
 
 test.serial("Test applicant created with valid request", async t => {
-  when(mockApplicationService.save(anything(), anything()))
+  when(mockApplicantService.save(anything(), anything()))
     .thenResolve(testApplicant);
 
   // Perform the request along .../apply
@@ -113,7 +113,7 @@ test.serial("Test applicant created with valid request", async t => {
 });
 
 test.serial("Test applicant created with valid request (using Other input options)", async t => {
-  when(mockApplicationService.save(anything(), anything()))
+  when(mockApplicantService.save(anything(), anything()))
     .thenResolve(testApplicant);
 
   // Perform the request along .../apply
@@ -126,7 +126,7 @@ test.serial("Test applicant created with valid request (using Other input option
 });
 
 test.serial("Test applicant not created with invalid input", async t => {
-  when(mockApplicationService.save(anything(), anything()))
+  when(mockApplicantService.save(anything(), anything()))
     .thenReject(new Error(""));
 
   // Perform the request along .../apply
@@ -167,7 +167,7 @@ test.serial("Test applicant not created with unsupported cv format", async t => 
 });
 
 test.serial("Test applicant created with doc cv", async t => {
-  when(mockApplicationService.save(anything(), anything()))
+  when(mockApplicantService.save(anything(), anything()))
     .thenResolve(testApplicant);
 
   // Perform the request along .../apply
@@ -181,7 +181,7 @@ test.serial("Test applicant created with doc cv", async t => {
 });
 
 test.serial("Test applicant created with pdf cv", async t => {
-  when(mockApplicationService.save(anything(), anything()))
+  when(mockApplicantService.save(anything(), anything()))
     .thenResolve(testApplicant);
 
   // Perform the request along .../apply
@@ -195,7 +195,7 @@ test.serial("Test applicant created with pdf cv", async t => {
 });
 
 test.serial("Test applicant created with docx cv", async t => {
-  when(mockApplicationService.save(anything(), anything()))
+  when(mockApplicantService.save(anything(), anything()))
     .thenResolve(testApplicant);
 
   // Perform the request along .../apply
