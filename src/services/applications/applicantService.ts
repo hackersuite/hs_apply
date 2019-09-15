@@ -1,6 +1,6 @@
 import { injectable, inject } from "inversify";
 import { Applicant } from "../../models/db/applicant";
-import { ApplicationRepository } from "../../repositories";
+import { ApplicantRepository } from "../../repositories";
 import { TYPES } from "../../types";
 import { ObjectID, Repository } from "typeorm";
 import { validateOrReject } from "class-validator";
@@ -8,26 +8,26 @@ import * as request from "request-promise-native";
 
 type ApplicationID = string | number | Date | ObjectID;
 
-export interface IApplicationService {
+export interface IApplicantService {
   getAll: () => Promise<Applicant[]>;
   findOne: (id: ApplicationID) => Promise<Applicant>;
   save: (newApplicants: Applicant, file?: Buffer) => Promise<Applicant>;
 }
 
 @injectable()
-export class ApplicationService implements IApplicationService {
-  private _applicationRepository: Repository<Applicant>;
+export class ApplicantService implements IApplicantService {
+  private _applicantRepository: Repository<Applicant>;
 
   public constructor(
-    @inject(TYPES.ApplicationRepository)
-    applicationRepository: ApplicationRepository
+    @inject(TYPES.ApplicantRepository)
+    applicantRepository: ApplicantRepository
   ) {
-    this._applicationRepository = applicationRepository.getRepository();
+    this._applicantRepository = applicantRepository.getRepository();
   }
 
   public getAll = async (): Promise<Applicant[]> => {
     try {
-      return await this._applicationRepository.find();
+      return await this._applicantRepository.find();
     } catch (err) {
       throw new Error(`Failed to get all applicants:\n${err}`);
     }
@@ -39,7 +39,7 @@ export class ApplicationService implements IApplicationService {
     }
 
     try {
-      return await this._applicationRepository.findOne(id);
+      return await this._applicantRepository.findOne(id);
     } catch (err) {
       throw new Error(`Failed to find an applicant:\n${err}`);
     }
@@ -66,7 +66,7 @@ export class ApplicationService implements IApplicationService {
     }
 
     try {
-      return await this._applicationRepository.save(newApplicant);
+      return await this._applicantRepository.save(newApplicant);
     } catch (err) {
       throw new Error(`Failed to save applicant:\n${err}`);
     }

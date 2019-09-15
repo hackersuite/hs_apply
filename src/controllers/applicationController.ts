@@ -3,7 +3,7 @@ import { Cache } from "../util/cache";
 import { Sections } from "../models/sections";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
-import { ApplicationService } from "../services";
+import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
 
@@ -18,14 +18,14 @@ export interface IApplicationController {
 @injectable()
 export class ApplicationController {
   private _cache: Cache;
-  private _applicationService: ApplicationService;
+  private _applicantService: ApplicantService;
 
   public constructor(
     @inject(TYPES.Cache) cache: Cache,
-    @inject(TYPES.ApplicationService) applicationService: ApplicationService
+    @inject(TYPES.ApplicantService) applicantService: ApplicantService
   ) {
     this._cache = cache;
-    this._applicationService = applicationService;
+    this._applicantService = applicantService;
   }
 
   public apply = (req: Request, res: Response, next: NextFunction): void => {
@@ -75,6 +75,7 @@ export class ApplicationController {
     newApplication.hardwareRequests = applicantHardwareReq;
     newApplication.dietaryRequirements = applicantDietaryRequirements === "Other" ? applicantDietaryRequirementsOther : applicantDietaryRequirements;
     newApplication.tShirtSize = applicantTShirt;
+    newApplication.createdAt = new Date();
 
     // Handling the CV file
     let cvFile: Buffer;
@@ -86,7 +87,7 @@ export class ApplicationController {
 
     let createdApplication: Applicant;
     try {
-      createdApplication = await this._applicationService.save(newApplication, cvFile);
+      createdApplication = await this._applicantService.save(newApplication, cvFile);
     } catch (errors) {
       return res.status(HttpResponseCode.BAD_REQUEST)
         .send({

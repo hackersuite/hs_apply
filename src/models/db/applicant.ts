@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { Min, IsDefined, IsInt, IsNotEmpty, IsOptional } from "class-validator";
+import { Min, IsDefined, IsInt, IsNotEmpty, IsOptional, IsDate } from "class-validator";
 
 @Entity()
 export class Applicant {
@@ -14,7 +14,7 @@ export class Applicant {
   @Column("integer")
   @IsDefined({ message: "The applicants age is required" })
   @IsInt()
-  @Min(1, { message: "Minimum age is 1"})
+  @Min(0, { message: "Minimum age is 0" })
   age: number;
 
   @Column("varchar")
@@ -55,7 +55,7 @@ export class Applicant {
 
   @Column("integer", { nullable: true })
   @IsInt()
-  @Min(0, { message: "Minimum number of hackathons is zero"})
+  @Min(0, { message: "Minimum number of hackathons is zero" })
   @IsOptional()
   hackathonCount: number;
 
