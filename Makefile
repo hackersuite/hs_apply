@@ -1,3 +1,8 @@
+prod_docker_compose_file=./docker-compose.yml
+dev_docker_compose_file=./docker/dev/docker-compose.yml
+
+prod_docker_file=./docker/prod/Dockerfile
+
 default: build test
 
 # builds the project into the dist folder
@@ -11,12 +16,7 @@ test:
 # builds the docker image
 build-docker:
 	@echo "=============building hs_application============="
-	docker build -f docker/prod/Dockerfile -t hs_application .
-
-# builds the docker image for dev environment
-build-docker-dev:
-	@echo "=============building hs_application (dev)============="
-	docker build -f docker/dev/Dockerfile -t hs_application .
+	docker build -f $(prod_docker_file) -t hs_application .
 
 # sets up the hacker suite docker network
 setup-network:
@@ -26,16 +26,23 @@ setup-network:
 # starts the app and MySQL in docker containers
 up: build-docker setup-network
 	@echo "=============starting hs_application============="
-	docker-compose up -d
+	docker-compose -f $(prod_docker_compose_file) up -d
 
-# starts the app and MySQL in docker containers for dev environment
-up-dev: build-docker-dev setup-network
+# starts the app in local environment and DB in container
+up-dev: export ENVIRONMENT=dev
+up-dev: export DB_HOST=localhost
+up-dev: setup-network
 	@echo "=============starting hs_application (dev)============="
-	docker-compose up -d
+	docker-compose -f $(dev_docker_compose_file) up -d
+	npm i && npm run start:watch
 
 # prints the logs from all containers
 logs:
-	docker-compose logs -f
+ifeq ($(ENV), dev)
+	docker-compose -f $(dev_docker_compose_file) logs -f
+else
+	docker-compose -f $(prod_docker_compose_file) logs -f
+endif
 
 # prints the logs only from the go app
 logs-app:
@@ -47,7 +54,8 @@ logs-db:
 
 # shuts down the containers
 down:
-	docker-compose down
+	docker-compose -f $(prod_docker_compose_file) down
+	docker-compose -f $(dev_docker_compose_file) down
 
 # cleans up unused images, networks and containers
 clean: down

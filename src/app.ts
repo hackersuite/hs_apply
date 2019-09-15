@@ -30,7 +30,10 @@ export class App {
 
     // Set up express middleware for request routing
     this.middlewareSetup(app);
-    this.devMiddlewareSetup(app);
+
+    if (app.get("env") === "dev") {
+      this.devMiddlewareSetup(app);
+    }
 
     // Load the hackathon application settings from disk
     await this.loadApplicationSettings();
@@ -115,18 +118,15 @@ export class App {
    * @param app The app to set up the middleware for
    */
   private devMiddlewareSetup = (app: Express): void => {
-    // Development environment set up
-    if (app.get("env") === "dev") {
-      // Request logging
-      app.use(morgan("dev"));
-      // Disable browser caching
-      app.use((req: Request, res: Response, next: NextFunction) => {
-        res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
-        res.header("Expires", "-1");
-        res.header("Pragma", "no-cache");
-        next();
-      });
-    }
+    // Request logging
+    app.use(morgan("dev"));
+    // Disable browser caching
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+      res.header("Expires", "-1");
+      res.header("Pragma", "no-cache");
+      next();
+    });
   };
 
   /**

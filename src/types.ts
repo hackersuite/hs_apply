@@ -1,7 +1,7 @@
 export const TYPES = {
   Router: Symbol.for("Router"),
-  ApplicationService: Symbol.for("ApplicationService"),
-  ApplicationRepository: Symbol.for("ApplicationRepository"),
+  ApplicantService: Symbol.for("ApplicantService"),
+  ApplicantRepository: Symbol.for("ApplicantRepository"),
   ApplicationController: Symbol.for("ApplicationController"),
 
   DashboardController: Symbol.for("DashboardController"),
