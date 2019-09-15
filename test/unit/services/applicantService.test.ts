@@ -3,8 +3,8 @@ import { when, mock, instance, verify } from "ts-mockito";
 import container from "../../../src/inversify.config";
 import { TYPES } from "../../../src/types";
 
-import { ApplicationService } from "../../../src/services";
-import { ApplicationRepository } from "../../../src/repositories";
+import { ApplicantService } from "../../../src/services";
+import { ApplicantRepository } from "../../../src/repositories";
 import { Repository } from "typeorm";
 import { Applicant } from "../../../src/models/db";
 
@@ -55,21 +55,21 @@ testApplicantInvalid.hackathonCount = 0;
 testApplicantInvalid.dietaryRequirements = "Halal";
 testApplicantInvalid.tShirtSize = "M";
 
-let applicationService: ApplicationService;
-let mockApplicationRepository: Repository<Applicant>;
+let applicantService: ApplicantService;
+let mockApplicantRepository: Repository<Applicant>;
 class StubApplicationRepository extends Repository<Applicant> { }
 
 test.before(t => {
-  const stubApplicationRepository: ApplicationRepository = mock(ApplicationRepository);
-  mockApplicationRepository = mock(StubApplicationRepository);
-  when(stubApplicationRepository.getRepository()).thenReturn(instance(mockApplicationRepository));
-  container.rebind(TYPES.ApplicationRepository).toConstantValue(instance(stubApplicationRepository));
+  const stubApplicantRepository: ApplicantRepository = mock(ApplicantRepository);
+  mockApplicantRepository = mock(StubApplicationRepository);
+  when(stubApplicantRepository.getRepository()).thenReturn(instance(mockApplicantRepository));
+  container.rebind(TYPES.ApplicantRepository).toConstantValue(instance(stubApplicantRepository));
 });
 
 test.beforeEach(t => {
   // Create a snapshot so each unit test can modify it without breaking other unit tests
   container.snapshot();
-  applicationService = container.get(TYPES.ApplicationService);
+  applicantService = container.get(TYPES.ApplicantService);
 });
 
 test.afterEach(t => {
@@ -79,100 +79,100 @@ test.afterEach(t => {
 
 test("Test all applicants can be found", async t => {
   // Set up the stubbed method in the mock
-  when(mockApplicationRepository.find())
+  when(mockApplicantRepository.find())
     .thenResolve([testApplicantMale]);
 
   // Perform the test by calling the method in the service
-  const result: Applicant[] = await applicationService.getAll();
+  const result: Applicant[] = await applicantService.getAll();
 
   // Check the result is expected
   t.deepEqual(result[0], testApplicantMale);
-  verify(mockApplicationRepository.find()).called();
+  verify(mockApplicantRepository.find()).called();
 });
 test("Test error thrown when getAll fails", async t => {
   // Set up the stubbed method in the mock
-  when(mockApplicationRepository.find())
+  when(mockApplicantRepository.find())
     .thenReject(new Error());
 
   // Perform the test by calling the method in the service
-  const error: Error = await t.throwsAsync(applicationService.getAll());
+  const error: Error = await t.throwsAsync(applicantService.getAll());
 
   // Check the result is expected
   t.truthy(error);
-  verify(mockApplicationRepository.find()).called();
+  verify(mockApplicantRepository.find()).called();
 });
 
 test("Test a single applicant can be found", async t => {
   // Set up the stubbed methods in the mock
-  when(mockApplicationRepository.findOne(testApplicantFemale.id))
+  when(mockApplicantRepository.findOne(testApplicantFemale.id))
     .thenResolve(testApplicantFemale);
 
   // Perform the test by calling the method in the service
-  const result: Applicant = await applicationService.findOne(testApplicantFemale.id);
+  const result: Applicant = await applicantService.findOne(testApplicantFemale.id);
 
   // Check the result is expected
   t.deepEqual(result, testApplicantFemale);
-  verify(mockApplicationRepository.findOne(testApplicantFemale.id)).once();
+  verify(mockApplicantRepository.findOne(testApplicantFemale.id)).once();
 });
 test("Test error thrown when id not provided to findOne()", async t => {
   // Perform the test by calling the method in the service
-  const error: Error = await t.throwsAsync(applicationService.findOne(undefined));
+  const error: Error = await t.throwsAsync(applicantService.findOne(undefined));
 
   // Check the result is expected
   t.truthy(error);
-  verify(mockApplicationRepository.findOne(undefined)).never();
+  verify(mockApplicantRepository.findOne(undefined)).never();
 });
 test("Test error thrown when applicant not found", async t => {
   // Set up the stubbed methods in the mock
-  when(mockApplicationRepository.findOne(testApplicantMale.id))
+  when(mockApplicantRepository.findOne(testApplicantMale.id))
     .thenReject(new Error());
 
   // Perform the test by calling the method in the service
-  const error: Error = await t.throwsAsync(applicationService.findOne(testApplicantMale.id));
+  const error: Error = await t.throwsAsync(applicantService.findOne(testApplicantMale.id));
 
   // Check the result is expected
   t.truthy(error);
-  verify(mockApplicationRepository.findOne(testApplicantMale.id)).once();
+  verify(mockApplicantRepository.findOne(testApplicantMale.id)).once();
 });
 
 test("Test a single applicant can be created", async t => {
   // Set up the stubbed methods in the mock
-  when(mockApplicationRepository.save(testApplicantFemale))
+  when(mockApplicantRepository.save(testApplicantFemale))
     .thenResolve(testApplicantFemale);
 
   // Perform the test by calling the method in the service
-  const result: Applicant = await applicationService.save(testApplicantFemale);
+  const result: Applicant = await applicantService.save(testApplicantFemale);
 
   // Check the result is expected
   t.deepEqual(result, testApplicantFemale);
-  verify(mockApplicationRepository.save(testApplicantFemale)).once();
+  verify(mockApplicantRepository.save(testApplicantFemale)).once();
 });
 
 test("Test that error thrown when save fails", async t => {
   // Simulate an error occuring in the database which causes an error to be thrown
-  when(mockApplicationRepository.save(testApplicantMale))
+  when(mockApplicantRepository.save(testApplicantMale))
     .thenReject(new Error());
 
-  const error: Error = await t.throwsAsync(applicationService.save(testApplicantMale));
+  const error: Error = await t.throwsAsync(applicantService.save(testApplicantMale));
   // Check the error actually is defined
   t.truthy(error);
-  verify(mockApplicationRepository.save(testApplicantMale)).once();
+  verify(mockApplicantRepository.save(testApplicantMale)).once();
 });
 
 test("Test that error thrown when applicant invalid", async t => {
   // Try and create the applicant and check for error
-  const errors: Error = await t.throwsAsync(applicationService.save(testApplicantInvalid));
+  const errors: Error = await t.throwsAsync(applicantService.save(testApplicantInvalid));
 
   // Check the error actually is defined
   t.truthy(errors);
-  verify(mockApplicationRepository.save(testApplicantInvalid)).never();
+  verify(mockApplicantRepository.save(testApplicantInvalid)).never();
 });
 
 test("Test that error thrown when ENV not set for file upload", async t => {
   // Try and create the applicant and check for error
-  const errors: Error = await t.throwsAsync(applicationService.save(testApplicantMale, Buffer.from("")));
+  const errors: Error = await t.throwsAsync(applicantService.save(testApplicantMale, Buffer.from("")));
 
   // Check the error actually is defined
   t.truthy(errors);
-  verify(mockApplicationRepository.save(testApplicantInvalid)).never();
+  verify(mockApplicantRepository.save(testApplicantInvalid)).never();
 });

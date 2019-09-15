@@ -75,7 +75,6 @@ export class ApplicationController {
     newApplication.hardwareRequests = applicantHardwareReq;
     newApplication.dietaryRequirements = applicantDietaryRequirements === "Other" ? applicantDietaryRequirementsOther : applicantDietaryRequirements;
     newApplication.tShirtSize = applicantTShirt;
-    newApplication.createdAt = new Date();
 
     // Handling the CV file
     let cvFile: Buffer;
