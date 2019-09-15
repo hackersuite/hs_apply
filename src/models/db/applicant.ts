@@ -79,4 +79,6 @@ export class Applicant {
   @IsNotEmpty({ message: "The applicants T-Shirt size is required" })
   tShirtSize: string;
 
+  @Column("datetime")
+  createdAt: Date;
 }

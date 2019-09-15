@@ -10,6 +10,7 @@ type ApplicationID = string | number | Date | ObjectID;
 
 export interface IApplicantService {
   getAll: () => Promise<Applicant[]>;
+  getAllAndCountSelection: (columns: (keyof Applicant)[]) => Promise<[Partial<Applicant>[], number]>;
   findOne: (id: ApplicationID) => Promise<Applicant>;
   save: (newApplicants: Applicant, file?: Buffer) => Promise<Applicant>;
 }
@@ -32,6 +33,14 @@ export class ApplicantService implements IApplicantService {
       throw new Error(`Failed to get all applicants:\n${err}`);
     }
   };
+
+  public getAllAndCountSelection = async (columns: (keyof Applicant)[]): Promise<[Partial<Applicant>[], number]> => {
+    try {
+      return await this._applicantRepository.findAndCount({ select: columns });
+    } catch (err) {
+      throw new Error(`Failed to get the select columns of applicants:\n${columns}`);
+    }
+  }
 
   public findOne = async (id: ApplicationID): Promise<Applicant> => {
     if (id === undefined) {

@@ -6,5 +6,7 @@ export const TYPES = {
 
   DashboardController: Symbol.for("DashboardController"),
 
+  AdminController: Symbol.for("AdminController"),
+
   Cache: Symbol.for("Cache")
 };
