@@ -8,19 +8,19 @@ const toEmails: string[] = ["admin@unicsmcr.com"];
 /**
  * Handles errors thrown by requests
  */
-export const errorHandler = (err: ApiError|Error, req: Request, res: Response, next: NextFunction) => {
+export const errorHandler = (err: ApiError | Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof Error) {
     if (process.env.ENVIRONMENT === "production") {
       // Send notification to admins when an uncaught error occurs
-    //   sendEmail("noreply@unicsmcr.com",
-    //   toEmails,
-    //     "Uncaught Error: " + err.name,
-    //     err.message + err.stack
-    //   );
+      //   sendEmail("noreply@unicsmcr.com",
+      //   toEmails,
+      //     "Uncaught Error: " + err.name,
+      //     err.message + err.stack
+      //   );
     }
 
     console.error(err.stack);
-    res.status(HttpResponseCode.INTERNAL_ERROR).send(new ApiError(HttpResponseCode.INTERNAL_ERROR, err.stack));
+    res.status(HttpResponseCode.INTERNAL_ERROR).send("An error occured.");
   } else {
     res.status(err.statusCode).send(err);
   }
