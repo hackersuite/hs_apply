@@ -31,6 +31,7 @@ ENV NODE_ENV=production
 
 # Install production dependencies only
 COPY package*.json ./
+COPY .env ./
 RUN npm install && \
   npm cache clean --force
 

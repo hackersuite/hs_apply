@@ -162,7 +162,7 @@ export class App {
     let sections: Array<IApplicationSection>;
     try {
       const fileBuffer: string = await this.readFileAsync(
-        "src/settings/questions.json",
+        __dirname + "/settings/questions.json",
         { encoding: "utf8" }
       );
       sections = JSON.parse(fileBuffer).sections;
