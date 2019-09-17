@@ -19,18 +19,33 @@ export class AdminController {
 
   public constructor(
     @inject(TYPES.ApplicantService) applicantService: ApplicantService,
-    @inject(TYPES.Cache) cache: Cache,
+    @inject(TYPES.Cache) cache: Cache
   ) {
     this._cache = cache;
     this._applicantService = applicantService;
   }
 
-  public overview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const [applicationTimes, totalApplications] = await this._applicantService.getAllAndCountSelection(["createdAt"]);
+  public overview = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    const [
+      applicationTimes,
+      totalApplications
+    ] = await this._applicantService.getAllAndCountSelection(["createdAt"]);
     res.render("pages/admin-overview", { totalApplications, applicationTimes });
   };
 
   public manage = (req: Request, res: Response, next: NextFunction): void => {
     res.render("pages/admin-manage");
+  };
+
+  public manageApplication = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void => {
+    res.render("pages/manageApplication");
   };
 }

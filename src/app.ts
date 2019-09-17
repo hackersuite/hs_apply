@@ -25,7 +25,10 @@ export class App {
   private readonly readFileAsync = promisify(fs.readFile);
   private readonly cache: Cache = container.get(TYPES.Cache);
 
-  public async buildApp(callback: (app: Express, err?: Error) => void, connectionOptions?: ConnectionOptions[]): Promise<void> {
+  public async buildApp(
+    callback: (app: Express, err?: Error) => void,
+    connectionOptions?: ConnectionOptions[]
+  ): Promise<void> {
     const app: Express = this.expressSetup();
 
     // Set up express middleware for request routing
@@ -39,33 +42,38 @@ export class App {
     await this.loadApplicationSettings();
 
     // Connecting to database
-    const databaseConnectionSettings: ConnectionOptions[] = connectionOptions || this.createDatabaseSettings();
+    const databaseConnectionSettings: ConnectionOptions[] =
+      connectionOptions || this.createDatabaseSettings();
 
-    createConnections(databaseConnectionSettings).then(async (connections: Connection[]) => {
-      connections.forEach(element => {
-        console.log("  Connection to database (" + element.name + ") established.");
+    createConnections(databaseConnectionSettings)
+      .then(async (connections: Connection[]) => {
+        connections.forEach(element => {
+          console.log(
+            "  Connection to database (" + element.name + ") established."
+          );
+        });
+
+        // Routes set up for express, resolving dependencies
+        // This is performed after successful DB connection since some routers use TypeORM repositories in their DI
+        const routers: IRouter[] = container.getAll(TYPES.Router);
+        routers.forEach(router => {
+          app.use(router.getPathRoot(), router.register());
+        });
+
+        // Setting up error handlers
+        app.use(error404Handler);
+        app.use(errorHandler);
+
+        // Set up passport for authentication
+        this.passportSetup(app);
+
+        return callback(app);
+      })
+      .catch((err: any) => {
+        console.error("  Could not connect to database");
+        console.error(err);
+        return callback(app, err);
       });
-
-      // Routes set up for express, resolving dependencies
-      // This is performed after successful DB connection since some routers use TypeORM repositories in their DI
-      const routers: IRouter[] = container.getAll(TYPES.Router);
-      routers.forEach((router) => {
-        app.use(router.getPathRoot(), router.register());
-      });
-
-      // Setting up error handlers
-      app.use(error404Handler);
-      app.use(errorHandler);
-
-      // Set up passport for authentication
-      this.passportSetup(app);
-
-      return callback(app);
-    }).catch((err: any) => {
-      console.error("  Could not connect to database");
-      console.error(err);
-      return callback(app, err);
-    });
   }
 
   /**
@@ -103,8 +111,7 @@ export class App {
     });
 
     app.use(
-      express.static(path.join(__dirname, "public"),
-        { maxAge: 31557600000 })
+      express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
     );
 
     app.use(express.json());
@@ -122,7 +129,10 @@ export class App {
     app.use(morgan("dev"));
     // Disable browser caching
     app.use((req: Request, res: Response, next: NextFunction) => {
-      res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+      res.header(
+        "Cache-Control",
+        "private, no-cache, no-store, must-revalidate"
+      );
       res.header("Expires", "-1");
       res.header("Pragma", "no-cache");
       next();
@@ -151,7 +161,10 @@ export class App {
 
     let sections: Array<IApplicationSection>;
     try {
-      const fileBuffer: string = await this.readFileAsync("src/settings/questions.json", { encoding: "utf8" });
+      const fileBuffer: string = await this.readFileAsync(
+        "src/settings/questions.json",
+        { encoding: "utf8" }
+      );
       sections = JSON.parse(fileBuffer).sections;
       // Handle non-exception-throwing cases
       if (!sections && typeof sections !== "object") {
@@ -171,27 +184,27 @@ export class App {
       saveUninitialized: true, // Saved new sessions
       resave: false, // Do not automatically write to the session store
       secret: process.env.SESSION_SECRET,
-      cookie: { // Configure when sessions expires
-        secure: (app.get("env") === "dev" ? false : true),
+      cookie: {
+        // Configure when sessions expires
+        secure: app.get("env") === "dev" ? false : true,
         maxAge: 2419200000
       }
     };
   };
 
   private createDatabaseSettings = (): ConnectionOptions[] => {
-    return [{
-      name: "applications",
-      type: "mysql",
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-      entities: [
-        __dirname + "/models/db/*{.js,.ts}"
-      ],
-      synchronize: true
-    }];
+    return [
+      {
+        name: "applications",
+        type: "mysql",
+        host: process.env.DB_HOST,
+        port: Number(process.env.DB_PORT),
+        username: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_DATABASE,
+        entities: [__dirname + "/models/db/*{.js,.ts}"],
+        synchronize: true
+      }
+    ];
   };
-
 }
