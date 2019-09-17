@@ -24,6 +24,7 @@ setup-network:
 	docker network create --driver bridge hacker_suite || echo "This is most likely fine, it just means that the network has already been created"
 
 # starts the app and MySQL in docker containers
+up: export ENVIRONMENT=production
 up: build-docker setup-network
 	@echo "=============starting hs_application============="
 	docker-compose -f $(prod_docker_compose_file) up -d

@@ -1,4 +1,4 @@
-version: '2.1'
+version: "2.1"
 services:
   hs_application:
     image: hs_application:latest
@@ -24,10 +24,13 @@ services:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
       timeout: 5s
       retries: 10
+    ports:
+      - "${DB_PORT}:3306"
     networks:
       - internal
     volumes:
       - db_store:/var/lib/mysql
+      - ./docker/database/:/docker-entrypoint-initdb.d/:ro
 
 # The volume for the database is persistent across launches
 volumes:
@@ -35,7 +38,7 @@ volumes:
 
 # The network allows multiple containers to connect together
 networks:
-  # internal network for hs_hub services
+  # internal network for hacker suite services
   internal:
     driver: bridge
   # external network for consumer-facing hacker suite services
