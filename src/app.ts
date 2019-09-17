@@ -171,7 +171,7 @@ export class App {
         throw "Failed to parse JSON";
       }
     } catch (err) {
-      throw "Failed to load questions";
+      console.error("Failed to load questions");
     }
     const applicationSections: Sections = new Sections(sections);
     this.cache.set(Sections.name, applicationSections);

@@ -1,4 +1,4 @@
-version: '2.1'
+version: "2.1"
 services:
   mysql_db:
     image: mysql:5.7
@@ -6,7 +6,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "${DB_PORT}:3306"
     # The healthcheck is used to ensure the database is running
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
@@ -16,6 +16,7 @@ services:
       - internal
     volumes:
       - db_store:/var/lib/mysql
+      - ../database/:/docker-entrypoint-initdb.d/:ro
 
 # The volume for the database is persistent across launches
 volumes:
