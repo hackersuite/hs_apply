@@ -3,6 +3,7 @@ import { Cache } from "../util/cache";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { ApplicantService } from "../services";
+import { Applicant } from "../models/db";
 
 export interface IAdminController {
   overview: (req: Request, res: Response, next: NextFunction) => void;
@@ -41,11 +42,15 @@ export class AdminController {
     res.render("pages/admin-manage");
   };
 
-  public manageApplication = (
+  public manageApplication = async (
     req: Request,
     res: Response,
     next: NextFunction
-  ): void => {
-    res.render("pages/manageApplication");
+  ): Promise<void> => {
+    const specifiedApplicant: Applicant = await this._applicantService.findOne(
+      req.url.split("/")[2]
+    );
+    console.log(specifiedApplicant);
+    res.render("pages/manageApplication", { applicant: specifiedApplicant });
   };
 }
