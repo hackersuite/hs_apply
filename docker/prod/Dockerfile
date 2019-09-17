@@ -14,7 +14,6 @@ RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 # Before running install, switch to non-root user "node"
 USER node
 
-
 # Define working directory and copy source
 WORKDIR /home/node/app
 COPY . .
@@ -32,6 +31,7 @@ ENV NODE_ENV=production
 
 # Install production dependencies only
 COPY package*.json ./
+COPY .env ./
 RUN npm install && \
   npm cache clean --force
 

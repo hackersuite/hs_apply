@@ -1,0 +1,35 @@
+version: "2.1"
+services:
+  mysql_db:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password --log_error_verbosity=1
+    env_file:
+      - ../../.env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:3306"
+    # The healthcheck is used to ensure the database is running
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+    volumes:
+      - db_store:/var/lib/mysql
+      - ../database/:/docker-entrypoint-initdb.d/:ro
+
+# The volume for the database is persistent across launches
+volumes:
+  db_store:
+
+# The network allows multiple containers to connect together
+networks:
+  # internal network for hs_hub services
+  internal:
+    driver: bridge
+  # external network for consumer-facing hacker suite services
+  hacker_suite:
+    external:
+      name: hacker_suite

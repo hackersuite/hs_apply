@@ -1,10 +1,11 @@
-import { buildApp } from "./app";
 import { Express } from "express";
+import { App } from "./app";
 
 /**
  * Start Express server.
  */
-buildApp((app: Express, err: Error) => {
+
+new App().buildApp((app: Express, err: Error) => {
   if (err) {
     console.error("Could not start server!");
   } else {

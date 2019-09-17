@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <% include ../partials/head.ejs %>
+  <title>Applications | Dashboard</title>
+</head>
+
+<body>
+  <div class="wrapper">
+    <% include ../partials/navbar.ejs %>
+    <div class="main-panel">
+      <div class="content">
+        <div class="container-fluid">
+          <div class="row justify-content-center">
+            <h2>You haven't created an application yet!</h2>
+          </div>
+          <div class="row justify-content-center">
+            <a href="/apply">
+              <button type="button" class="btn btn-info text-center">Create Application</button>
+            </a>
+          </div>
+        </div>
+      </div>
+      <% include ../partials/footer.ejs %>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"
+      integrity="sha256-tw5/wId1F+4LyUF2ZJnpRoHNXJ66jrK3IGhfq4LhLjY=" crossorigin="anonymous"></script>
+    </div>
+  </div>
+</body>
+
+</html>

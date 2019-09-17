@@ -1,10 +1,12 @@
-version: '2.1'
+version: "2.1"
 services:
   hs_application:
     image: hs_application:latest
     depends_on:
       mysql_db:
         condition: service_healthy
+    env_file:
+      - ./.env
     volumes:
       - .:/home/node/app/
       - /home/node/app/node_modules
@@ -18,11 +20,8 @@ services:
     image: mysql:5.7
     command: --default-authentication-plugin=mysql_native_password --log_error_verbosity=1
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hub
-    ports:
-      - "${DB_PORT}:${DB_PORT}"
-    # The healthcheck is used to ensure the database is running before the hub starts
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    # The healthcheck is used to ensure the database is running before hs_application starts
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
       timeout: 5s
@@ -31,6 +30,7 @@ services:
       - internal
     volumes:
       - db_store:/var/lib/mysql
+      - ./docker/database/:/docker-entrypoint-initdb.d/:ro
 
 # The volume for the database is persistent across launches
 volumes:
@@ -38,7 +38,7 @@ volumes:
 
 # The network allows multiple containers to connect together
 networks:
-  # internal network for hs_hub services
+  # internal network for hacker suite services
   internal:
     driver: bridge
   # external network for consumer-facing hacker suite services

@@ -5,14 +5,10 @@ node_js:
 
 services:
   - mysql
-  - postgresql
 
 before_install:
  - npm i -g npm@6.5.0
- - mysql -e 'CREATE DATABASE IF NOT EXISTS hub;'
-
-before_script:  
- - psql -c 'CREATE DATABASE applications;' -U postgres 
+ - mysql -e 'CREATE DATABASE IF NOT EXISTS applications;'
 
 # Use npm ci to ensure a clean install of dependencies
 install:
@@ -24,6 +20,9 @@ cache: npm
 
 script:
  - npm run test:coverage
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
 notifications:
   email: false
