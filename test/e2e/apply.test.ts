@@ -21,7 +21,8 @@ const newApplicantRequest: any = {
   applicantWorkArea: "Other",
   applicantWorkAreaOther: "This",
   applicantHackathonCount: 0,
-  applicantDietaryRequirements: "None",
+  applicantDietaryRequirements: "Other",
+  applicantDietaryRequirementsOther: "Test",
   applicantTShirt: "M"
 };
 
@@ -36,7 +37,7 @@ testApplicant.university = "UoM";
 testApplicant.yearOfStudy = "Foundation";
 testApplicant.workArea = "This";
 testApplicant.hackathonCount = 0;
-testApplicant.dietaryRequirements = "None";
+testApplicant.dietaryRequirements = "Test";
 testApplicant.tShirtSize = "M";
 
 test.before.cb(t => {
@@ -64,8 +65,7 @@ test.afterEach(t => {
 
 test("Test 404 page provided when invalid URL", async t => {
   // Perform the request along .../apply
-  const response = await request(bApp)
-    .get("/invalidpage-url-123");
+  const response = await request(bApp).get("/invalidpage-url-123");
 
   // Check that we get a OK (200) response code
   t.is(response.status, HttpResponseCode.OK);
@@ -81,9 +81,12 @@ test("Test applicant created with valid request", async t => {
   t.is(response.status, HttpResponseCode.OK);
   t.truthy(response.body.id);
   testApplicant.id = response.body.id;
+  testApplicant.createdAt = response.body.createdAt;
 
   // Remove all null properties before comparison
-  Object.keys(response.body).forEach((key) => (response.body[key] == null) && delete response.body[key]);
+  Object.keys(response.body).forEach(
+    key => response.body[key] == null && delete response.body[key]
+  );
 
   t.deepEqual(response.body, { ...testApplicant });
 });
