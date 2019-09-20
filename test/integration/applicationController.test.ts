@@ -125,6 +125,19 @@ test.serial("Test applicant created with valid request (using Other input option
   t.is(response.status, HttpResponseCode.OK);
 });
 
+test.serial("Test applicant created with valid request (with no Other input provided)", async t => {
+  when(mockApplicantService.save(anything(), anything()))
+    .thenResolve(testApplicant);
+
+  // Perform the request along .../apply
+  const response = await request(bApp)
+    .post("/apply")
+    .send({ ...newApplicantRequest, applicantGenderOther: undefined, applicantWorkAreaOther: undefined, applicantDietaryRequirementsOther: undefined });
+
+  // Check that we get a OK (200) response code
+  t.is(response.status, HttpResponseCode.OK);
+});
+
 test.serial("Test applicant not created with invalid input", async t => {
   when(mockApplicantService.save(anything(), anything()))
     .thenReject(new Error(""));
