@@ -3,9 +3,27 @@ var left, opacity, scale; // Forms properties which we will animate
 var animating; // Flag to prevent quick multi-click glitches
 currentForm = $("div .apply-form-card").first();
 
+$(".submit-form").click(function () {
+  if (!checkFormStageInputs()) {
+    $.notify({
+      message: "Please fill in the required fields"
+    }, {
+      type: "danger"
+    });
+  }
+});
+
 // Requires jQuery Easing
 $(".next-form-stage").click(function () {
-  if (animating || !checkFormStageInputs()) return false;
+  if (animating) return false;
+  if (!checkFormStageInputs()) {
+    $.notify({
+      message: "Please fill in the required fields"
+    }, {
+      type: "danger"
+    });
+    return false;
+  }
   animating = true;
 
   currentForm = $(this).closest("div .apply-form-card");
