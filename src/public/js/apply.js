@@ -116,7 +116,11 @@ $(".form-check-input[value=Other]").each(function () {
 uniqueRadioGroups.forEach((groupName) => {
   $(`input[name=${groupName}]`).change(function () {
     var radioInputOther = $(this).attr("name") + "Other";
-    $(`[name=${radioInputOther}]`).toggle(250);
+    if ($(this).attr("value") === "Other") {
+      $(`[name=${radioInputOther}]`).fadeIn();
+    } else {
+      $(`[name=${radioInputOther}]`).fadeOut();
+    }
   });
 });
 
