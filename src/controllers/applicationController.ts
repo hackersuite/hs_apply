@@ -61,19 +61,19 @@ export class ApplicationController {
     const newApplication: Applicant = new Applicant();
     newApplication.name = applicantName;
     newApplication.age = Number(applicantAge);
-    newApplication.gender = applicantGender === "Other" ? applicantGenderOther : applicantGender;
+    newApplication.gender = applicantGender === "Other" ? (applicantGenderOther || "Other") : applicantGender;
     newApplication.nationality = applicantNationality;
     newApplication.country = applicantCountry;
     newApplication.city = applicantCity;
     newApplication.university = applicantUniversity;
     newApplication.yearOfStudy = applicantStudyYear;
-    newApplication.workArea = applicantWorkArea === "Other" ? applicantWorkAreaOther : applicantWorkArea;
+    newApplication.workArea = applicantWorkArea === "Other" ? (applicantWorkAreaOther || "Other") : applicantWorkArea;
     newApplication.skills = applicantSkills;
     newApplication.hackathonCount = Number.isInteger(applicantHackathonCount) ? Number.parseInt(applicantHackathonCount) : undefined;
     newApplication.whyChooseHacker = applicantWhyChoose;
     newApplication.pastProjects = applicantPastProj;
     newApplication.hardwareRequests = applicantHardwareReq;
-    newApplication.dietaryRequirements = applicantDietaryRequirements === "Other" ? applicantDietaryRequirementsOther : applicantDietaryRequirements;
+    newApplication.dietaryRequirements = applicantDietaryRequirements === "Other" ? (applicantDietaryRequirementsOther || "Other") : applicantDietaryRequirements;
     newApplication.tShirtSize = applicantTShirt;
 
     // Handling the CV file
