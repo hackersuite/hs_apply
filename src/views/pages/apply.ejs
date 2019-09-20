@@ -97,7 +97,7 @@
                               <div class="form-row">
                                 <div class="col-auto">
                                   <label class="form-check-label">
-                                      <input class="form-check-input" type="radio" name="<%= question.questionName %>" value="Other" id="<%= `${currentID}` %>-radio-other">
+                                      <input class="form-check-input" type="radio" name="<%= question.questionName %>" value="Other" id="<%= `${currentID}` %>-radio-other" <%= question.required ? "required" : "" %>>
                                       Other
                                       <span class="circle">
                                           <span class="check"></span>

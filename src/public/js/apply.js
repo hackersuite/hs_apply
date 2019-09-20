@@ -1,11 +1,11 @@
 var currentForm, nextForm, previousForm; // Forms
 var left, opacity, scale; // Forms properties which we will animate
 var animating; // Flag to prevent quick multi-click glitches
+currentForm = $("div .apply-form-card").first();
 
 // Requires jQuery Easing
-
 $(".next-form-stage").click(function () {
-  if (animating) return false;
+  if (animating || !checkFormStageInputs()) return false;
   animating = true;
 
   currentForm = $(this).closest("div .apply-form-card");
@@ -42,6 +42,7 @@ $(".next-form-stage").click(function () {
     duration: 800,
     complete: function () {
       currentForm.hide();
+      currentForm = nextForm;
       animating = false;
     },
     // This comes from the custom easing plugin
@@ -85,6 +86,7 @@ $(".previous-form-stage").click(function () {
     complete: function () {
       currentForm.hide();
       previousForm.css("position", "relative");
+      currentForm = previousForm;
       animating = false;
     },
     //this comes from the custom easing plugin
@@ -94,31 +96,14 @@ $(".previous-form-stage").click(function () {
 
 function checkFormStageInputs() {
   var isValid = true;
-  $('input').filter('[required]').each(function () {
-    if ($(this).val() === '') {
-      $('#confirm').prop('disabled', true)
+  $(currentForm).find(":input[required]").each(function () {
+    if (!$(this)[0].checkValidity()) {
       isValid = false;
       return false;
     }
   });
-  if (isValid) {
-    $('#confirm').prop('disabled', false)
-  }
   return isValid;
 }
-
-// TODO:
-// Verify that the information provided at each stage of the form is correct
-// Either this, or switch sections at the end when they try to submit the form
-
-// $(".next-form-stage").click(function () {
-//   // Verify that the data has been filled in for the required fields
-//   $(this).parent().find("input").filter("[required]").each(function () {
-//     if (!$(this).checkValidity()) {
-//       return false;
-//     }
-//   });
-// });
 
 var uniqueRadioGroups = [];
 $(".form-check-input[value=Other]").each(function () {
