@@ -120,10 +120,20 @@ function checkFormStageInputs() {
 //   });
 // });
 
-// $(".custom-file").on("change", function() {
-//   var fileName = $(this).val().split("\\").pop();
-//   $(this).siblings(".custom-file").addClass("selected").html(fileName);
-// });
+var uniqueRadioGroups = [];
+$(".form-check-input[value=Other]").each(function () {
+  // Get all the inputs for the "other" option and hide them
+  var elementName = $(this).attr("name");
+  $("[name=" + elementName + "Other]").hide();
+  uniqueRadioGroups.push(elementName);
+});
+
+uniqueRadioGroups.forEach((groupName) => {
+  $(`input[name=${groupName}]`).change(function () {
+    var radioInputOther = $(this).attr("name") + "Other";
+    $(`[name=${radioInputOther}]`).toggle(250);
+  });
+});
 
 function fileChanged() {
   if (this.files[0].size > 5 * (1 << 20)) {
