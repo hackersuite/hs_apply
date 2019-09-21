@@ -67,7 +67,7 @@
                           <%= question.questionText %>
                           <%- question.required ? "<span class='label-req'> *</span>" : "" %>
                           </label>
-                          <select class="form-control selectpicker" id="<%= currentID %>" name="<%= question.questionName %>" data-style="btn btn-link" data-live-search="true" title="Choose one of the following..." <%= question.required ? "required" : "" %>>
+                          <select class="form-control selectpicker" id="<%= currentID %>" name="<%= question.questionName %>" data-style="btn btn-link" data-live-search="true" data-live-search-style="startsWith" title="Choose one of the following..." <%= question.required ? "required" : "" %>>
                             <% if (question.hasOwnProperty('answerOptions')) { %>
                               <% question.answerOptions.forEach(multioption => { %>
                               <option><%= multioption %></option>
