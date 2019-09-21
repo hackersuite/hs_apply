@@ -26,15 +26,8 @@ export class AdminController {
     this._applicantService = applicantService;
   }
 
-  public overview = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    const [
-      applicationTimes,
-      totalApplications
-    ] = await this._applicantService.getAllAndCountSelection(["createdAt"]);
+  public overview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const [applicationTimes, totalApplications] = await this._applicantService.getAllAndCountSelection(["createdAt"]);
     res.render("pages/admin-overview", { totalApplications, applicationTimes });
   };
 
@@ -42,11 +35,7 @@ export class AdminController {
     res.render("pages/admin-manage");
   };
 
-  public manageApplication = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  public manageApplication = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const specifiedApplicant: Applicant = await this._applicantService.findOne(
       req.url.split("/")[2]
     );
