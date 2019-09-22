@@ -14,7 +14,7 @@ export class Applicant {
   @Column("integer")
   @IsDefined({ message: "The applicants age is required" })
   @IsInt()
-  @Min(1, { message: "Minimum age is 1" })
+  @Min(18, { message: "Minimum age is 18" })
   age: number;
 
   @Column("varchar")

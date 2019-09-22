@@ -39,23 +39,35 @@
                         <% var currentID = `section${sectionIndex}-question${questionIndex}`; %>
                         <% if (question.answerType === "short") { %>
                         <div class="form-group">
-                          <label class="bmd-label-floating apply-label" for="<%= currentID %>"><%= question.questionText %></label>
+                          <label class="bmd-label-floating apply-label" for="<%= currentID %>">
+                          <%= question.questionText %>
+                          <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+                          </label>
                           <input autocomplete="false" spellcheck="false" type="text" class="form-control" for="<%= currentID %>" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
                         </div>
                         <% } else if (question.answerType == "long") { %>
                         <div class="form-group">
-                          <label class="bmd-label-floating apply-label" for="<%= currentID %>"><%= question.questionText %></label>
+                          <label class="bmd-label-floating apply-label" for="<%= currentID %>">
+                          <%= question.questionText %>
+                          <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+                          </label>
                           <textarea class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" rows="3" <%= question.required ? "required" : "" %>></textarea>
                         </div>
                         <% } else if (question.answerType == "number") { %>
                         <div class="form-group">
-                          <label class="bmd-label-floating apply-label" for="<%= currentID %>"><%= question.questionText %></label>
+                          <label class="bmd-label-floating apply-label" for="<%= currentID %>">
+                          <%= question.questionText %>
+                          <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+                          </label>
                           <input type="number" class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" min="0" <%= question.required ? "required" : "" %>>
                         </div>
                         <% } else if (question.answerType == "dropdown") { %>
                         <div class="form-group bmd-form-group">
-                          <label for="<%= currentID %>"><%= question.questionText %></label>
-                          <select class="form-control selectpicker" id="<%= currentID %>" name="<%= question.questionName %>" data-style="btn btn-link" data-live-search="true" title="Choose one of the following..." <%= question.required ? "required" : "" %>>
+                          <label for="<%= currentID %>">
+                          <%= question.questionText %>
+                          <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+                          </label>
+                          <select class="form-control selectpicker" id="<%= currentID %>" name="<%= question.questionName %>" data-style="btn btn-link" data-live-search="true" data-live-search-style="startsWith" title="Choose one of the following..." <%= question.required ? "required" : "" %>>
                             <% if (question.hasOwnProperty('answerOptions')) { %>
                               <% question.answerOptions.forEach(multioption => { %>
                               <option><%= multioption %></option>
@@ -65,7 +77,10 @@
                         </div>
                         <% } else if (question.answerType == "radio") { %>
                           <div class="form-group bmd-form-group">
-                            <label class="apply-form-radio-label apply-label"><%= question.questionText %></label>
+                            <label class="apply-form-radio-label apply-label">
+                            <%= question.questionText %>
+                            <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+                            </label>
                           <% if (question.hasOwnProperty('answerOptions')) { %>
                             <% question.answerOptions.forEach((multiradio, index) => { %>
                               <div class="form-check form-check-radio">
@@ -82,7 +97,7 @@
                               <div class="form-row">
                                 <div class="col-auto">
                                   <label class="form-check-label">
-                                      <input class="form-check-input" type="radio" name="<%= question.questionName %>" value="Other" id="<%= `${currentID}` %>-radio-other">
+                                      <input class="form-check-input" type="radio" name="<%= question.questionName %>" value="Other" id="<%= `${currentID}` %>-radio-other" <%= question.required ? "required" : "" %>>
                                       Other
                                       <span class="circle">
                                           <span class="check"></span>
@@ -105,10 +120,14 @@
                               <span class="check"></span>
                             </span>
                           </label>
+                          <%- question.required ? "<span class='label-req'> *</span>" : "" %>
                         </div>
                         <% } else if (question.answerType == "file") { %>
                         <div class="form-group">
-                          <label class="apply-form-radio-label apply-label"><%= question.questionText %></label>
+                          <label class="apply-form-radio-label apply-label">
+                          <%= question.questionText %>
+                          <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+                          </label>
                           <div class="custom-file">
                             <input type="file" class="custom-file-input" id="customFile" name="<%= question.questionName %>" <%= question.required ? "required" : "" %> accept=".pdf,.doc,.docx">
                             <label class="custom-file-label" for="customFile">Choose file</label>

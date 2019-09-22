@@ -141,8 +141,13 @@
   top: -7px;
 }
 
-.next-form-stage,.submit-form {
+.next-form-stage,
+.submit-form {
   float: right;
+}
+
+.label-req {
+  color: red;
 }
 
 div.custom-file {

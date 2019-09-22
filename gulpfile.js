@@ -10,6 +10,10 @@ const paths = {
     src: ['src/public/css/**/*.css', '!src/public/css/**/*.min.css'],
     dest: 'dist/public/css/'
   },
+  css_min: {
+    src: ['src/public/css/**/*.min.css'],
+    dest: 'dist/public/css/'
+  },
   scripts: {
     src: ['src/public/js/**/*.js', '!src/public/js/**/*.min.js'],
     dest: 'dist/public/js/'
@@ -43,6 +47,11 @@ function css() {
       suffix: '.min'
     }))
     .pipe(gulp.dest(paths.css.dest));
+}
+
+function cssCopyMin() {
+  return gulp.src(paths.css_min.src)
+    .pipe(gulp.dest(paths.css_min.dest));
 }
 
 function scripts() {
@@ -95,6 +104,7 @@ exports.default = parallel(
   scripts,
   scriptsCopyMin,
   css,
+  cssCopyMin,
   copyRemainingPublic,
   copyHackathonSettings
 );
