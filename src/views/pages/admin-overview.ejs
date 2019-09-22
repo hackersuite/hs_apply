@@ -19,9 +19,8 @@
 
           <div class="col-md-6">
             <div class="card card-chart">
-              <div class="card-header card-header-tabs card-header-primary">
-                <div class="ct-chart" id="applicants-chart">
-
+              <div class="card-header card-header-primary">
+                <div class="ct-chart" id="applicants-over-time-chart">
                 </div>
               </div>
               <div class="card-body">
@@ -29,13 +28,17 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
       <% include ../partials/footer.ejs %>
     </div>
   </div>
+  <script>
+    var applicationCreatedAtTimes = <%- JSON.stringify(applicationTimes || null) %>;
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.11.4/chartist.min.js" integrity="sha256-xNhpuwaNiVdna6L8Wy3GNuQz1z+SCmo4NY1c7cJ9Vdc=" crossorigin="anonymous"></script>
+  <script src="/js/admin.js"></script>
 </body>
 
 </html>

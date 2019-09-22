@@ -10,7 +10,7 @@ type ApplicationID = string | number | Date | ObjectID;
 
 export interface IApplicantService {
   getAll: () => Promise<Applicant[]>;
-  getAllAndCountSelection: (columns: (keyof Applicant)[]) => Promise<[Partial<Applicant>[], number]>;
+  getAllAndCountSelection: (columns: (keyof Applicant)[], orderBy?: keyof Applicant, orderType?: "ASC" | "DESC") => Promise<[Partial<Applicant>[], number]>;
   findOne: (id: ApplicationID) => Promise<Applicant>;
   save: (newApplicants: Applicant, file?: Buffer) => Promise<Applicant>;
 }
@@ -34,11 +34,16 @@ export class ApplicantService implements IApplicantService {
     }
   };
 
-  public getAllAndCountSelection = async (columns: (keyof Applicant)[]): Promise<[Partial<Applicant>[], number]> => {
+  public getAllAndCountSelection = async (
+    columns: (keyof Applicant)[],
+    orderBy?: keyof Applicant,
+    orderType?: "ASC" | "DESC"
+  ): Promise<[Partial<Applicant>[], number]> => {
     try {
-      return await this._applicantRepository.findAndCount({ select: columns });
+      const orderOptions: object = orderBy && orderBy ? { [orderBy]: orderType } : undefined;
+      return await this._applicantRepository.findAndCount({ select: columns, order: orderOptions });
     } catch (err) {
-      throw new Error(`Failed to get the select columns of applicants:\n${columns}`);
+      throw new Error(`Failed to get the list of applications`);
     }
   }
 

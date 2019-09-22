@@ -1,5 +1,5 @@
 import test from "ava";
-import { when, mock, instance, verify } from "ts-mockito";
+import { when, mock, instance, verify, anything, reset } from "ts-mockito";
 import container from "../../../src/inversify.config";
 import { TYPES } from "../../../src/types";
 
@@ -30,7 +30,7 @@ testApplicantMale.tShirtSize = "M";
 const testApplicantFemale: Applicant = new Applicant();
 testApplicantFemale.id = "7479a451-e826-4271-8073-929ccef522ee";
 testApplicantFemale.name = "Test";
-testApplicantFemale.age = 18;
+testApplicantFemale.age = 19;
 testApplicantFemale.gender = "Female";
 testApplicantFemale.nationality = "British";
 testApplicantFemale.country = "UK";
@@ -75,6 +75,7 @@ test.beforeEach(t => {
 test.afterEach(t => {
   // Restore to last snapshot so each unit test takes a clean copy of the application container
   container.restore();
+  reset(mockApplicantRepository);
 });
 
 test("Test all applicants can be found", async t => {
@@ -175,4 +176,56 @@ test("Test that error thrown when ENV not set for file upload", async t => {
   // Check the error actually is defined
   t.truthy(errors);
   verify(mockApplicantRepository.save(testApplicantInvalid)).never();
+});
+
+test.serial("Test that all applications and count selected with ascesnding order by date", async t => {
+  // Set up the stubbed methods in the mock
+  when(mockApplicantRepository.findAndCount(anything()))
+    .thenResolve([[testApplicantMale, testApplicantFemale], 2]);
+
+  // Call the function in the applicant service
+  const result: [Partial<Applicant>[], number] = await applicantService.getAllAndCountSelection(
+    ["gender"],
+    "age",
+    "ASC"
+  );
+
+  // Check that the results are as expected
+  const allFoundApplicants: Partial<Applicant>[] = result[0];
+  const numberOfApplicants: number = result[1];
+  t.is(allFoundApplicants[0].gender, testApplicantMale.gender);
+  t.is(allFoundApplicants[1].gender, testApplicantFemale.gender);
+  t.is(numberOfApplicants, 2);
+  verify(mockApplicantRepository.findAndCount(anything())).once();
+});
+test.serial("Test that all applications and count selected with no ordering", async t => {
+  // Set up the stubbed methods in the mock
+  when(mockApplicantRepository.findAndCount(anything()))
+    .thenResolve([[testApplicantMale, testApplicantFemale], 2]);
+
+  // Call the function in the applicant service
+  const result: [Partial<Applicant>[], number] = await applicantService.getAllAndCountSelection(
+    ["name", "gender"]
+  );
+
+  // Check that the results are as expected
+  const allFoundApplicants: Partial<Applicant>[] = result[0];
+  const numberOfApplicants: number = result[1];
+  t.is(allFoundApplicants[0].gender, testApplicantMale.gender);
+  t.is(allFoundApplicants[0].name, testApplicantMale.name);
+  t.is(allFoundApplicants[1].gender, testApplicantFemale.gender);
+  t.is(allFoundApplicants[1].name, testApplicantFemale.name);
+  t.is(numberOfApplicants, 2);
+  verify(mockApplicantRepository.findAndCount(anything())).called();
+});
+test.serial("Test that error thrown when getting applicants and count fails", async t => {
+  // Set up the stubbed methods in the mock
+  when(mockApplicantRepository.findAndCount(anything()))
+    .thenThrow(new Error());
+
+  // Call the function in the applicant service
+  const error: Error = await t.throwsAsync(applicantService.getAllAndCountSelection(["name"]));
+
+  t.truthy(error);
+  verify(mockApplicantRepository.findAndCount(anything())).once();
 });

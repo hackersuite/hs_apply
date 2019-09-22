@@ -27,7 +27,7 @@ export class AdminController {
   }
 
   public overview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const [applicationTimes, totalApplications] = await this._applicantService.getAllAndCountSelection(["createdAt"]);
+    const [applicationTimes, totalApplications] = await this._applicantService.getAllAndCountSelection(["createdAt"], "createdAt", "ASC");
     res.render("pages/admin-overview", { totalApplications, applicationTimes });
   };
 
