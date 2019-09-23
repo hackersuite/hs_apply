@@ -30,9 +30,11 @@ export class AdminController {
     const [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(["gender", "createdAt"], "createdAt", "ASC");
 
     const applicationTimes: Date[] = applications.map((applicant) => applicant.createdAt);
-    const genders = {};
+    const genders = {"Male": 0, "Female": 0, "Other": 0};
+    let genderSlice = "";
     applications.forEach((applicant) => {
-      genders[applicant.gender] = 1 + (genders[applicant.gender] || 0);
+      genderSlice = applicant.gender === "Male" || applicant.gender === "Female" ? applicant.gender : "Other";
+      genders[genderSlice]++;
     });
 
     res.render("pages/admin-overview", { totalApplications, applicationTimes, applicationGenders: genders });
