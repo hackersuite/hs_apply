@@ -22,7 +22,7 @@ function lineChartAnimation(e) {
   seq = 0
 }
 
-function barChartAnimation(event) {
+function pieChartAnimation(event) {
   event.on("draw", function(e) {
     "slice" === e.type && (seq2++,
     e.element.animate({
@@ -35,6 +35,20 @@ function barChartAnimation(event) {
       }
     }))
   }, seq2 = 0);
+}
+
+function barChartAnimation(event) {
+  event.on('draw', function(data) {
+    if(data.type == 'bar') {
+      data.element.animate({
+        y2: {
+          dur: '0.6s',
+          from: data.y1,
+          to: data.y2
+        }
+      });
+    }
+  });
 }
 
 $(document).ready(function () {
@@ -64,7 +78,7 @@ $(document).ready(function () {
     chartPadding: {
       top: 20,
       bottom: 0
-    },
+    }
   }
   var applicantsLineChart = new Chartist.Line('#applicants-over-time-chart', data, options);
   // Animate the chart on load
@@ -95,5 +109,14 @@ $(document).ready(function () {
     }]
   ];
   var applicantsGenderPieChart = new Chartist.Pie('#applicants-gender', data, options, responsiveOptions);
-  barChartAnimation(applicantsGenderPieChart);
+  pieChartAnimation(applicantsGenderPieChart);
+
+  // Create distributed bar chart for TShirt sizes
+  var applicantTShirtChart = new Chartist.Bar('#applicants-tshirts', {
+    labels: Object.keys(applicationTShirtStats),
+    series: Object.values(applicationTShirtStats)
+  }, {
+    distributeSeries: true
+  });
+  barChartAnimation(applicantTShirtChart);
 });

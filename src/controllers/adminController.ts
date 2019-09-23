@@ -27,17 +27,38 @@ export class AdminController {
   }
 
   public overview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(["gender", "createdAt"], "createdAt", "ASC");
+    const [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(["gender", "tShirtSize", "createdAt"], "createdAt", "ASC");
 
-    const applicationTimes: Date[] = applications.map((applicant) => applicant.createdAt);
+    // Create an array of the application times
+    const createdAtTimes: Date[] = applications.map((applicant) => applicant.createdAt);
+
+    // Create the map of genders and their respective count
     const genders = {"Male": 0, "Female": 0, "Other": 0};
     let genderSlice = "";
+
+    // Create a map of T-Shirt sizes and their count
+    const tShirts = {
+      "XS": 0,
+      "S": 0,
+      "M": 0,
+      "L": 0,
+      "XL": 0,
+      "XXL": 0
+    };
+
     applications.forEach((applicant) => {
       genderSlice = applicant.gender === "Male" || applicant.gender === "Female" ? applicant.gender : "Other";
       genders[genderSlice]++;
+
+      tShirts[applicant.tShirtSize] = 1 + (tShirts[applicant.tShirtSize] || 0);
     });
 
-    res.render("pages/admin-overview", { totalApplications, applicationTimes, applicationGenders: genders });
+    res.render("pages/admin-overview", {
+      totalApplications,
+      applicationTimes: createdAtTimes,
+      applicationGenders: genders,
+      applicationTShirts: tShirts
+    });
   };
 
   public manage = (req: Request, res: Response, next: NextFunction): void => {

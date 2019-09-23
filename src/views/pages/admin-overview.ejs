@@ -31,7 +31,7 @@
               </div>
             </div>
 
-            <div class="col-md-6 col-lg-6">
+            <div class="col-sm-6 col-md-6 col-lg-6">
               <div class="card card-chart">
                 <div class="card-header card-header-success">
                   <div class="ct-chart" id="applicants-gender">
@@ -42,7 +42,22 @@
                 </div>
               </div>
             </div>
-          </div>
+
+            <div class="col-sm-6 col-md-6 col-lg-6">
+              <div class="card card-chart">
+                <div class="card-header card-header-primary">
+                  <div class="ct-chart" id="applicants-tshirts">
+                  </div>
+                </div>
+                <div class="card-body">
+                  <h4 class="card-title text-center"></h4>
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- end row -->
+
+          
 
         </div>
       </div>
@@ -52,6 +67,7 @@
   <script>
     var applicationCreatedAtTimes = <%- JSON.stringify(applicationTimes || null) %>;
     var applicationGenderStats = <%- JSON.stringify(applicationGenders || null) %>;
+    var applicationTShirtStats = <%- JSON.stringify(applicationTShirts || null) %>;
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.11.4/chartist.min.js" integrity="sha256-xNhpuwaNiVdna6L8Wy3GNuQz1z+SCmo4NY1c7cJ9Vdc=" crossorigin="anonymous"></script>
