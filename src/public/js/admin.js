@@ -119,4 +119,13 @@ $(document).ready(function () {
     distributeSeries: true
   });
   barChartAnimation(applicantTShirtChart);
+
+  // Create distributed bar chart for dietry requirements
+  var applicantDietry = new Chartist.Bar('#applicants-dietry', {
+    labels: Object.keys(applicationDietryReq),
+    series: Object.values(applicationDietryReq)
+  }, {
+    distributeSeries: true
+  });
+  barChartAnimation(applicantDietry);
 });

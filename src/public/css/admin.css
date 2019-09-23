@@ -1,3 +1,8 @@
 .applicant-total {
   font-size: 1em;
 }
+
+.breakdown-scroll {
+  overflow: auto;
+  max-height: 18vh;
+}

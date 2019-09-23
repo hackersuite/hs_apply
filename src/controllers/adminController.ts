@@ -27,7 +27,7 @@ export class AdminController {
   }
 
   public overview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(["gender", "tShirtSize", "createdAt"], "createdAt", "ASC");
+    const [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(["gender", "tShirtSize", "createdAt", "dietaryRequirements", "hardwareRequests"], "createdAt", "ASC");
 
     // Create an array of the application times
     const createdAtTimes: Date[] = applications.map((applicant) => applicant.createdAt);
@@ -46,18 +46,35 @@ export class AdminController {
       "XXL": 0
     };
 
+    // Create a map for the dietry requirements
+    const dietryReq = {};
+
+    // Create an array with all the hardware requests
+    const hardwareReq = [];
+
     applications.forEach((applicant) => {
       genderSlice = applicant.gender === "Male" || applicant.gender === "Female" ? applicant.gender : "Other";
       genders[genderSlice]++;
 
       tShirts[applicant.tShirtSize] = 1 + (tShirts[applicant.tShirtSize] || 0);
+
+      dietryReq[applicant.dietaryRequirements] = 1 + (dietryReq[applicant.dietaryRequirements] || 0);
+
+      if (applicant.hardwareRequests && (
+        applicant.hardwareRequests !== "None" &&
+        applicant.hardwareRequests !== "Nothing")
+      ) {
+        hardwareReq.push(applicant.hardwareRequests);
+      }
     });
 
     res.render("pages/admin-overview", {
       totalApplications,
       applicationTimes: createdAtTimes,
       applicationGenders: genders,
-      applicationTShirts: tShirts
+      applicationTShirts: tShirts,
+      applicationDietry: dietryReq,
+      applicationHardwareReq: hardwareReq
     });
   };
 
