@@ -27,8 +27,15 @@ export class AdminController {
   }
 
   public overview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const [applicationTimes, totalApplications] = await this._applicantService.getAllAndCountSelection(["createdAt"], "createdAt", "ASC");
-    res.render("pages/admin-overview", { totalApplications, applicationTimes });
+    const [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(["gender", "createdAt"], "createdAt", "ASC");
+
+    const applicationTimes: Date[] = applications.map((applicant) => applicant.createdAt);
+    const genders = {};
+    applications.forEach((applicant) => {
+      genders[applicant.gender] = 1 + (genders[applicant.gender] || 0);
+    });
+
+    res.render("pages/admin-overview", { totalApplications, applicationTimes, applicationGenders: genders });
   };
 
   public manage = (req: Request, res: Response, next: NextFunction): void => {

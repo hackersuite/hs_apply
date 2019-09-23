@@ -13,21 +13,37 @@
     <div class="main-panel">
       <div class="content">
         <div class="container-fluid">
+
           <div class="row justify-content-center">
             <h1>Applications Overview</h1>
           </div>
 
-          <div class="col-md-6">
-            <div class="card card-chart">
-              <div class="card-header card-header-primary">
-                <div class="ct-chart" id="applicants-over-time-chart">
+          <div class="row">
+            <div class="col-md-6 col-lg-12">
+              <div class="card card-chart">
+                <div class="card-header card-header-primary">
+                  <div class="ct-chart" id="applicants-over-time-chart">
+                  </div>
+                </div>
+                <div class="card-body">
+                  <h4 class="card-title text-center">Currently  <%= totalApplications %> applications</h4>
                 </div>
               </div>
-              <div class="card-body">
-                <h4 class="card-title text-center">Currently  <%= totalApplications %> applications</h4>
+            </div>
+
+            <div class="col-md-6 col-lg-6">
+              <div class="card card-chart">
+                <div class="card-header card-header-success">
+                  <div class="ct-chart" id="applicants-gender">
+                  </div>
+                </div>
+                <div class="card-body">
+                  <h4 class="card-title text-center"></h4>
+                </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
       <% include ../partials/footer.ejs %>
@@ -35,6 +51,7 @@
   </div>
   <script>
     var applicationCreatedAtTimes = <%- JSON.stringify(applicationTimes || null) %>;
+    var applicationGenderStats = <%- JSON.stringify(applicationGenders || null) %>;
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.11.4/chartist.min.js" integrity="sha256-xNhpuwaNiVdna6L8Wy3GNuQz1z+SCmo4NY1c7cJ9Vdc=" crossorigin="anonymous"></script>
