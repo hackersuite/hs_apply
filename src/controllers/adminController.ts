@@ -68,7 +68,7 @@ export class AdminController {
       }
     });
 
-    res.render("pages/admin-overview", {
+    res.render("pages/admin/adminOverview", {
       totalApplications,
       applicationTimes: createdAtTimes,
       applicationGenders: genders,
@@ -78,8 +78,21 @@ export class AdminController {
     });
   };
 
-  public manage = (req: Request, res: Response, next: NextFunction): void => {
-    res.render("pages/admin-manage");
+  public manage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const columnsToSelect: (keyof Applicant)[] = ["id", "name", "university", "yearOfStudy", "createdAt"];
+    const columnNames: object[] = [
+      ["Name"],
+      ["University"],
+      ["Year"],
+      ["V/S/I/C", "Verified / Submitted / Invited / Confirmed"],
+      ["Manage"]
+    ];
+    const applications: Applicant[] = await this._applicantService.getAll(columnsToSelect);
+
+    res.render("pages/admin/adminManage", {
+      applicationRows: columnNames,
+      applications
+    });
   };
 
   public manageApplication = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

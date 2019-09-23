@@ -26,9 +26,12 @@ export class ApplicantService implements IApplicantService {
     this._applicantRepository = applicantRepository.getRepository();
   }
 
-  public getAll = async (): Promise<Applicant[]> => {
+  public getAll = async (
+    columns?: (keyof Applicant)[]
+  ): Promise<Applicant[]> => {
     try {
-      return await this._applicantRepository.find();
+      const options: object = columns ? { select: columns } : undefined;
+      return await this._applicantRepository.find(options);
     } catch (err) {
       throw new Error(`Failed to get all applicants:\n${err}`);
     }
