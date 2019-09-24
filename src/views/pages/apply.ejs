@@ -123,14 +123,16 @@
                           <%- question.required ? "<span class='label-req'> *</span>" : "" %>
                         </div>
                         <% } else if (question.answerType == "file") { %>
-                        <div class="form-group">
-                          <label class="apply-form-radio-label apply-label">
-                          <%= question.questionText %>
-                          <%- question.required ? "<span class='label-req'> *</span>" : "" %>
-                          </label>
-                          <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="customFile" name="<%= question.questionName %>" <%= question.required ? "required" : "" %> accept=".pdf,.doc,.docx">
-                            <label class="custom-file-label" for="customFile">Choose file</label>
+                        <div class="form-group form-file-upload form-file-simple bmd-form-group">
+                          <label class="apply-form-radio-label apply-label"><%= question.questionText %></label>
+                          <input type="file" class="inputFileHidden" id="customFile" name="<%= question.questionName %>" <%= question.required ? "required" : "" %> accept=".pdf,.doc,.docx">
+                          <div class="input-group">
+                            <input type="text" class="form-control inputFileVisible" placeholder="Choose file" aria-label="Choose CV to upload">
+                            <span class="input-group-btn">
+                              <button type="button" class="btn btn-fab btn-round btn-primary">
+                                <i class="material-icons">attach_file</i>
+                              </button>
+                            </span>
                           </div>
                         </div>
                         <% } %>

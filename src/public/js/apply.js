@@ -142,27 +142,34 @@ uniqueRadioGroups.forEach((groupName) => {
   });
 });
 
-function fileChanged() {
+$('.form-file-simple .inputFileVisible, .form-file-simple .input-group-btn').click(function() {
+  $(this).parent().parent().find('.inputFileHidden').trigger('click');
+  $(this).parent().parent().addClass('is-focused');
+});
+
+$('.form-file-simple .inputFileHidden').change(function() {
+  var shownFileInput = $(this).siblings('.input-group').find('.inputFileVisible');
   if (this.files[0].size > 5 * (1 << 20)) {
     // Notify the user the file chosen is invalid
-
     $.notify({
-      message: "Maximum file size is 5 MB"
+      message: 'Maximum file size is 5 MB'
     }, {
-      type: "danger"
+      type: 'danger'
     });
 
     // Remove the file from the input
     $(this).val('');
   } else {
-    // Add the file name to the input label
-    if ($(this).val()) {
-      var label = $(this).val().replace(/\\/g, '/').replace(/.*\//, '');
-      $('.custom-file-label').text(label);
-    }
+    var name = $(this).get(0).files.item(0).name;
+    $(shownFileInput).val(name);
   }
+  $(shownFileInput).attr('value', '');
+});
 
-  // Reset the input value so a new file can be chosen (even with same name)
-  $(this).attr("value", "");
-}
-$(".custom-file-input").change(fileChanged);
+$('.form-file-simple .btn').on('focus', function() {
+  $(this).parent().siblings().trigger('focus');
+});
+
+$('.form-file-simple .btn').on('focusout', function() {
+  $(this).parent().siblings().trigger('focusout');
+});
