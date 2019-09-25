@@ -16,7 +16,7 @@ import { Sections } from "./models/sections";
 import { TYPES } from "./types";
 import container from "./inversify.config";
 import { error404Handler, errorHandler } from "./util/errorHandling";
-import { passportSetup } from "./util/auth";
+import { RequestAuthentication } from "./util/auth";
 
 // Load environment variables from .env file
 dotenv.config({ path: ".env" });
@@ -54,7 +54,8 @@ export class App {
         });
 
         // Set up passport for authentication
-        passportSetup(app);
+        const requestAuth: RequestAuthentication = container.get(TYPES.RequestAuthentication);
+        requestAuth.passportSetup(app);
 
         // Routes set up for express, resolving dependencies
         // This is performed after successful DB connection since some routers use TypeORM repositories in their DI

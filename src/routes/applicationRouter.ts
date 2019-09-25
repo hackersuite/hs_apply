@@ -5,10 +5,18 @@ import { IRouter } from "./registerableRouter";
 import { TYPES } from "../types";
 import * as multer from "multer";
 import { HttpResponseCode } from "../util/errorHandling";
-import { checkAuth } from "../util/auth";
+import { checkLoggedIn, RequestAuthentication, checkIsOrganizer, checkIsAttendee } from "../util/auth";
 
 @injectable()
 export class ApplicationRouter implements IRouter {
+  private _applicationController: ApplicationController;
+
+  public constructor(
+    @inject(TYPES.ApplicationController) applicationController: ApplicationController,
+  ) {
+    this._applicationController = applicationController;
+  }
+
   private fileUploadHandler: RequestHandler = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -35,15 +43,6 @@ export class ApplicationRouter implements IRouter {
     });
   };
 
-  private _applicationController: ApplicationController;
-
-  public constructor(
-    @inject(TYPES.ApplicationController)
-    applicationController: ApplicationController
-  ) {
-    this._applicationController = applicationController;
-  }
-
   public getPathRoot(): string {
     return "/apply";
   }
@@ -51,9 +50,13 @@ export class ApplicationRouter implements IRouter {
   public register(): Router {
     const router: Router = Router();
 
-    router.use(checkAuth);
+    // Protect all the following routes in the router
+    // Ensure that at a minimum the user is logged in in order to access the apply page
+    router.use(checkLoggedIn);
 
-    router.get("/", this._applicationController.apply);
+    router.get("/",
+      this._applicationController.apply
+    );
 
     router.post("/",
       this.fileCheckMiddleware,

@@ -7,6 +7,10 @@ export class Applicant {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
+  @Column("varchar", { nullable: true, unique: true })
+  @IsOptional()
+  authId: string;
+
   @Column("varchar")
   @IsNotEmpty({ message: "The applicants name is required" })
   name: string;

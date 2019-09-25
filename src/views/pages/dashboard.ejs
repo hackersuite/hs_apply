@@ -12,14 +12,23 @@
     <div class="main-panel">
       <div class="content">
         <div class="container-fluid">
-          <div class="row justify-content-center">
-            <h2>You haven't created an application yet!</h2>
-          </div>
-          <div class="row justify-content-center">
-            <a href="/apply">
-              <button type="button" class="btn btn-info text-center">Create Application</button>
-            </a>
-          </div>
+          <% if (hasApplied) { %>
+            <div class="row justify-content-center">
+              <h2>Thank you for applying!</h2>
+            </div>
+            <div class="row justify-content-center">
+              <p>We will be in touch soon</p>
+            </div>
+          <% } else { %>
+            <div class="row justify-content-center">
+              <h2>You haven't created an application yet!</h2>
+            </div>
+            <div class="row justify-content-center">
+              <a href="/apply">
+                <button type="button" class="btn btn-info text-center">Create Application</button>
+              </a>
+            </div>
+          <% } %>
         </div>
       </div>
       <% include ../partials/footer.ejs %>

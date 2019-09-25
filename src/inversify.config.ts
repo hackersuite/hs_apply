@@ -11,6 +11,7 @@ import { IDashboardController, DashboardController } from "./controllers";
 
 import { IRouter, ApplicationRouter, DashboardRouter } from "./routes";
 import { ICache, Cache } from "./util/cache";
+import { IRequestAuthentication, RequestAuthentication } from "./util/auth";
 
 const container = new Container();
 
@@ -26,6 +27,10 @@ container.bind<ApplicantRepository>(TYPES.ApplicantRepository).to(ApplicantRepos
 // Dashboard
 container.bind<IDashboardController>(TYPES.DashboardController).to(DashboardController);
 
+// Request Authentication
+container.bind<IRequestAuthentication>(TYPES.RequestAuthentication).to(RequestAuthentication);
+
+// Constants
 container.bind<ICache>(TYPES.Cache).toConstantValue(new Cache());
 
 export default container;

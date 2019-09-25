@@ -6,6 +6,7 @@ import { TYPES } from "../types";
 import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
+import { RequestUser } from "../util/auth";
 
 export interface IApplicationController {
   apply: (req: Request, res: Response, next: NextFunction) => void;
@@ -28,10 +29,23 @@ export class ApplicationController {
     this._applicantService = applicantService;
   }
 
-  public apply = (req: Request, res: Response, next: NextFunction): void => {
-    const cachedSections: Array<Sections> = this._cache.getAll(Sections.name);
-    const sections = cachedSections[0].sections;
-    res.render("pages/apply", { sections: sections });
+  public apply = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    // Check if the user has already made an application using req.user.auth_id
+    let application: Applicant;
+    try {
+      application = await this._applicantService.findOne((req.user as RequestUser).auth_id, "authId");
+    } catch (err) {
+      return next(err);
+    }
+
+    if (application) {
+      // The user already has made an application, show the application overview page
+      res.send(JSON.stringify(application, undefined, 2));
+    } else {
+      const cachedSections: Array<Sections> = this._cache.getAll(Sections.name);
+      const sections = cachedSections[0].sections;
+      res.render("pages/apply", { sections: sections });
+    }
   };
 
   public submitApplication = async (req: Request, res: Response, next: NextFunction) => {
@@ -75,6 +89,7 @@ export class ApplicationController {
     newApplication.hardwareRequests = applicantHardwareReq;
     newApplication.dietaryRequirements = applicantDietaryRequirements === "Other" ? (applicantDietaryRequirementsOther || "Other") : applicantDietaryRequirements;
     newApplication.tShirtSize = applicantTShirt;
+    newApplication.authId = (req.user as RequestUser).auth_id;
 
     // Handling the CV file
     let cvFile: Buffer;

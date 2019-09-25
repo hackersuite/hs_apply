@@ -33,13 +33,14 @@ export class ApplicantService implements IApplicantService {
     }
   };
 
-  public findOne = async (id: ApplicationID): Promise<Applicant> => {
+  public findOne = async (id: ApplicationID, findBy?: keyof Applicant): Promise<Applicant> => {
     if (id === undefined) {
       throw new Error("Applicant ID must be provided");
     }
 
     try {
-      return await this._applicantRepository.findOne(id);
+      const findColumn: keyof Applicant = findBy || "id";
+      return await this._applicantRepository.findOne({ [findColumn]: id });
     } catch (err) {
       throw new Error(`Failed to find an applicant:\n${err}`);
     }

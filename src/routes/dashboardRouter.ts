@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { ApplicationController, DashboardController } from "../controllers";
+import { DashboardController } from "../controllers";
 import { injectable, inject } from "inversify";
 import { IRouter } from "./registerableRouter";
 import { TYPES } from "../types";
+import { checkLoggedIn } from "../util/auth";
 
 @injectable()
 export class DashboardRouter implements IRouter {
@@ -20,6 +21,8 @@ export class DashboardRouter implements IRouter {
 
   public register(): Router {
     const router: Router = Router();
+
+    router.use(checkLoggedIn);
 
     router.get("/",
       this._dashboardController.dashboard);
