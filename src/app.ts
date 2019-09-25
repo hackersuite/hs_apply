@@ -4,7 +4,6 @@ import * as express from "express";
 import * as dotenv from "dotenv";
 import * as path from "path";
 import * as morgan from "morgan";
-import * as passport from "passport";
 import * as expressSession from "express-session";
 import * as cookieParser from "cookie-parser";
 import { IApplicationSection } from "./settings";
@@ -17,6 +16,7 @@ import { Sections } from "./models/sections";
 import { TYPES } from "./types";
 import container from "./inversify.config";
 import { error404Handler, errorHandler } from "./util/errorHandling";
+import { passportSetup } from "./util/auth";
 
 // Load environment variables from .env file
 dotenv.config({ path: ".env" });
@@ -53,6 +53,9 @@ export class App {
           );
         });
 
+        // Set up passport for authentication
+        passportSetup(app);
+
         // Routes set up for express, resolving dependencies
         // This is performed after successful DB connection since some routers use TypeORM repositories in their DI
         const routers: IRouter[] = container.getAll(TYPES.Router);
@@ -63,9 +66,6 @@ export class App {
         // Setting up error handlers
         app.use(error404Handler);
         app.use(errorHandler);
-
-        // Set up passport for authentication
-        this.passportSetup(app);
 
         return callback(app);
       })
@@ -117,7 +117,7 @@ export class App {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
-    app.use(expressSession(this.getSessionOptions(app)));
+    // app.use(expressSession(this.getSessionOptions(app)));
   };
 
   /**
@@ -137,17 +137,6 @@ export class App {
       res.header("Pragma", "no-cache");
       next();
     });
-  };
-
-  /**
-   * Creates the passport middleware for handling user authentication
-   * @param app The app to set up the middleware for
-   */
-  private passportSetup = (app: Express): void => {
-    // Passport configuration
-    app.use(passport.initialize());
-    app.use(passport.session());
-    // passport.use(passportLocalStrategy(userService));
   };
 
   /**

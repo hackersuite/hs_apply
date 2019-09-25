@@ -5,6 +5,7 @@ import { IRouter } from "./registerableRouter";
 import { TYPES } from "../types";
 import * as multer from "multer";
 import { HttpResponseCode } from "../util/errorHandling";
+import { checkAuth } from "../util/auth";
 
 @injectable()
 export class ApplicationRouter implements IRouter {
@@ -49,6 +50,8 @@ export class ApplicationRouter implements IRouter {
 
   public register(): Router {
     const router: Router = Router();
+
+    router.use(checkAuth);
 
     router.get("/", this._applicationController.apply);
 
