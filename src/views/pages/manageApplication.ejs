@@ -16,12 +16,12 @@
               <h1>Application Details</h1>
             </div>
 
-            <div class="container">
-              <div class="row">
-                <h2><u>Basic Details</u></h2>
+            <div class="card">
+              <div class="card-header card-header-primary">
+                <h2 class="card-title">Basic Details</h2>
               </div>
-              <div class="row">
-                <div class="col-4">
+              <div class="row card-body">
+                <div class="col-md-4">
                   <p><strong>Applicant ID</strong>: <%= applicant.id %></p>
                   <p><strong>Name</strong>: <%= applicant.name %></p>
                   <p><strong>Age</strong>: <%= applicant.age %></p>
@@ -29,7 +29,7 @@
                     <strong>Nationality</strong>: <%= applicant.nationality %>
                   </p>
                 </div>
-                <div class="col-4">
+                <div class="col-md-4">
                   <p><strong>Country</strong>: <%= applicant.country %></p>
                   <p><strong>City</strong>: <%= applicant.city %></p>
                   <p>
@@ -39,7 +39,7 @@
                     <strong>Year of Study</strong>: <%= applicant.yearOfStudy %>
                   </p>
                 </div>
-                <div class="col-4">
+                <div class="col-md-4">
                   <p><strong>Skills</strong>: <%= applicant.skills %></p>
                   <p>
                     <strong>T-shirt Size</strong>: <%= applicant.tShirtSize %>
@@ -52,28 +52,30 @@
                 </div>
               </div>
             </div>
-            <br />
-            <div class="container">
-              <div class="row">
-                <h2><u>Experience</u></h2>
+
+            <div class="card">
+              <div class="card-header card-header-primary">
+                <h2 class="card-title">Experience</h2>
               </div>
-              <div class="row">
-                <p>
-                  <strong>Hackathon Count</strong>: <%= applicant.hackathonCount
-                  %>
-                </p>
-              </div>
-              <div class="row">
-                <h3>Past Projects</h3>
-                <%= applicant.pastProjects %>
+              <div class="card-body">
+                <div class="row">
+                  <p>
+                    <strong>Hackathon Count</strong>: <%=
+                    applicant.hackathonCount %>
+                  </p>
+                </div>
+                <div class="row">
+                  <h3>Past Projects</h3>
+                  <%= applicant.pastProjects %>
+                </div>
               </div>
             </div>
-            <br />
-            <div class="container">
-              <div class="row">
-                <h2><u>Motivation</u></h2>
+
+            <div class="card">
+              <div class="card-header card-header-primary">
+                <h2 class="card-title">Motivation</h2>
               </div>
-              <div class="row">
+              <div class="card-body">
                 <%= applicant.whyChooseHacker %>
               </div>
             </div>
