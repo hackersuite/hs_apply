@@ -10,8 +10,17 @@ type ApplicationID = string | number | Date | ObjectID;
 
 export interface IApplicantService {
   getAll: () => Promise<Applicant[]>;
+<<<<<<< HEAD
   getAllAndCountSelection: (columns: (keyof Applicant)[], orderBy?: keyof Applicant, orderType?: "ASC" | "DESC") => Promise<[Partial<Applicant>[], number]>;
   findOne: (id: ApplicationID, findBy?: keyof Applicant) => Promise<Applicant>;
+=======
+  getAllAndCountSelection: (
+    columns: (keyof Applicant)[],
+    orderBy?: keyof Applicant,
+    orderType?: "ASC" | "DESC"
+  ) => Promise<[Partial<Applicant>[], number]>;
+  findOne: (id: ApplicationID) => Promise<Applicant>;
+>>>>>>> Update specific applicant page.
   save: (newApplicants: Applicant, file?: Buffer) => Promise<Applicant>;
 }
 
@@ -43,12 +52,16 @@ export class ApplicantService implements IApplicantService {
     orderType?: "ASC" | "DESC"
   ): Promise<[Partial<Applicant>[], number]> => {
     try {
-      const orderOptions: object = orderBy && orderBy ? { [orderBy]: orderType } : undefined;
-      return await this._applicantRepository.findAndCount({ select: columns, order: orderOptions });
+      const orderOptions: object =
+        orderBy && orderBy ? { [orderBy]: orderType } : undefined;
+      return await this._applicantRepository.findAndCount({
+        select: columns,
+        order: orderOptions
+      });
     } catch (err) {
       throw new Error(`Failed to get the list of applications`);
     }
-  }
+  };
 
   public findOne = async (id: ApplicationID, findBy?: keyof Applicant): Promise<Applicant> => {
     if (id === undefined) {
@@ -63,7 +76,10 @@ export class ApplicantService implements IApplicantService {
     }
   };
 
-  public save = async (newApplicant: Applicant, file?: Buffer): Promise<Applicant> => {
+  public save = async (
+    newApplicant: Applicant,
+    file?: Buffer
+  ): Promise<Applicant> => {
     try {
       // Validate the new applicant using class-validation and fail if there is an error
       // Hide the target in the report for nicer error messages
@@ -90,6 +106,7 @@ export class ApplicantService implements IApplicantService {
     }
   };
 
+<<<<<<< HEAD
   public remove = async (id: ApplicationID, findBy?: keyof Applicant): Promise<void> => {
       if (id === undefined) {
         throw new Error("Applicant ID must be provided");
@@ -104,9 +121,18 @@ export class ApplicantService implements IApplicantService {
     };
 
   private saveToDropbox = async (fileName: string, file: Buffer): Promise<string> => {
+=======
+  private saveToDropbox = async (
+    fileName: string,
+    file: Buffer
+  ): Promise<string> => {
+>>>>>>> Update specific applicant page.
     if (!process.env.DROPBOX_API_TOKEN)
-      throw new Error("Failed to upload CV to Dropbox, set dropbox envs correctly");
+      throw new Error(
+        "Failed to upload CV to Dropbox, set dropbox envs correctly"
+      );
 
+<<<<<<< HEAD
     const result = await request.post("https://content.dropboxapi.com/2/files/upload", {
       headers: {
         "Content-Type": "application/octet-stream",
@@ -115,7 +141,48 @@ export class ApplicantService implements IApplicantService {
       },
       body: file
     });
+=======
+    const result = await request.post(
+      "https://content.dropboxapi.com/2/files/upload",
+      {
+        headers: {
+          "Content-Type": "application/octet-stream",
+          Authorization: "Bearer " + process.env.DROPBOX_API_TOKEN,
+          "Dropbox-API-Arg": `{"path": "/hackathon-cv/${fileName}", "mode": "overwrite", "autorename": true, "mute": false}`
+        },
+        body: file
+      }
+    );
+>>>>>>> Update specific applicant page.
 
     return result;
   };
+
+  // public getCVLink = async (fileName: string): Promise<string> => {
+  //   if (!process.env.DROPBOX_API_TOKEN)
+  //     throw new Error(
+  //       "Failed to upload CV to Dropbox, set dropbox envs correctly"
+  //     );
+  //   let result: any;
+  //   let link: string;
+  //   try {
+  //     result = await request.post(
+  //       "https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings",
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: "Bearer " + process.env.DROPBOX_API_TOKEN
+  //         },
+  //         body: `{ "path": "/hackathon-cv/${fileName}" }`
+  //       }
+  //     );
+  //     link = result.url;
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+
+  //   link = link.slice(0, -4) + "raw=1";
+
+  //   return link;
+  // };
 }

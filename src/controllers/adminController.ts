@@ -32,20 +32,22 @@ export class AdminController {
     const [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(["gender", "tShirtSize", "createdAt", "dietaryRequirements", "hardwareRequests", "university"], "createdAt", "ASC");
 
     // Create an array of the application times
-    const createdAtTimes: Date[] = applications.map((applicant) => applicant.createdAt);
+    const createdAtTimes: Date[] = applications.map(
+      applicant => applicant.createdAt
+    );
 
     // Create the map of genders and their respective count
-    const genders = {"Male": 0, "Female": 0, "Other": 0};
+    const genders = { Male: 0, Female: 0, Other: 0 };
     let genderSlice = "";
 
     // Create a map of T-Shirt sizes and their count
     const tShirts = {
-      "XS": 0,
-      "S": 0,
-      "M": 0,
-      "L": 0,
-      "XL": 0,
-      "XXL": 0
+      XS: 0,
+      S: 0,
+      M: 0,
+      L: 0,
+      XL: 0,
+      XXL: 0
     };
 
     // Create a map for the dietry requirements
@@ -57,17 +59,22 @@ export class AdminController {
     // Create an array with all the hardware requests
     const hardwareReq = [];
 
-    applications.forEach((applicant) => {
-      genderSlice = applicant.gender === "Male" || applicant.gender === "Female" ? applicant.gender : "Other";
+    applications.forEach(applicant => {
+      genderSlice =
+        applicant.gender === "Male" || applicant.gender === "Female"
+          ? applicant.gender
+          : "Other";
       genders[genderSlice]++;
 
       tShirts[applicant.tShirtSize] = 1 + (tShirts[applicant.tShirtSize] || 0);
 
-      dietryReq[applicant.dietaryRequirements] = 1 + (dietryReq[applicant.dietaryRequirements] || 0);
+      dietryReq[applicant.dietaryRequirements] =
+        1 + (dietryReq[applicant.dietaryRequirements] || 0);
 
-      if (applicant.hardwareRequests && (
-        applicant.hardwareRequests !== "None" &&
-        applicant.hardwareRequests !== "Nothing")
+      if (
+        applicant.hardwareRequests &&
+        (applicant.hardwareRequests !== "None" &&
+          applicant.hardwareRequests !== "Nothing")
       ) {
         hardwareReq.push(applicant.hardwareRequests);
       }
@@ -109,7 +116,9 @@ export class AdminController {
       ["V/S/I/C", "Verified / Submitted / Invited / Confirmed"],
       ["Manage"]
     ];
-    const applications: Applicant[] = await this._applicantService.getAll(columnsToSelect);
+    const applications: Applicant[] = await this._applicantService.getAll(
+      columnsToSelect
+    );
 
     const authUsersResult: any = JSON.parse(apiResult).users;
     const authUsers = {};
@@ -128,11 +137,16 @@ export class AdminController {
     });
   };
 
-  public manageApplication = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  public manageApplication = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     const specifiedApplicant: Applicant = await this._applicantService.findOne(
       req.url.split("/")[2]
     );
-    console.log(specifiedApplicant);
-    res.render("pages/manageApplication", { applicant: specifiedApplicant });
+    res.render("pages/manageApplication", {
+      applicant: specifiedApplicant
+    });
   };
 }
