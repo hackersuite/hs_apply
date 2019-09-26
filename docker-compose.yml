@@ -41,6 +41,7 @@ networks:
   # internal network for hacker suite services
   internal:
     driver: bridge
+    name: internal
   # external network for consumer-facing hacker suite services
   hacker_suite:
     external:
