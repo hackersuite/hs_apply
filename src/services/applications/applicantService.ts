@@ -94,7 +94,7 @@ export class ApplicantService implements IApplicantService {
       headers: {
         "Content-Type": "application/octet-stream",
         Authorization: "Bearer " + process.env.DROPBOX_API_TOKEN,
-        "Dropbox-API-Arg": `{"path": "/hackathon-cv/${fileName}", "mode": "overwrite", "autorename": true, "mute": false}`
+        "Dropbox-API-Arg": `{"path": "/hackathon-cv/${fileName}", "mode": "add", "autorename": true, "mute": false}`
       },
       body: file
     });
