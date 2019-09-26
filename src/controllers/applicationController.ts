@@ -83,7 +83,7 @@ export class ApplicationController {
     newApplication.yearOfStudy = applicantStudyYear;
     newApplication.workArea = applicantWorkArea === "Other" ? (applicantWorkAreaOther || "Other") : applicantWorkArea;
     newApplication.skills = applicantSkills;
-    newApplication.hackathonCount = Number.isInteger(applicantHackathonCount) ? Number.parseInt(applicantHackathonCount) : undefined;
+    newApplication.hackathonCount = !isNaN(applicantHackathonCount) ? Number.parseInt(applicantHackathonCount) : undefined;
     newApplication.whyChooseHacker = applicantWhyChoose;
     newApplication.pastProjects = applicantPastProj;
     newApplication.hardwareRequests = applicantHardwareReq;
