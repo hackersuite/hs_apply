@@ -27,7 +27,7 @@
                 <% }) %>
               </ul>
 
-              <form id="applyForm" action="/apply" method="post" enctype="multipart/form-data">
+              <form id="applyForm" action="javascript:;" method="post" enctype="multipart/form-data">
                 <% sections.forEach((section, sectionIndex) => { %>
                 <div class="card apply-form-card">
                   <div class="card-header card-header-tabs card-header-primary">
@@ -139,7 +139,7 @@
                         <input type="button" name="previous" class="btn btn-danger previous-form-stage" value="Previous" />
                       <% } %>
                       <% if (sectionIndex == sections.length - 1) { %>
-                        <input type="submit" name="submit" class="btn btn-success submit-form" value="Submit" />
+                        <input id="submit-form-btn" type="submit" name="submit" class="btn btn-success submit-form" value="Submit" />
                       <% } else { %>
                         <input type="button" name="next" class="btn btn-primary next-form-stage" value="Next" />
                       <% } %>

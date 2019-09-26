@@ -83,7 +83,7 @@ export class ApplicationController {
     newApplication.yearOfStudy = applicantStudyYear;
     newApplication.workArea = applicantWorkArea === "Other" ? (applicantWorkAreaOther || "Other") : applicantWorkArea;
     newApplication.skills = applicantSkills;
-    newApplication.hackathonCount = !isNaN(applicantHackathonCount) ? Number.parseInt(applicantHackathonCount) : undefined;
+    newApplication.hackathonCount = this.isNumeric(applicantHackathonCount) ? Number(applicantHackathonCount) : undefined;
     newApplication.whyChooseHacker = applicantWhyChoose;
     newApplication.pastProjects = applicantPastProj;
     newApplication.hardwareRequests = applicantHardwareReq;
@@ -99,16 +99,19 @@ export class ApplicationController {
       cvFile = req.files[0].buffer;
     }
 
-    let createdApplication: Applicant;
     try {
-      createdApplication = await this._applicantService.save(newApplication, cvFile);
+      await this._applicantService.save(newApplication, cvFile);
     } catch (errors) {
-      return res.status(HttpResponseCode.BAD_REQUEST)
-        .send({
-          error: true,
-          message: "Could not create application!"
-        });
+      return res.status(HttpResponseCode.BAD_REQUEST).send({
+        message: "Could not create application!"
+      });
     }
-    res.send(createdApplication);
+    res.send({
+      message: "Application recieved!"
+    });
   };
+
+  private isNumeric(n: any): boolean {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
 }

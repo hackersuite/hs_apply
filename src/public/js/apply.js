@@ -1,36 +1,66 @@
 var currentForm, nextForm, previousForm; // Forms
 var left, opacity, scale; // Forms properties which we will animate
 var animating; // Flag to prevent quick multi-click glitches
-currentForm = $("div .apply-form-card").first();
+currentForm = $('div .apply-form-card').first();
 
-$(".submit-form").click(function () {
+$('#applyForm').submit(function () {
+  var form = $(this)[0];
+  var data = new FormData(form);
+
+  $("#submit-form-btn").prop('disabled', true);
+
+  $.ajax({
+    type: 'POST',
+    url: '/apply',
+    enctype: 'multipart/form-data',
+    processData: false,
+    contentType: false,
+    cache: false,
+    data: data,
+    success: function (data) {
+      console.log(data);
+      window.location.replace("/");
+    },
+    error: function (error) {
+      $("#submit-form-btn").prop('disabled', false);
+      $.notify({
+        message: error.responseJSON.message
+      }, {
+        type: 'danger'
+      });
+    }
+  })
+
+})
+
+$('.submit-form').click(function () {
   if (!checkFormStageInputs()) {
     $.notify({
-      message: "Please fill in the required fields"
+      message: 'Please fill in the required fields'
     }, {
-      type: "danger"
+      type: 'danger'
     });
   }
 });
 
 // Requires jQuery Easing
-$(".next-form-stage").click(function () {
+$('.next-form-stage').click(function () {
   if (animating) return false;
   if (!checkFormStageInputs()) {
     $.notify({
-      message: "Please fill in the required fields"
+      message: 'Please fill in the required fields'
     }, {
-      type: "danger"
+      type: 'danger'
     });
     return false;
   }
   animating = true;
 
-  currentForm = $(this).closest("div .apply-form-card");
+  currentForm = $(this).closest('div .apply-form-card');
   nextForm = currentForm.next();
 
   // Activate next step on progressbar using the index of next_fs
-  $("#progressbar li").eq($("div .apply-form-card").index(nextForm)).addClass("active");
+  $('#progressbar li').eq($('div .apply-form-card').index(nextForm)).addClass('active');
 
   // Show the next partial-form
   nextForm.show();
@@ -40,12 +70,12 @@ $(".next-form-stage").click(function () {
     opacity: 0
   }, {
     step: function (now, mx) {
-      //as the opacity of currentForm reduces to 0 - stored in "now"
+      //as the opacity of currentForm reduces to 0 - stored in 'now'
       //1. scale currentForm down to 80%
       scale = 0.2 * (now + 4);
 
       //2. bring nextForm from the right(50%)
-      left = (now * 50) + "%";
+      left = (now * 50) + '%';
       //3. increase opacity of nextForm to 1 as it moves in
       opacity = 1 - now;
       currentForm.css({
@@ -68,15 +98,15 @@ $(".next-form-stage").click(function () {
   });
 });
 
-$(".previous-form-stage").click(function () {
+$('.previous-form-stage').click(function () {
   if (animating) return false;
   animating = true;
 
-  currentForm = $(this).closest("div .apply-form-card");
+  currentForm = $(this).closest('div .apply-form-card');
   previousForm = currentForm.prev();
 
   //de-activate current step on progressbar
-  $("#progressbar li").eq($("div .apply-form-card").index(currentForm)).removeClass("active");
+  $('#progressbar li').eq($('div .apply-form-card').index(currentForm)).removeClass('active');
 
   //show the previous fieldset
   previousForm.show();
@@ -85,11 +115,11 @@ $(".previous-form-stage").click(function () {
     opacity: 0
   }, {
     step: function (now, mx) {
-      //as the opacity of currentForm reduces to 0 - stored in "now"
+      //as the opacity of currentForm reduces to 0 - stored in 'now'
       //1. scale previousForm from 80% to 100%
       scale = 0.8 + (1 - now) * 0.2;
       //2. take currentForm to the right(50%) - from 0%
-      left = ((1 - now) * 50) + "%";
+      left = ((1 - now) * 50) + '%';
       //3. increase opacity of previousForm to 1 as it moves in
       opacity = 1 - now;
       currentForm.css({
@@ -103,7 +133,7 @@ $(".previous-form-stage").click(function () {
     duration: 800,
     complete: function () {
       currentForm.hide();
-      previousForm.css("position", "relative");
+      previousForm.css('position', 'relative');
       currentForm = previousForm;
       animating = false;
     },
@@ -114,7 +144,7 @@ $(".previous-form-stage").click(function () {
 
 function checkFormStageInputs() {
   var isValid = true;
-  $(currentForm).find(":input[required]").each(function () {
+  $(currentForm).find(':input[required]').each(function () {
     if (!$(this)[0].checkValidity()) {
       isValid = false;
       return false;
@@ -124,17 +154,17 @@ function checkFormStageInputs() {
 }
 
 var uniqueRadioGroups = [];
-$(".form-check-input[value=Other]").each(function () {
-  // Get all the inputs for the "other" option and hide them
-  var elementName = $(this).attr("name");
-  $("[name=" + elementName + "Other]").hide();
+$('.form-check-input[value=Other]').each(function () {
+  // Get all the inputs for the 'other' option and hide them
+  var elementName = $(this).attr('name');
+  $('[name=' + elementName + 'Other]').hide();
   uniqueRadioGroups.push(elementName);
 });
 
 uniqueRadioGroups.forEach((groupName) => {
   $(`input[name=${groupName}]`).change(function () {
-    var radioInputOther = $(this).attr("name") + "Other";
-    if ($(this).attr("value") === "Other") {
+    var radioInputOther = $(this).attr('name') + 'Other';
+    if ($(this).attr('value') === 'Other') {
       $(`[name=${radioInputOther}]`).fadeIn();
     } else {
       $(`[name=${radioInputOther}]`).fadeOut();
@@ -145,11 +175,10 @@ uniqueRadioGroups.forEach((groupName) => {
 function fileChanged() {
   if (this.files[0].size > 5 * (1 << 20)) {
     // Notify the user the file chosen is invalid
-
     $.notify({
-      message: "Maximum file size is 5 MB"
+      message: 'Maximum file size is 5 MB'
     }, {
-      type: "danger"
+      type: 'danger'
     });
 
     // Remove the file from the input
@@ -163,6 +192,6 @@ function fileChanged() {
   }
 
   // Reset the input value so a new file can be chosen (even with same name)
-  $(this).attr("value", "");
+  $(this).attr('value', '');
 }
-$(".custom-file-input").change(fileChanged);
+$('.custom-file-input').change(fileChanged);
