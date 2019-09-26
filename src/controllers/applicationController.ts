@@ -11,6 +11,7 @@ import { RequestUser } from "../util/auth";
 export interface IApplicationController {
   apply: (req: Request, res: Response, next: NextFunction) => void;
   submitApplication: (req: Request, res: Response, next: NextFunction) => void;
+  cancel: (req: Request, res: Response, next: NextFunction) => void;
 }
 
 /**
@@ -109,6 +110,16 @@ export class ApplicationController {
     res.send({
       message: "Application recieved!"
     });
+  };
+
+  public cancel = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await this._applicantService.remove((req.user as RequestUser).auth_id, "authId");
+    } catch (err) {
+      return next(err);
+    }
+    // TODO: On application cancel, remove their CV
+    res.redirect("/");
   };
 
   private isNumeric(n: any): boolean {

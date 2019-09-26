@@ -1,0 +1,24 @@
+.complete-status {
+  font-size: 250%;
+  font-weight: bold;
+  letter-spacing: 3px;
+  color: green;
+  text-align: center !important;
+}
+
+.incomplete-status {
+  font-size: 250%;
+  font-weight: bold;
+  letter-spacing: 3px;
+  color: red;
+  text-align: center !important;
+}
+
+.status-footer {
+  border-top: 1px solid #dcdcdc !important;
+}
+
+.status-footer>.row {
+  padding-top: 15px;
+  padding-left: 15px;
+}

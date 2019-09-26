@@ -3,6 +3,7 @@
 
 <head>
   <% include ../partials/head.ejs %>
+  <link type="text/css" href="/css/dashboard.css" rel="stylesheet" />
   <title>Applications | Dashboard</title>
 </head>
 
@@ -12,28 +13,69 @@
     <div class="main-panel">
       <div class="content">
         <div class="container-fluid">
-          <% if (hasApplied) { %>
-            <div class="row justify-content-center">
-              <h2>Thank you for applying!</h2>
+          <div class="row justify-content-center">
+            <div class="col-md-8">
+              <div class="card card-nav-tabs">
+                <div class="card-header card-header-primary">
+                  <h2 class="card-title text-center">Application Status</h2>
+                </div>
+                <div class="card-body">
+                  <% if (hasApplied) { %>
+                    <h3 class="complete-status">Complete</h3>
+                  <% } else { %>
+                    <h3 class="incomplete-status">Incomplete</h3>
+                  <% } %>
+                  <div class="status-footer">
+                    <% if (hasApplied) { %>
+                      <div class="row">
+                        <h4 class="font-weight-bold">Thank you for applying!</h4>
+                      </div>
+                      <div class="row">
+                        <p>We will be in touch soon any updates.</p>
+                      </div>
+                      <div class="row justify-content-center">
+                        <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModel">Cancel your application</button>
+                      </div>
+                      
+                      <div class="modal fade" id="cancelApplicationModel" tabindex="-1" role="dialog" aria-labelledby="cancelApplicationModelLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="cancelApplicationModelLabel">Cancel Application</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              Are you sure you want to cancel your application?
+                            </div>
+                            <div class="modal-footer">
+                              <a href="/apply/cancel" class="btn btn-danger">Yes, cancel my application</a>
+                              <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    <% } else { %>
+                      <div class="row">
+                        <h4 class="font-weight-bold">You still need to complete your application!</h4>
+                      </div>
+                      <div class="row">
+                        <p>Click the button below to fill out your application.</p>
+                      </div>
+                      <div class="row justify-content-center">
+                        <a href="/apply" class="btn btn-success text-center">Create your application</a>
+                      </div>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="row justify-content-center">
-              <p>We will be in touch soon</p>
-            </div>
-          <% } else { %>
-            <div class="row justify-content-center">
-              <h2>You haven't created an application yet!</h2>
-            </div>
-            <div class="row justify-content-center">
-              <a href="/apply">
-                <button type="button" class="btn btn-info text-center">Create Application</button>
-              </a>
-            </div>
-          <% } %>
+          </div>
         </div>
       </div>
       <% include ../partials/footer.ejs %>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"
-      integrity="sha256-tw5/wId1F+4LyUF2ZJnpRoHNXJ66jrK3IGhfq4LhLjY=" crossorigin="anonymous"></script>
     </div>
   </div>
 </body>

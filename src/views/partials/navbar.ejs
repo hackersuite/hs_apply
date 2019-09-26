@@ -13,12 +13,14 @@
           <p>Dashboard</p>
         </a>
       </li>
+      <% if (!locals.hasApplied) { %>
       <li class="nav-item">
         <a class="nav-link" href="/apply">
           <i class="material-icons">person</i>
           <p>Application</p>
         </a>
       </li>
+      <% } %>
     </ul>
   </div>
 </div>

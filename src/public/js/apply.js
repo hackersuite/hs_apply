@@ -18,7 +18,6 @@ $('#applyForm').submit(function () {
     cache: false,
     data: data,
     success: function (data) {
-      console.log(data);
       window.location.replace("/");
     },
     error: function (error) {

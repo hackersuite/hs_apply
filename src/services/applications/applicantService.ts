@@ -73,6 +73,19 @@ export class ApplicantService implements IApplicantService {
     }
   };
 
+  public remove = async (id: ApplicationID, findBy?: keyof Applicant): Promise<void> => {
+      if (id === undefined) {
+        throw new Error("Applicant ID must be provided");
+      }
+
+      try {
+        const findColumn: keyof Applicant = findBy || "id";
+        await this._applicantRepository.delete({ [findColumn]: id });
+      } catch (err) {
+        throw new Error(`Failed to remove an applicant:\n${err}`);
+      }
+    };
+
   private saveToDropbox = async (fileName: string, file: Buffer): Promise<string> => {
     if (!process.env.DROPBOX_API_TOKEN)
       throw new Error("Failed to upload CV to Dropbox, set dropbox envs correctly");

@@ -63,6 +63,10 @@ export class ApplicationRouter implements IRouter {
       this._applicationController.submitApplication
     );
 
+    router.get("/cancel",
+      this._applicationController.cancel
+    );
+
     return router;
   }
 }
