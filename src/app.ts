@@ -54,6 +54,7 @@ export class App {
         });
 
         // Set up passport for authentication
+        // Also add the logout route
         const requestAuth: RequestAuthentication = container.get(TYPES.RequestAuthentication);
         requestAuth.passportSetup(app);
 

@@ -31,7 +31,16 @@ export class RequestAuthentication {
     this._applicantService = applicantService;
   }
 
+  private logout = (app: Application) => {
+    app.get("/logout", function(req: Request, res: Response) {
+      res.clearCookie("Authorization");
+      return res.redirect("/");
+    });
+  };
+
   public passportSetup = (app: Application) => {
+    this.logout(app);
+
     app.use(passport.initialize());
     passport.use(new CookieStrategy({
       cookieName: "Authorization",
@@ -41,7 +50,7 @@ export class RequestAuthentication {
       let apiResult: string;
       try {
         apiResult = await request
-          .get(`http://localhost:8000/api/v1/users/verify`, {
+          .get(`${process.env.AUTH_URL}/api/v1/users/verify`, {
             headers: {
               "Authorization": `${token}`,
               "Referer": req.originalUrl
@@ -78,8 +87,8 @@ export const checkLoggedIn = (req: Request, res: Response, next: NextFunction) =
 
     // There is no authenticated user, so redirect to logins
     if (!user) {
-      const queryParam: string = querystring.encode({"returnto": "http://localhost:8010/apply"});
-      return res.redirect(`http://localhost:8000/login?${queryParam}`);
+      const queryParam: string = querystring.encode({"returnto": `${process.env.APPLICATION_URL}${req.originalUrl}`});
+      return res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
     }
 
     return next();
