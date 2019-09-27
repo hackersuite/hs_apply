@@ -8,14 +8,18 @@ import { AuthLevels } from "./authLevels";
 import { injectable, inject } from "inversify";
 import { ApplicantService } from "../../services";
 import { TYPES } from "../../types";
+import { Applicant } from "../../models/db";
 
 export interface IRequestAuthentication {
   passportSetup: (app: Application) => void;
 }
 
 export type RequestUser = {
-  auth_id: string,
-  auth_level: number
+  "auth_id": string;
+  "auth_level": number;
+  "name": string;
+  "email": string;
+  "team": string;
 };
 
 @injectable()
@@ -50,7 +54,7 @@ export class RequestAuthentication {
       let apiResult: string;
       try {
         apiResult = await request
-          .get(`${process.env.AUTH_URL}/api/v1/users/verify`, {
+          .get(`${process.env.AUTH_URL}/api/v1/users/me`, {
             headers: {
               "Authorization": `${token}`,
               "Referer": req.originalUrl
@@ -65,15 +69,18 @@ export class RequestAuthentication {
       if (result.error && result.status === HttpResponseCode.UNAUTHORIZED) {
         // When there is an error message and the status code is 401
         return done(undefined, false);
-      } else if (result.status === HttpResponseCode.OK) {
+      } else if (result.status === 0) {
         // The request has been authorized
         // TODO: Load the applicant from the database into req.user
         // The problems is that if they haven't created an application they wont be in the database
         // We only have the auth_id to find the user in the db. We could create a new entry
         // but since we use class validation for applications it will always fail right now
         req.user = {
-          "auth_id": result.user_id,
-          "auth_level": result.auth_level
+          "auth_id": result.user._id,
+          "auth_level": result.user.auth_level,
+          "name": result.user.name,
+          "email": result.user.email,
+          "team": result.user.team
         };
         return done(undefined, req.user);
       }

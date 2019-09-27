@@ -7,6 +7,7 @@ import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
 import { RequestUser } from "../util/auth";
+import { ApplicantStatus } from "../services/applications/applicantStatus";
 
 export interface IApplicationController {
   apply: (req: Request, res: Response, next: NextFunction) => void;
@@ -40,18 +41,19 @@ export class ApplicationController {
     }
 
     if (application) {
-      // The user already has made an application, show the application overview page
-      res.send(JSON.stringify(application, undefined, 2));
+      // The application has been made, redirect to dashboard
+      return res.redirect("/");
     } else {
       const cachedSections: Array<Sections> = this._cache.getAll(Sections.name);
       const sections = cachedSections[0].sections;
-      res.render("pages/apply", { sections: sections });
+      res.render("pages/apply", { sections: sections, hasApplied: false });
     }
   };
 
   public submitApplication = async (req: Request, res: Response, next: NextFunction) => {
+    const reqUser: RequestUser = (req.user) as RequestUser;
+
     const {
-      applicantName,
       applicantAge,
       applicantGender,
       applicantGenderOther,
@@ -74,7 +76,6 @@ export class ApplicationController {
 
     // TODO: Rewrite this to make it easier to add more attributes
     const newApplication: Applicant = new Applicant();
-    newApplication.name = applicantName;
     newApplication.age = Number(applicantAge);
     newApplication.gender = applicantGender === "Other" ? (applicantGenderOther || "Other") : applicantGender;
     newApplication.nationality = applicantNationality;
@@ -91,12 +92,12 @@ export class ApplicationController {
     newApplication.dietaryRequirements = applicantDietaryRequirements === "Other" ? (applicantDietaryRequirementsOther || "Other") : applicantDietaryRequirements;
     newApplication.tShirtSize = applicantTShirt;
     newApplication.authId = (req.user as RequestUser).auth_id;
+    newApplication.applicationStatus = ApplicantStatus.Applied;
 
     // Handling the CV file
     let cvFile: Buffer;
     if (req.files && req.files.length === 1 && req.files[0].fieldname === "applicantCV") {
-      // TODO: Change to <name>-<email>.<ext> when linked to hs_auth
-      newApplication.cv = `${newApplication.name}-${req.files[0].originalname}`;
+      newApplication.cv = `${reqUser.name}.${reqUser.email}.${req.files[0].originalname}`;
       cvFile = req.files[0].buffer;
     }
 
@@ -113,12 +114,31 @@ export class ApplicationController {
   };
 
   public cancel = async (req: Request, res: Response, next: NextFunction) => {
+    let application: Applicant;
     try {
-      await this._applicantService.remove((req.user as RequestUser).auth_id, "authId");
+      application = await this._applicantService.findOne((req.user as RequestUser).auth_id, "authId");
     } catch (err) {
       return next(err);
     }
-    // TODO: On application cancel, remove their CV
+
+
+    if (application.applicationStatus <= ApplicantStatus.Applied) {
+      // Delete the application so they can re-apply
+      try {
+        await this._applicantService.remove(application.id);
+      } catch (err) {
+        return next(err);
+      }
+    } else {
+      // It is too late in the process to re-apply so cancel their application
+      try {
+        application.applicationStatus = ApplicantStatus.Cancelled;
+        await this._applicantService.save(application);
+      } catch (err) {
+        return next(err);
+      }
+    }
+
     res.redirect("/");
   };
 

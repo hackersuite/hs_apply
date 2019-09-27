@@ -5,6 +5,7 @@ import { TYPES } from "../types";
 import { Applicant } from "../models/db";
 import { ApplicantService } from "../services";
 import { RequestUser } from "../util/auth";
+import { ApplicantStatus } from "../services/applications/applicantStatus";
 
 export interface IDashboardController {
   dashboard: (req: Request, res: Response, next: NextFunction) => void;
@@ -34,7 +35,11 @@ export class DashboardController {
       return next(err);
     }
 
-    const hasApplied: boolean = applicant !== undefined;
-    res.render("pages/dashboard", { "hasApplied": hasApplied });
+    const applicationStatus: ApplicantStatus = applicant !== undefined ?
+      applicant.applicationStatus : ApplicantStatus.Verified;
+    res.render("pages/dashboard", {
+      "applicationStatus": applicationStatus,
+      "applicantName": (req.user as RequestUser).name
+    });
   };
 }

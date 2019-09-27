@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { Min, IsDefined, IsInt, IsNotEmpty, IsOptional, IsDate } from "class-validator";
+import { ApplicantStatus } from "../../services/applications/applicantStatus";
 
 @Entity()
 export class Applicant {
@@ -10,10 +11,6 @@ export class Applicant {
   @Column("varchar", { nullable: true, unique: true })
   @IsOptional()
   authId: string;
-
-  @Column("varchar")
-  @IsNotEmpty({ message: "The applicants name is required" })
-  name: string;
 
   @Column("integer")
   @IsDefined({ message: "The applicants age is required" })
@@ -82,5 +79,13 @@ export class Applicant {
   @Column("varchar")
   @IsNotEmpty({ message: "The applicants T-Shirt size is required" })
   tShirtSize: string;
+
+  // Applicant status, refers to the Enum ApplicationStatus
+  @Column({
+    type: "enum",
+    enum: ApplicantStatus,
+    default: ApplicantStatus.Applied
+  })
+  applicationStatus: ApplicantStatus;
 
 }

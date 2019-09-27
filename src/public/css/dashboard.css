@@ -1,17 +1,20 @@
-.complete-status {
+.application-status {
   font-size: 250%;
   font-weight: bold;
   letter-spacing: 3px;
-  color: green;
   text-align: center !important;
 }
-
 .incomplete-status {
-  font-size: 250%;
-  font-weight: bold;
-  letter-spacing: 3px;
   color: red;
-  text-align: center !important;
+}
+.complete-status {
+  color: orange;
+}
+.invited-status {
+  color: purple;
+}
+.confirmed-status {
+  color: green;
 }
 
 .status-footer {

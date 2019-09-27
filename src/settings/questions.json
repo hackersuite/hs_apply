@@ -2,12 +2,6 @@
   "sections": [{
       "name": "Basic Information",
       "questions": [{
-          "questionName": "applicantName",
-          "questionText": "What is your name?",
-          "answerType": "short",
-          "required": true
-        },
-        {
           "questionName": "applicantAge",
           "questionText": "How old are you?",
           "answerType": "number",
