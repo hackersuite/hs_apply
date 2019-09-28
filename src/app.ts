@@ -4,15 +4,14 @@ import * as express from "express";
 import * as dotenv from "dotenv";
 import * as path from "path";
 import * as morgan from "morgan";
-import * as expressSession from "express-session";
 import * as cookieParser from "cookie-parser";
-import { IApplicationSection } from "./settings";
+import { IApplicationSection, IHackathonSettings } from "./settings";
 import { Express, Request, Response, NextFunction } from "express";
 import { ConnectionOptions, createConnections, Connection } from "typeorm";
 import { IRouter } from "./routes";
 import { Cache } from "./util/cache";
 import { promisify } from "util";
-import { Sections } from "./models/sections";
+import { Sections, HackathonSettings } from "./models";
 import { TYPES } from "./types";
 import container from "./inversify.config";
 import { error404Handler, errorHandler } from "./util/errorHandling";
@@ -39,7 +38,7 @@ export class App {
     }
 
     // Load the hackathon application settings from disk
-    await this.loadApplicationSettings();
+    await this.loadApplicationSettings(app);
 
     // Connecting to database
     const databaseConnectionSettings: ConnectionOptions[] =
@@ -142,33 +141,61 @@ export class App {
   };
 
   /**
-   * Loads the applications settings into Cache
+   * Loads the questions settings into Cache
+   *
    * Questions are stored under the name `Questions`
+   *
    * Hackathon settings are stored under `Hackathon`
+   *
+   * Also loads the hackathon settings into app.locals for use in EJS templates
+   *
+   * If you update the hackathon settings, you need to restart the application
    */
-  private loadApplicationSettings = async (): Promise<void> => {
-    // Check if the file exists in the current directory, and if it is writable.
-    console.log("Loading hackathon application settings...");
+  private loadApplicationSettings = async (app: Express): Promise<void> => {
+    console.log("Loading hackathon application questions...");
+    const sections: Array<IApplicationSection> = await this.loadSettingsFile("questions.json", "sections");
+    if (sections) {
+      const applicationSections: Sections = new Sections(sections);
+      this.cache.set(Sections.name, applicationSections);
+      console.log("\tLoaded application questions");
+    }
 
-    let sections: Array<IApplicationSection>;
+    console.log("Loading hackathon application settings...");
+    const settings: IHackathonSettings = await this.loadSettingsFile("hackathon.json");
+    if (settings) {
+      const hackathonSettings: HackathonSettings = new HackathonSettings(settings);
+      this.cache.set(HackathonSettings.name, hackathonSettings);
+      app.locals.settings = hackathonSettings;
+      console.log("\tLoaded application settings");
+    } else {
+      // We couldn't load the hackathon settings so set some defaults
+      app.locals.settings = {
+        "shortName": "Hackathon",
+        "fullName": "Hackathon",
+        "applicationsOpen": new Date(),
+        "applicationsClose": new Date(Date.now() + 10800 * 1000) // 3 hours from now
+      };
+    }
+  };
+  private loadSettingsFile = async <T>(fileName: string, obj?: string): Promise<T> => {
+    // Check if the file exists in the current directory, and if it is writable.
+    let settings: T;
     try {
       const fileBuffer: string = await this.readFileAsync(
-        __dirname + "/settings/questions.json",
+        __dirname + `/settings/${fileName}`,
         { encoding: "utf8" }
       );
-      sections = JSON.parse(fileBuffer).sections;
+      settings = obj ? JSON.parse(fileBuffer)[obj] : JSON.parse(fileBuffer);
       // Handle non-exception-throwing cases
-      if (!sections && typeof sections !== "object") {
+      if (!settings && typeof settings !== "object") {
         throw "Failed to parse JSON";
       }
     } catch (err) {
-      console.error("Failed to load questions");
+      console.error("  Failed to load settings!");
+      return undefined;
     }
-    const applicationSections: Sections = new Sections(sections);
-    this.cache.set(Sections.name, applicationSections);
-
-    console.log("Done loading settings!");
-  };
+    return settings;
+  }
 
   private getSessionOptions = (app: Express): any => {
     return {
