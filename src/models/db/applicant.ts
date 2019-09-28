@@ -80,6 +80,10 @@ export class Applicant {
   @IsNotEmpty({ message: "The applicants T-Shirt size is required" })
   tShirtSize: string;
 
+  @Column("datetime", { nullable: true })
+  @IsOptional()
+  inviteAcceptDeadline: Date;
+
   // Applicant status, refers to the Enum ApplicationStatus
   @Column({
     type: "enum",

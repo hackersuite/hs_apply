@@ -3,13 +3,17 @@ import { TYPES } from "./types";
 
 // Applicants
 import { IApplicantService, ApplicantService } from "./services";
-import { IApplicationController, ApplicationController } from "./controllers";
+import { IApplicationController, ApplicationController, IInviteController, InviteController } from "./controllers";
 import { ApplicantRepository } from "./repositories";
 
 // Dashboard
 import { IDashboardController, DashboardController } from "./controllers";
 
-import { IRouter, ApplicationRouter, DashboardRouter } from "./routes";
+// Email
+import { IEmailService, EmailService } from "./services";
+
+// Routers
+import { IRouter, ApplicationRouter, DashboardRouter, InviteRouter } from "./routes";
 import { ICache, Cache } from "./util/cache";
 import { IRequestAuthentication, RequestAuthentication } from "./util/auth";
 
@@ -18,6 +22,7 @@ const container = new Container();
 // Routers
 container.bind<IRouter>(TYPES.Router).to(ApplicationRouter);
 container.bind<IRouter>(TYPES.Router).to(DashboardRouter);
+container.bind<IRouter>(TYPES.Router).to(InviteRouter);
 
 // Applications
 container.bind<IApplicantService>(TYPES.ApplicantService).to(ApplicantService);
@@ -26,6 +31,10 @@ container.bind<ApplicantRepository>(TYPES.ApplicantRepository).to(ApplicantRepos
 
 // Dashboard
 container.bind<IDashboardController>(TYPES.DashboardController).to(DashboardController);
+
+// Email
+container.bind<IInviteController>(TYPES.InviteController).to(InviteController);
+container.bind<IEmailService>(TYPES.EmailService).to(EmailService);
 
 // Request Authentication
 container.bind<IRequestAuthentication>(TYPES.RequestAuthentication).to(RequestAuthentication);

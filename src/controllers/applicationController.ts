@@ -46,7 +46,7 @@ export class ApplicationController {
     } else {
       const cachedSections: Array<Sections> = this._cache.getAll(Sections.name);
       const sections = cachedSections[0].sections;
-      res.render("pages/apply", { sections: sections, hasApplied: false });
+      res.render("pages/apply", { sections: sections });
     }
   };
 

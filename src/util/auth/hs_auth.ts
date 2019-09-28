@@ -8,7 +8,6 @@ import { AuthLevels } from "./authLevels";
 import { injectable, inject } from "inversify";
 import { ApplicantService } from "../../services";
 import { TYPES } from "../../types";
-import { Applicant } from "../../models/db";
 
 export interface IRequestAuthentication {
   passportSetup: (app: Application) => void;
@@ -120,7 +119,7 @@ const checkAuthLevel = (req: Request, res: Response, user: RequestUser, required
   if (!user || user.auth_level < requiredAuth) {
     const queryParam: string = querystring.encode({"returnto": `${process.env.APPLICATION_URL}${req.originalUrl}`});
     res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
-    return false;
+    return;
   }
   return true;
 };

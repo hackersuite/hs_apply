@@ -9,7 +9,8 @@
 
 <body>
   <div class="wrapper">
-    <% include ../partials/navbar.ejs %>
+    <% var hasApplied = applicationStatus !== 0; %>
+    <%- include('../partials/navbar', { hasApplied: hasApplied }); %>
     <div class="main-panel">
       <div class="content">
         <div class="container-fluid">
