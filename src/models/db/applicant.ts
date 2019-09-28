@@ -92,6 +92,6 @@ export class Applicant {
   })
   applicationStatus: ApplicantStatus;
 
-  @Column("datetime")
+  @Column("datetime", { nullable: false, default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
 }

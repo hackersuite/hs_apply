@@ -3,6 +3,7 @@ import { AdminController } from "../controllers";
 import { injectable, inject } from "inversify";
 import { IRouter } from "./registerableRouter";
 import { TYPES } from "../types";
+import { checkIsOrganizer, checkLoggedIn } from "../util/auth";
 
 @injectable()
 export class AdminRouter implements IRouter {
@@ -20,6 +21,9 @@ export class AdminRouter implements IRouter {
 
   public register(): Router {
     const router: Router = Router();
+
+    router.use(checkLoggedIn);
+    router.use(checkIsOrganizer);
 
     router.get("/overview", this._adminController.overview);
 

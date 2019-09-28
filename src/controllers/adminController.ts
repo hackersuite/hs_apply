@@ -1,9 +1,11 @@
+import * as request from "request-promise-native";
 import { Request, Response, NextFunction } from "express";
 import { Cache } from "../util/cache";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
+import { RequestUser } from "../util/auth";
 
 export interface IAdminController {
   overview: (req: Request, res: Response, next: NextFunction) => void;
@@ -79,7 +81,20 @@ export class AdminController {
   };
 
   public manage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const columnsToSelect: (keyof Applicant)[] = ["id", "name", "university", "yearOfStudy", "createdAt"];
+    let apiResult: any;
+    try {
+      apiResult = await request
+        .get(`${process.env.AUTH_URL}/api/v1/users`, {
+          headers: {
+            "Authorization": `${req.cookies["Authorization"]}`
+          }
+      });
+    } catch (err) {
+      // Some internal error has occured
+      return next(err);
+    }
+
+    const columnsToSelect: (keyof Applicant)[] = ["id", "authId", "university", "yearOfStudy", "createdAt"];
     const columnNames: object[] = [
       ["Name"],
       ["University"],
@@ -89,9 +104,21 @@ export class AdminController {
     ];
     const applications: Applicant[] = await this._applicantService.getAll(columnsToSelect);
 
+    const authUsersResult: any = JSON.parse(apiResult).users;
+    const authUsers = {};
+    authUsersResult.forEach(a => {
+      authUsers[a._id] = {...a};
+    });
+    console.log(authUsers);
+
+    const combinedApplications: any = [];
+    applications.forEach(a => {
+      combinedApplications.push({...a, ...authUsers[a.authId]});
+    });
+
     res.render("pages/admin/adminManage", {
       applicationRows: columnNames,
-      applications
+      applications: combinedApplications
     });
   };
 
