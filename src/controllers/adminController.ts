@@ -109,7 +109,6 @@ export class AdminController {
     authUsersResult.forEach(a => {
       authUsers[a._id] = {...a};
     });
-    console.log(authUsers);
 
     const combinedApplications: any = [];
     applications.forEach(a => {
