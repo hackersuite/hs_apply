@@ -1,0 +1,29 @@
+.applicant-total {
+  font-size: 1em;
+}
+
+.breakdown-scroll {
+  overflow: auto;
+  max-height: 18vh;
+}
+
+.applicants-scroll {
+  overflow: auto;
+}
+
+.search-icon {
+  padding-top: 9px;
+  padding-right: 5px;
+}
+
+.applicant-status {
+  font-size: 16px;
+}
+
+.applicant-status.check-valid {
+  color: green;
+}
+
+.applicant-status.check-invalid {
+  color: red;
+}

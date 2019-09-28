@@ -10,7 +10,8 @@ type ApplicationID = string | number | Date | ObjectID;
 
 export interface IApplicantService {
   getAll: () => Promise<Applicant[]>;
-  findOne: (id: ApplicationID) => Promise<Applicant>;
+  getAllAndCountSelection: (columns: (keyof Applicant)[], orderBy?: keyof Applicant, orderType?: "ASC" | "DESC") => Promise<[Partial<Applicant>[], number]>;
+  findOne: (id: ApplicationID, findBy?: keyof Applicant) => Promise<Applicant>;
   save: (newApplicants: Applicant, file?: Buffer) => Promise<Applicant>;
 }
 
@@ -25,13 +26,29 @@ export class ApplicantService implements IApplicantService {
     this._applicantRepository = applicantRepository.getRepository();
   }
 
-  public getAll = async (): Promise<Applicant[]> => {
+  public getAll = async (
+    columns?: (keyof Applicant)[]
+  ): Promise<Applicant[]> => {
     try {
-      return await this._applicantRepository.find();
+      const options: object = columns ? { select: columns } : undefined;
+      return await this._applicantRepository.find(options);
     } catch (err) {
       throw new Error(`Failed to get all applicants:\n${err}`);
     }
   };
+
+  public getAllAndCountSelection = async (
+    columns: (keyof Applicant)[],
+    orderBy?: keyof Applicant,
+    orderType?: "ASC" | "DESC"
+  ): Promise<[Partial<Applicant>[], number]> => {
+    try {
+      const orderOptions: object = orderBy && orderBy ? { [orderBy]: orderType } : undefined;
+      return await this._applicantRepository.findAndCount({ select: columns, order: orderOptions });
+    } catch (err) {
+      throw new Error(`Failed to get the list of applications`);
+    }
+  }
 
   public findOne = async (id: ApplicationID, findBy?: keyof Applicant): Promise<Applicant> => {
     if (id === undefined) {

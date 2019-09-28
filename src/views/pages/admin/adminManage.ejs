@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <% include ../../partials/head.ejs %>
+  <link type="text/css" href="/css/admin.css" rel="stylesheet" />
+  <title>Applications | Admin</title>
+</head>
+
+<body>
+  <div class="wrapper">
+    <% include ../../partials/navbar.ejs %>
+    <div class="main-panel">
+      <div class="content">
+        <div class="container-fluid">
+
+          <div class="row justify-content-center">
+            <h1 style="display: none;">Applications Management</h1>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header card-header-primary">
+                  <h2 class="card-title text-center">Search</h2>
+                </div>
+                <div class="card-body">
+                  <div class="form-group input-group">
+                    <span class="search-icon">
+                        <i class="material-icons">search</i>
+                    </span>
+                    <input id="filterNameInput" type="text" class="form-control" placeholder="Enter name..." aria-label="Type a name to filter applications">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-8">
+              <div class="card">
+                <div class="card-header card-header-primary">
+                  <h2 class="card-title text-center">Applications Management</h2>
+                </div>
+
+                <div class="card-body applicants-scroll">
+                  <table class="table">
+                    <thead class="text-primary">
+                      <tr>
+                        <% applicationRows.forEach((row) => { %>
+                          <% if (row.length > 1) { %>
+                            <th class="text-center" data-toggle="tooltip" data-placement="top" title="<%= row[1] %>"><%= row[0] %></th>
+                          <% } else { %>
+                            <th class="text-center"><%= row[0] %></th>
+                          <% } %>
+                        <% }) %>
+                      </tr>
+                    </thead>
+                    <tbody id="applications-container">
+                      <% applications.forEach((applicant, index) => { %>
+                        <tr>
+                          <td class="text-center"><%= applicant.name %></td>
+                          <td class="text-center"><%= applicant.university %></td>
+                          <td class="text-center"><%= applicant.yearOfStudy %></td>
+                          <td class="text-center">
+                            <i class="material-icons applicant-status check-valid">check_circle</i>
+                            <i class="material-icons applicant-status check-valid">check_circle</i>
+                            <i class="material-icons applicant-status check-invalid">error</i>
+                            <i class="material-icons applicant-status check-invalid">error</i>
+                          </td>
+                          <td class="td-actions text-center">
+                            <a class="btn btn-primary" role="button" rel="tooltip" href="manage/<%= applicant.id %>" target="_blank">
+                              <i class="material-icons">person</i>
+                            </a>
+                            <a class="btn btn-info" role="button" rel="tooltip">
+                              <i class="material-icons">email</i>
+                            </a>
+                            <a class="btn btn-success" role="button" rel="tooltip">
+                              <i class="material-icons">person_add</i>
+                            </a>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- end row -->
+
+        </div>
+      </div>
+      <% include ../../partials/footer.ejs %>
+    </div>
+  </div>
+  <script>
+    var allApplications = <%- JSON.stringify(applications || null) %>;
+    
+    // Enable the tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+  </script>
+  <script src="/js/admin/adminManagement.js"></script>
+</body>
+
+</html>

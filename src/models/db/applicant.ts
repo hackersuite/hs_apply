@@ -92,4 +92,6 @@ export class Applicant {
   })
   applicationStatus: ApplicantStatus;
 
+  @Column("datetime")
+  createdAt: Date;
 }

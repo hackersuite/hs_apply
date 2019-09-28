@@ -47,10 +47,7 @@
                         </div>
                         <% } else if (question.answerType == "long") { %>
                         <div class="form-group">
-                          <label class="bmd-label-floating apply-label" for="<%= currentID %>">
-                          <%= question.questionText %>
-                          <%- question.required ? "<span class='label-req'> *</span>" : "" %>
-                          </label>
+                          <label class="bmd-label-floating apply-label" for="<%= currentID %>"><%= question.questionText %></label>
                           <textarea class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" rows="3" <%= question.required ? "required" : "" %>></textarea>
                         </div>
                         <% } else if (question.answerType == "number") { %>
