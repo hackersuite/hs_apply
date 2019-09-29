@@ -227,7 +227,8 @@ $(document).ready(function() {
         input: "form-control",
         menu: "dropdown-menu",
         open: "inner show",
-        suggestion: "dropdown-item"
+        suggestion: "dropdown-item",
+        selectable: "list-group-item-action"
       }
     },
     {
