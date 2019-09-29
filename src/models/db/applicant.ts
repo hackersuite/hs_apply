@@ -39,6 +39,10 @@ export class Applicant {
   university: string;
 
   @Column("varchar")
+  @IsNotEmpty({ message: "The applicants degree is required" })
+  degree: string;
+
+  @Column("varchar")
   @IsNotEmpty({ message: "The applicants year of study is required" })
   yearOfStudy: string;
 

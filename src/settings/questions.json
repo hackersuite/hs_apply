@@ -482,6 +482,12 @@
           "required": true
         },
         {
+          "questionName": "applicantDegree",
+          "questionText": "What's your major/degree?",
+          "answerType": "short",
+          "required": true
+        },
+        {
           "questionName": "applicantStudyYear",
           "questionText": "Which year of study are you in?",
           "answerType": "short",
@@ -595,7 +601,7 @@
           "questionName": "applicantCodeConduct",
           "questionText": "Code of conduct",
           "answerType": "tick",
-          "answerLink": "",
+          "answerLink": "https://docs.google.com/document/d/1neir7QKGEWbZyrwSQKiKFdiU8LpORQvENTtGRbUisFU/edit?usp=sharing",
           "required": true
         }
       ]

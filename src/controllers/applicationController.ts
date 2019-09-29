@@ -62,6 +62,7 @@ export class ApplicationController {
       applicantCity,
       applicantUniversity,
       applicantStudyYear,
+      applicantDegree,
       applicantWorkArea,
       applicantWorkAreaOther,
       applicantSkills,
@@ -72,7 +73,8 @@ export class ApplicationController {
       applicantDietaryRequirements,
       applicantDietaryRequirementsOther,
       applicantTShirt,
-      applicantHearAbout
+      applicantHearAbout,
+      applicantHearAboutOther
     } = req.body;
 
     // TODO: Rewrite this to make it easier to add more attributes
@@ -84,6 +86,7 @@ export class ApplicationController {
     newApplication.city = applicantCity;
     newApplication.university = applicantUniversity;
     newApplication.yearOfStudy = applicantStudyYear;
+    newApplication.degree = applicantDegree;
     newApplication.workArea = applicantWorkArea === "Other" ? (applicantWorkAreaOther || "Other") : applicantWorkArea;
     newApplication.skills = applicantSkills;
     newApplication.hackathonCount = this.isNumeric(applicantHackathonCount) ? Number(applicantHackathonCount) : undefined;
@@ -92,7 +95,7 @@ export class ApplicationController {
     newApplication.hardwareRequests = applicantHardwareReq;
     newApplication.dietaryRequirements = applicantDietaryRequirements === "Other" ? (applicantDietaryRequirementsOther || "Other") : applicantDietaryRequirements;
     newApplication.tShirtSize = applicantTShirt;
-    newApplication.hearAbout = applicantHearAbout;
+    newApplication.hearAbout = applicantHearAbout === "Other" ? (applicantHearAboutOther || "Other") : applicantHearAbout;
     newApplication.authId = (req.user as RequestUser).auth_id;
     newApplication.applicationStatus = ApplicantStatus.Applied;
 
