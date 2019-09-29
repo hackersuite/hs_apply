@@ -45,6 +45,20 @@ $('.submit-form').click(function () {
 // Requires jQuery Easing
 $('.next-form-stage').click(function () {
   if (animating) return false;
+
+  // Check the age input
+  var ageInput = $(currentForm).find(":input[name='applicantAge']");
+  if (ageInput.length > 0) {
+    if (ageInput.val() < 18) {
+      $.notify({
+        message: 'You must be over the age of 18 to apply'
+      }, {
+        type: 'danger'
+      });
+      return false;
+    }
+  }
+
   if (!checkFormStageInputs()) {
     $.notify({
       message: 'Please fill in the required fields'
