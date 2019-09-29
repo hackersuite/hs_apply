@@ -5,7 +5,7 @@ import { IRouter } from "./registerableRouter";
 import { TYPES } from "../types";
 import * as multer from "multer";
 import { HttpResponseCode } from "../util/errorHandling";
-import { checkLoggedIn, RequestAuthentication, checkIsOrganizer, checkIsAttendee } from "../util/auth";
+import { checkLoggedIn } from "../util/auth";
 
 @injectable()
 export class ApplicationRouter implements IRouter {
@@ -42,6 +42,17 @@ export class ApplicationRouter implements IRouter {
       }
     });
   };
+  private checkApplicationsOpen = (req: Request, res: Response, next: NextFunction) => {
+    const applicationsOpenTime: number = new Date(req.app.locals.settings.applicationsOpen).getTime();
+    const applicationsCloseTime: number = new Date(req.app.locals.settings.applicationsClose).getTime();
+    const currentTime: number = new Date().getTime();
+
+    if (currentTime  >= applicationsOpenTime && currentTime <= applicationsCloseTime) {
+      next();
+    } else {
+      return res.redirect("/");
+    }
+  };
 
   public getPathRoot(): string {
     return "/apply";
@@ -55,10 +66,12 @@ export class ApplicationRouter implements IRouter {
     router.use(checkLoggedIn);
 
     router.get("/",
+      this.checkApplicationsOpen,
       this._applicationController.apply
     );
 
     router.post("/",
+      this.checkApplicationsOpen,
       this.fileCheckMiddleware,
       this._applicationController.submitApplication
     );
