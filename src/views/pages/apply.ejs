@@ -36,6 +36,7 @@
                   <div class="card-body">
                     <div class="apply-form-section">
                       <% section.questions.forEach((question, questionIndex) => { %>
+                        <% question.questionText = question.questionText.replace("<hackathon-name>", locals.settings.shortName) %>
                         <% var currentID = `section${sectionIndex}-question${questionIndex}`; %>
                         <% if (question.answerType === "short") { %>
                         <div class="form-group">
@@ -108,11 +109,53 @@
                             </div>
                           <% } %>
                           </div>
+                        <% } else if (question.answerType == "multi") { %>
+                        <div class="form-group bmd-form-group">
+                          <label class="apply-form-radio-label apply-label">
+                            <%= question.questionText %>
+                            <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+                          </label>
+                          <% if (question.hasOwnProperty('answerOptions')) { %>
+                            <% question.answerOptions.forEach((multiradio, index) => { %>
+                              <div class="form-check">
+                                <label class="form-check-label">
+                                  <input class="form-check-input" type="checkbox" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
+                                  <%= multiradio %>
+                                  <span class="form-check-sign">
+                                    <span class="check"></span>
+                                  </span>
+                                </label>
+                              </div>
+                            <% }); %>
+                            <div class="form-check form-check-radio">
+                              <div class="form-row">
+                                <div class="col-auto">
+                                  <label class="form-check-label">
+                                      <input class="form-check-input" type="checkbox" name="<%= question.questionName %>" value="Other" id="<%= `${currentID}` %>-radio-other" <%= question.required ? "required" : "" %>>
+                                      Other
+                                      <span class="form-check-sign">
+                                          <span class="check"></span>
+                                      </span>
+                                  </label>
+                                </div>
+                                <div class="col-auto apply-form-radio-input-other">
+                                  <input class="form-control" type="text" name="<%= question.questionName %>Other" placeholder="Please specify"/>
+                                </div>
+                              </div>
+                            </div>
+                          <% } %>
+                        </div>
                         <% } else if (question.answerType == "tick") { %>
                         <div class="form-check">
                           <label class="form-check-label">
                             <input class="form-check-input" type="checkbox" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
-                            <%= question.questionText %>
+                            <% if(question.hasOwnProperty("answerLink")) { %>
+                              <a href="<%- question.answerLink %>" target="_blank" rel="noopener noreferrer">
+                                <%= question.questionText %>
+                              </a>
+                            <% } else { %>
+                              <%= question.questionText %>
+                            <% } %>
                             <span class="form-check-sign">
                               <span class="check"></span>
                             </span>

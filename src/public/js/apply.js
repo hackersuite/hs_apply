@@ -161,7 +161,7 @@ $('.form-check-input[value=Other]').each(function () {
 });
 
 uniqueRadioGroups.forEach((groupName) => {
-  $(`input[name=${groupName}]`).change(function () {
+  $(`input[name=${groupName}]`).on('change', function () {
     var radioInputOther = $(this).attr('name') + 'Other';
     if ($(this).attr('value') === 'Other') {
       $(`[name=${radioInputOther}]`).fadeIn();

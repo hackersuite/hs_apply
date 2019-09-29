@@ -546,7 +546,7 @@
       "questions": [{
           "questionName": "applicantHearAbout",
           "questionText": "How did you hear about <hackathon-name>?",
-          "answerType": "multi",
+          "answerType": "radio",
           "answerOptions": [
             "Facebook",
             "Friends",
@@ -588,12 +588,14 @@
           "questionName": "applicantAcceptDataSharing",
           "questionText": "Acceptance of Data sharing with Companies",
           "answerType": "tick",
+          "answerLink": "",
           "required": true
         },
         {
           "questionName": "applicantCodeConduct",
           "questionText": "Code of conduct",
           "answerType": "tick",
+          "answerLink": "",
           "required": true
         }
       ]

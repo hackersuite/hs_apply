@@ -71,7 +71,8 @@ export class ApplicationController {
       applicantHardwareReq,
       applicantDietaryRequirements,
       applicantDietaryRequirementsOther,
-      applicantTShirt
+      applicantTShirt,
+      applicantHearAbout
     } = req.body;
 
     // TODO: Rewrite this to make it easier to add more attributes
@@ -91,6 +92,7 @@ export class ApplicationController {
     newApplication.hardwareRequests = applicantHardwareReq;
     newApplication.dietaryRequirements = applicantDietaryRequirements === "Other" ? (applicantDietaryRequirementsOther || "Other") : applicantDietaryRequirements;
     newApplication.tShirtSize = applicantTShirt;
+    newApplication.hearAbout = applicantHearAbout;
     newApplication.authId = (req.user as RequestUser).auth_id;
     newApplication.applicationStatus = ApplicantStatus.Applied;
 

@@ -7,6 +7,7 @@ export interface IApplicationQuestion extends Cacheable {
   questionText: string;
   answerType: answerTypeOptions;
   answerOptions?: Array<string>;
+  answerLink?: string;
   required: boolean;
 }
 
