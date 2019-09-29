@@ -165,7 +165,7 @@ export class App {
     if (settings) {
       const hackathonSettings: HackathonSettings = new HackathonSettings(settings);
       this.cache.set(HackathonSettings.name, hackathonSettings);
-      app.locals.settings = hackathonSettings;
+      app.locals.settings = hackathonSettings.settings;
       console.log("\tLoaded application settings");
     } else {
       // We couldn't load the hackathon settings so set some defaults

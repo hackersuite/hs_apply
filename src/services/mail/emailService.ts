@@ -26,7 +26,7 @@ export class EmailService implements IEmailService {
     const email = new EmailTemplate({
       message: msgOptions,
       views: {
-        root: __dirname + "../../settings/emailTemplates",
+        root: __dirname + "../../../settings/emailTemplates",
         options: {
           extension: "ejs"
         }
@@ -38,10 +38,9 @@ export class EmailService implements IEmailService {
       const emailHTML = await email.render(template, locals);
       response = await sgMail.send({...msgOptions, html: emailHTML }, false);
     } catch (err) {
-      console.log(err);
       throw new Error("Failed to send email");
     }
 
-    return response[0].statusCode === HttpResponseCode.OK;
+    return response[0].statusCode === HttpResponseCode.ACCEPTED;
   };
 }

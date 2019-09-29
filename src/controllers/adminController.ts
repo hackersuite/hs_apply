@@ -94,9 +94,10 @@ export class AdminController {
       return next(err);
     }
 
-    const columnsToSelect: (keyof Applicant)[] = ["id", "authId", "university", "yearOfStudy", "createdAt"];
+    const columnsToSelect: (keyof Applicant)[] = ["id", "authId", "university", "yearOfStudy", "applicationStatus", "createdAt"];
     const columnNames: object[] = [
       ["Name"],
+      ["Email"],
       ["University"],
       ["Year"],
       ["V/S/I/C", "Verified / Submitted / Invited / Confirmed"],

@@ -4,6 +4,7 @@ function renderApplicationRow(container, applicant) {
   var applicantRow = `
   <tr>
     <td class="text-center">${applicant.name}</td>
+    <td class="text-center">${applicant.email}</td>
     <td class="text-center">${applicant.university}</td>
     <td class="text-center">${applicant.yearOfStudy}</td>
     <td class="text-center">
@@ -16,7 +17,7 @@ function renderApplicationRow(container, applicant) {
       <a class="btn btn-primary" role="button" rel="tooltip" href="manage/${applicant.id}" target="_blank">
         <i class="material-icons">person</i>
       </a>
-      <a class="btn btn-info" role="button" rel="tooltip">
+      <a class="btn btn-info" role="button" rel="tooltip" href="invite/${applicant.id}/send">
         <i class="material-icons">email</i>
       </a>
       <a class="btn btn-success" role="button" rel="tooltip">
