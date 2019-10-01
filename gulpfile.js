@@ -37,6 +37,10 @@ const paths = {
   hackathonSettings: {
     src: 'src/settings/*.json',
     dest: 'dist/settings/'
+  },
+  autocompleteJSON: {
+    src: 'src/public/js/**/*.json',
+    dest: 'dist/public/js'
   }
 };
 
@@ -73,8 +77,8 @@ function scriptsCopyMin() {
 function views() {
   return gulp.src(paths.views.src)
     /* The regex looks complicated but here are the steps:
-     * 1. Positive lookbehind -- check that the HTML contains src="|', href="|'
-     * (this remove changing references to remote resources)
+     * 1. Positive lookbehind -- check that the HTML contains src=" or ', href=" or '
+     * (this prevents changing references to remote resources)
      * 2. Check for any charater any number of times, this is the uri
      * 3. Positive lookahead for the file extension being .js or .css with no other characters after
      * Replaces the match with .min.js or .min.css
@@ -98,6 +102,11 @@ function copyHackathonSettings() {
     .pipe(gulp.dest(paths.hackathonSettings.dest));
 }
 
+function copyAutocompleteJSON() {
+  return gulp.src(paths.autocompleteJSON.src)
+    .pipe(gulp.dest(paths.autocompleteJSON.dest));
+}
+
 exports.default = parallel(
   images,
   views,
@@ -106,5 +115,6 @@ exports.default = parallel(
   css,
   cssCopyMin,
   copyRemainingPublic,
-  copyHackathonSettings
+  copyHackathonSettings,
+  copyAutocompleteJSON
 );

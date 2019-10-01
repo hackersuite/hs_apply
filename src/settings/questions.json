@@ -490,7 +490,15 @@
         {
           "questionName": "applicantStudyYear",
           "questionText": "Which year of study are you in?",
-          "answerType": "short",
+          "answerType": "dropdown",
+          "answerOptions": [
+            "Foundation",
+            "1",
+            "2",
+            "3",
+            "4",
+            "Postgraduate"
+          ],
           "required": true
         },
         {
@@ -594,7 +602,7 @@
           "questionName": "applicantAcceptDataSharing",
           "questionText": "Acceptance of Data sharing with Companies",
           "answerType": "tick",
-          "answerLink": "",
+          "answerLink": "https://docs.google.com/document/d/1s9mMUc1zjVtSv-8fh4jEcDIgd9cKTkrkgwqX6aBGHLE/edit?usp=sharing",
           "required": true
         },
         {

@@ -85,7 +85,6 @@ export class Applicant {
   tShirtSize: string;
 
   @Column("varchar")
-  @IsOptional()
   hearAbout: string;
 
   @Column("datetime", { nullable: true })

@@ -7,14 +7,28 @@
   </div>
   <div class="sidebar-wrapper">
     <ul class="nav">
-      <li class="nav-item">
+      <% if (locals._locals.authLevel == 3) { %>
+      <li id="admin-overview" class="nav-item">
+        <a class="nav-link" href="/admin/overview">
+          <i class="material-icons">lock</i>
+          <p>Admin | Overview</p>
+        </a>
+      </li>
+      <li id="admin-manage" class="nav-item">
+        <a class="nav-link" href="/admin/manage">
+          <i class="material-icons">lock</i>
+          <p>Admin | Manage</p>
+        </a>
+      </li>
+      <% } %>
+      <li id="dashboard" class="nav-item">
         <a class="nav-link" href="/">
           <i class="material-icons">dashboard</i>
           <p>Dashboard</p>
         </a>
       </li>
       <% if (locals.hasOwnProperty("hasApplied") && hasApplied === false) { %>
-      <li class="nav-item">
+      <li id="apply" class="nav-item">
         <a class="nav-link" href="/apply">
           <i class="material-icons">person</i>
           <p>Application</p>
@@ -24,6 +38,12 @@
     </ul>
   </div>
 </div>
+<script>
+  var currentPage = "<%- locals.currentPage || null %>";
+  if (document.getElementById(currentPage) !== null) {
+    document.getElementById(currentPage).classList.add("active");
+  }
+</script>
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top " id="navigation-bar">
   <div class="container-fluid">

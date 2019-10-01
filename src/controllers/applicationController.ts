@@ -80,22 +80,22 @@ export class ApplicationController {
     // TODO: Rewrite this to make it easier to add more attributes
     const newApplication: Applicant = new Applicant();
     newApplication.age = Number(applicantAge);
-    newApplication.gender = applicantGender === "Other" ? (applicantGenderOther || "Other") : applicantGender;
+    newApplication.gender = applicantGenderOther || applicantGender || "Other";
     newApplication.nationality = applicantNationality;
     newApplication.country = applicantCountry;
     newApplication.city = applicantCity;
     newApplication.university = applicantUniversity;
     newApplication.yearOfStudy = applicantStudyYear;
     newApplication.degree = applicantDegree;
-    newApplication.workArea = applicantWorkArea === "Other" ? (applicantWorkAreaOther || "Other") : applicantWorkArea;
+    newApplication.workArea = applicantWorkAreaOther || applicantWorkArea || "Other";
     newApplication.skills = applicantSkills;
     newApplication.hackathonCount = this.isNumeric(applicantHackathonCount) ? Number(applicantHackathonCount) : undefined;
     newApplication.whyChooseHacker = applicantWhyChoose;
     newApplication.pastProjects = applicantPastProj;
     newApplication.hardwareRequests = applicantHardwareReq;
-    newApplication.dietaryRequirements = applicantDietaryRequirements === "Other" ? (applicantDietaryRequirementsOther || "Other") : applicantDietaryRequirements;
+    newApplication.dietaryRequirements = applicantDietaryRequirementsOther || applicantDietaryRequirements || "Other";
     newApplication.tShirtSize = applicantTShirt;
-    newApplication.hearAbout = applicantHearAbout === "Other" ? (applicantHearAboutOther || "Other") : applicantHearAbout;
+    newApplication.hearAbout = applicantHearAboutOther || applicantHearAbout || "Other";
     newApplication.authId = (req.user as RequestUser).auth_id;
     newApplication.applicationStatus = ApplicantStatus.Applied;
 

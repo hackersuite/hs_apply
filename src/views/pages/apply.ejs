@@ -10,7 +10,7 @@
 
 <body>
   <div class="wrapper">
-    <%- include('../partials/navbar', { hasApplied: false }); %>
+    <%- include('../partials/navbar', { currentPage: "apply", hasApplied: false }); %>
     <div class="main-panel">
       <div class="content">
         <div class="container-fluid">
@@ -149,18 +149,15 @@
                         <div class="form-check">
                           <label class="form-check-label">
                             <input class="form-check-input" type="checkbox" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
-                            <% if(question.hasOwnProperty("answerLink")) { %>
-                              <a href="<%- question.answerLink %>" target="_blank" rel="noopener noreferrer">
-                                <%= question.questionText %>
-                              </a>
-                            <% } else { %>
-                              <%= question.questionText %>
-                            <% } %>
+                            <%= question.questionText %>
                             <span class="form-check-sign">
                               <span class="check"></span>
                             </span>
                           </label>
                           <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+                          <% if(question.hasOwnProperty("answerLink")) { %>
+                            (<a href="<%- question.answerLink %>" target="_blank" rel="noopener noreferrer">Read here</a>)
+                          <% } %>
                         </div>
                         <% } else if (question.answerType == "file") { %>
                         <div class="form-group form-file-upload form-file-simple bmd-form-group">

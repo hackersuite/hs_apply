@@ -43,7 +43,7 @@ export class InviteController {
 
     // Check that the chosen user can be invited
     if (applicant.applicationStatus === ApplicantStatus.Applied || applicant.applicationStatus === ApplicantStatus.Reviewed) {
-      const subject: string = `[${req.app.locals.settings.shortName}] Congrats! You've been accepted!`;
+      const subject: string = `[${req.app.locals.settings.shortName}] You've been accepted!`;
       const confirmLink: string = `${req.app.locals.settings.hackathonURL}/invite/${req.params.id}/confirm`;
       const hackathonLogoURL: string = `${req.app.locals.settings.hackathonURL}/img/logo.png`;
 

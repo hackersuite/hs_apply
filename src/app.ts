@@ -163,17 +163,19 @@ export class App {
     console.log("Loading hackathon application settings...");
     const settings: IHackathonSettings = await this.loadSettingsFile("hackathon.json");
     if (settings) {
+      // Add the hackathon settings to the cache and add them to app locals
       const hackathonSettings: HackathonSettings = new HackathonSettings(settings);
       this.cache.set(HackathonSettings.name, hackathonSettings);
       app.locals.settings = hackathonSettings.settings;
-      console.log("\tLoaded application settings");
+      console.log("\tLoaded hackathon settings");
+      console.log(JSON.stringify(hackathonSettings.settings, undefined, 2));
     } else {
       // We couldn't load the hackathon settings so set some defaults
       app.locals.settings = {
         "shortName": "Hackathon",
         "fullName": "Hackathon",
-        "applicationsOpen": new Date(),
-        "applicationsClose": new Date(Date.now() + 10800 * 1000) // 3 hours from now
+        "applicationsOpen": new Date().toString(),
+        "applicationsClose": new Date(Date.now() + 10800 * 1000).toString() // 3 hours from now
       };
     }
   };

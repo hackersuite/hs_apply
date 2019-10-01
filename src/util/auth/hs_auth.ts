@@ -1,13 +1,15 @@
 import * as passport from "passport";
 import * as request from "request-promise-native";
 import * as querystring from "querystring";
-import { Request, Response, Application, NextFunction } from "express";
+import { Express, Request, Response, Application, NextFunction, CookieOptions } from "express";
 import { HttpResponseCode } from "../errorHandling";
 import * as CookieStrategy from "passport-cookie";
 import { AuthLevels } from "./authLevels";
 import { injectable, inject } from "inversify";
 import { ApplicantService } from "../../services";
 import { TYPES } from "../../types";
+import { Cache } from "../cache";
+import { HackathonSettings } from "../../models";
 
 export interface IRequestAuthentication {
   passportSetup: (app: Application) => void;
@@ -28,20 +30,33 @@ export class RequestAuthentication {
   // and attach it to req.user
   private _applicantService: ApplicantService;
 
+  private _cache: Cache;
+
   public constructor(
+    @inject(TYPES.Cache) cache: Cache,
     @inject(TYPES.ApplicantService) applicantService: ApplicantService
   ) {
     this._applicantService = applicantService;
+    this._cache = cache;
   }
 
-  private logout = (app: Application) => {
-    app.get("/logout", function(req: Request, res: Response) {
-      res.clearCookie("Authorization");
+  private logout = (app: Express) => {
+    let logoutCookieOptions: CookieOptions = undefined;
+    if (app.get("env") === "production") {
+      logoutCookieOptions = {
+        "domain": app.locals.settings.rootDomain,
+        "secure": true,
+        "httpOnly": true
+      };
+    }
+
+    app.get("/logout", function(req: Request, res: Response, next: NextFunction) {
+      res.cookie("Authorization", "", logoutCookieOptions);
       return res.redirect("/");
     });
   };
 
-  public passportSetup = (app: Application) => {
+  public passportSetup = (app: Express) => {
     this.logout(app);
 
     app.use(passport.initialize());
@@ -70,10 +85,7 @@ export class RequestAuthentication {
         return done(undefined, false);
       } else if (result.status === 0) {
         // The request has been authorized
-        // TODO: Load the applicant from the database into req.user
-        // The problems is that if they haven't created an application they wont be in the database
-        // We only have the auth_id to find the user in the db. We could create a new entry
-        // but since we use class validation for applications it will always fail right now
+
         req.user = {
           "auth_id": result.user._id,
           "auth_level": result.user.auth_level,
@@ -88,15 +100,20 @@ export class RequestAuthentication {
 }
 
 export const checkLoggedIn = (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate("cookie", { session: false }, (err, user, info) => {
+  passport.authenticate("cookie", {
+    session: false
+  }, (err, user, info) => {
     if (err) { return next(err); }
 
-    // There is no authenticated user, so redirect to logins
+    // There is not authenticated user, so redirect to logins
     if (!user) {
-      const queryParam: string = querystring.encode({"returnto": `${process.env.APPLICATION_URL}${req.originalUrl}`});
-      return res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
+      const queryParam: string = querystring.encode({
+        "returnto": `${process.env.APPLICATION_URL}${req.originalUrl}`
+      });
+      res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
+      return;
     }
-
+    res.locals.authLevel = user.auth_level;
     return next();
   })(req, res, next);
 };
