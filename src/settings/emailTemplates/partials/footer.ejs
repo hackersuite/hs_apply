@@ -22,19 +22,19 @@
                                       <table style="padding-top: 20px" cellpadding="0" cellspacing="0" border="0"
                                           align="center">
                                           <tr>
-                                              <% if (locals.settings.facebookURL) { %>
+                                              <% if (settings.facebookLink) { %>
                                               <td style="padding: 0px 5px;">
-                                                  <a role="social-icon-link" href="<%- locals.settings.facebookURL %>"
+                                                  <a role="social-icon-link" href="https://facebook.com/<%- settings.facebookLink %>"
                                                       target="_blank" border="0" alt="Facebook" title="Facebook"
                                                       style="border-radius: 5px; -webkit-border-radius:5px; -moz-border-radius:5px; -ms-border-radius:5px; -o-border-radius:5px; color: black; display: inline-block; outline: none; text-decoration:none; border: none; font-family: Helvetica, arial, sans-serif;">
                                                       Facebook
                                                   </a>
                                               </td>
                                               <% } %>
-                                              <%- locals.settings.facebookURL && locals.settings.twitterURL ? "-" : "" %>
-                                              <% if (locals.settings.twitterURL) { %>
+                                              <%- locals.settings.facebookLink && locals.settings.twitterLink ? "-" : "" %>
+                                              <% if (settings.twitterLink) { %>
                                               <td style="padding: 0px 5px;"><a role="social-icon-link"
-                                                      href="<%- locals.settings.twitterURL %>" target="_blank" border="0"
+                                                      href="https://twitter.com/<%- settings.twitterLink %>" target="_blank" border="0"
                                                       alt="Twitter" title="Twitter"
                                                       style="border-radius: 5px; -webkit-border-radius:5px; -moz-border-radius:5px; -ms-border-radius:5px; -o-border-radius:5px; color: black; display: inline-block; outline: none; text-decoration:none; border: none; font-family: Helvetica, arial, sans-serif;">
                                                       Twitter

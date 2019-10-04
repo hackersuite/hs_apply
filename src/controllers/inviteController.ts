@@ -50,10 +50,11 @@ export class InviteController {
       try {
         // Send the email to the user
         const result: boolean = await this._emailService
-          .sendEmail(req.app.locals.settings.contactEmail, reqUser.email, subject, "invited", {
+          .sendEmail(req.app.locals.settings.mainEmail, reqUser.email, subject, "invited", {
+            "subject": subject,
             "settings": req.app.locals.settings,
             "confirmLink": confirmLink,
-            "hackathonImageURL": hackathonLogoURL,
+            "hackathonLogoURL": hackathonLogoURL,
             "applicant": {
               "id": applicant.id,
               "name": reqUser.name

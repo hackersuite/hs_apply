@@ -1,3 +1,5 @@
+<% include ./partials/header.ejs %>
+
 <p>
     Hey <%= applicant.name %>, we have some good news!
 </p>
@@ -16,12 +18,9 @@
 </p>
 <p>Look out for further emails with important information before the big day!</p>
 <p>
-    Have any other question? Email us at <%= settings.contactEmail %> or message us on
-    <a href="https://facebook.com/<%- settings.facebookLink %>" target="_blank" rel="noopener noreferrer">
-        Facebook</a>
-        <a href="https://instagram.com/<%- settings.instagramLink %>" target="_blank" rel="noopener noreferrer">
-            Instagram</a>
-        or <a href="https://instagram.com/<%- settings.twitterLink %>" target="_blank" rel="noopener noreferrer">Twitter</a>.
+    Have any other question? Email us at <%= settings.contactEmail %>
 </p>
 <p>We look forward to meeting you at <%= settings.fullName %>!</p>
 <p>The <%= settings.shortName %> team</p>
+
+<% include ./partials/footer.ejs %>

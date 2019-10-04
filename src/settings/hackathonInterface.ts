@@ -5,6 +5,7 @@ export interface IHackathonSettings {
   hackathonURL: string;
   applicationsOpen: string;
   applicationsClose: string;
+  mainEmail: string;
   contactEmail: string;
   facebookLink: string;
   instagramLink: string;
