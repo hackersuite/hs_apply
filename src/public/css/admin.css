@@ -36,3 +36,25 @@ text.ct-label {
 span.ct-label.ct-horizontal,span.ct-vertical {
   color: white !important;
 }
+
+.search-input {
+  left: 15px;
+}
+
+@media only screen and (max-width: 768px) {
+  .search-input {
+    max-width: 50%;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .search-input {
+    max-width: 30%;
+  }
+}
+
+/* @media only screen and (min-width: 992px) {
+  .search-input {
+    max-width: 25%;
+  }
+} */
