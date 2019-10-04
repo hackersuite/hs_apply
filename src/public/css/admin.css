@@ -27,3 +27,12 @@
 .applicant-status.check-invalid {
   color: red;
 }
+
+text.ct-label {
+  color: black !important;
+  fill: black !important;
+}
+
+span.ct-label.ct-horizontal,span.ct-vertical {
+  color: white !important;
+}

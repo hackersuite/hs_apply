@@ -59,14 +59,15 @@ $(document).ready(function () {
       applicantsLineChartData.push({x: new Date(createdAt), y: count + 1});
     });
   }
+  var data, options, responsiveOptions;
 
   // Create the chart using Chartist
-  var data = { series: [{
+  data = { series: [{
       name: 'applicants',
       data: applicantsLineChartData
     }]
   };
-  var options = {
+  options = {
     axisX: {
       type: Chartist.FixedScaleAxis,
       divisor: 5,
@@ -95,7 +96,7 @@ $(document).ready(function () {
       return `${value} ` + Math.round(applicationGenderStats[value] / data.series.reduce((a, b) => a + b) * 100) + '%';
     }
   };
-  var responsiveOptions = [
+  responsiveOptions = [
     ['screen and (max-width: 768px)', {
       labelOffset: 20
     }],
@@ -110,6 +111,32 @@ $(document).ready(function () {
   ];
   var applicantsGenderPieChart = new Chartist.Pie('#applicants-gender', data, options, responsiveOptions);
   pieChartAnimation(applicantsGenderPieChart);
+
+  data = {
+    labels: Object.keys(applicationUniversity),
+    series: Object.values(applicationUniversity)
+  };
+  options = {
+    labelInterpolationFnc: function(value) {
+      return value.split(" ").slice(-1)[0];
+    },
+    labelDirection: 'explode'
+  };
+  responsiveOptions = [
+    ['screen and (max-width: 768px)', {
+      labelOffset: 0
+    }],
+    ['screen and (min-width: 768) and (max-width: 992px)', {
+      labelOffset: 0,
+      chartPadding: 20,
+    }],
+    ['screen and (min-width: 992)', {
+      labelOffset: 75,
+      chartPadding: 20
+    }]
+  ];
+  var applicationUniversityPieChart = new Chartist.Pie('#applicants-university', data, options, responsiveOptions);
+  pieChartAnimation(applicationUniversityPieChart);
 
   // Create distributed bar chart for TShirt sizes
   var applicantTShirtChart = new Chartist.Bar('#applicants-tshirts', {

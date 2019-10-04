@@ -29,7 +29,7 @@ export class AdminController {
   }
 
   public overview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(["gender", "tShirtSize", "createdAt", "dietaryRequirements", "hardwareRequests"], "createdAt", "ASC");
+    const [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(["gender", "tShirtSize", "createdAt", "dietaryRequirements", "hardwareRequests", "university"], "createdAt", "ASC");
 
     // Create an array of the application times
     const createdAtTimes: Date[] = applications.map((applicant) => applicant.createdAt);
@@ -51,6 +51,9 @@ export class AdminController {
     // Create a map for the dietry requirements
     const dietryReq = {};
 
+    // Create a map to contain the universities and counts
+    const university = {};
+
     // Create an array with all the hardware requests
     const hardwareReq = [];
 
@@ -68,6 +71,8 @@ export class AdminController {
       ) {
         hardwareReq.push(applicant.hardwareRequests);
       }
+
+      university[applicant.university] = 1 + (university[applicant.university] || 0);
     });
 
     res.render("pages/admin/adminOverview", {
@@ -76,7 +81,8 @@ export class AdminController {
       applicationGenders: genders,
       applicationTShirts: tShirts,
       applicationDietry: dietryReq,
-      applicationHardwareReq: hardwareReq
+      applicationHardwareReq: hardwareReq,
+      applicationUniversity: university
     });
   };
 
