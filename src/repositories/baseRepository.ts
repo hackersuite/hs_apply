@@ -1,6 +1,5 @@
-import { Repository, Connection, getConnectionManager, ConnectionManager } from "typeorm";
-import { injectable, unmanaged, decorate } from "inversify";
-import { Applicant } from "../models/db";
+import { Repository, getConnectionManager, ConnectionManager } from "typeorm";
+import { injectable, decorate } from "inversify";
 
 // First decorate the TypeORM base class repository with the injectable() annotation to prevent this error:
 // Error: Missing required @injectable annotation in: Repository

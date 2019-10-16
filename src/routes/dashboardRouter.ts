@@ -1,17 +1,15 @@
 import { Router } from "express";
 import { DashboardController } from "../controllers";
 import { injectable, inject } from "inversify";
-import { IRouter } from "./registerableRouter";
+import { RouterInterface } from "./registerableRouter";
 import { TYPES } from "../types";
 import { checkLoggedIn } from "../util/auth";
 
 @injectable()
-export class DashboardRouter implements IRouter {
+export class DashboardRouter implements RouterInterface {
   private _dashboardController: DashboardController;
 
-  public constructor(
-    @inject(TYPES.DashboardController) dashboardController: DashboardController
-  ) {
+  public constructor(@inject(TYPES.DashboardController) dashboardController: DashboardController) {
     this._dashboardController = dashboardController;
   }
 
@@ -24,8 +22,7 @@ export class DashboardRouter implements IRouter {
 
     router.use(checkLoggedIn);
 
-    router.get("/",
-      this._dashboardController.dashboard);
+    router.get("/", this._dashboardController.dashboard);
 
     return router;
   }

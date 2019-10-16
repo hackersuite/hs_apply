@@ -1,6 +1,6 @@
 import { Cacheable } from "./cacheable";
 
-export interface ICache {
+export interface CacheInterface {
   get<T extends Cacheable>(className: string, id: number): T;
   getAll<T extends Cacheable>(className: string): T[];
   set(className: string, obj: Cacheable): void;

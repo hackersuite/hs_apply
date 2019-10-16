@@ -1,10 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { Min, IsDefined, IsInt, IsNotEmpty, IsOptional, IsDate } from "class-validator";
+import { Min, IsDefined, IsInt, IsNotEmpty, IsOptional } from "class-validator";
 import { ApplicantStatus } from "../../services/applications/applicantStatus";
 
 @Entity()
 export class Applicant {
-
   @PrimaryGeneratedColumn("uuid")
   id: string;
 

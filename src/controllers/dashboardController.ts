@@ -7,7 +7,7 @@ import { ApplicantService } from "../services";
 import { RequestUser } from "../util/auth";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 
-export interface IDashboardController {
+export interface DashboardControllerInterface {
   dashboard: (req: Request, res: Response, next: NextFunction) => void;
 }
 
@@ -15,7 +15,7 @@ export interface IDashboardController {
  * A controller for dashboard methods
  */
 @injectable()
-export class DashboardController {
+export class DashboardController implements DashboardControllerInterface {
   private _cache: Cache;
   private _applicantService: ApplicantService;
 
@@ -30,16 +30,16 @@ export class DashboardController {
   public dashboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let applicant: Applicant;
     try {
-      applicant = await this._applicantService.findOne((req.user as RequestUser).auth_id, "authId");
+      applicant = await this._applicantService.findOne((req.user as RequestUser).authId, "authId");
     } catch (err) {
       return next(err);
     }
 
-    const applicationStatus: ApplicantStatus = applicant !== undefined ?
-      applicant.applicationStatus : ApplicantStatus.Verified;
+    const applicationStatus: ApplicantStatus =
+      applicant !== undefined ? applicant.applicationStatus : ApplicantStatus.Verified;
     res.render("pages/dashboard", {
-      "applicationStatus": applicationStatus,
-      "applicantName": (req.user as RequestUser).name
+      applicationStatus: applicationStatus,
+      applicantName: (req.user as RequestUser).name
     });
   };
 }

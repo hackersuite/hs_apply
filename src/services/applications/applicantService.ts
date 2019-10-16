@@ -8,36 +8,26 @@ import * as request from "request-promise-native";
 
 type ApplicationID = string | number | Date | ObjectID;
 
-export interface IApplicantService {
+export interface ApplicantServiceInterface {
   getAll: () => Promise<Applicant[]>;
-<<<<<<< HEAD
-  getAllAndCountSelection: (columns: (keyof Applicant)[], orderBy?: keyof Applicant, orderType?: "ASC" | "DESC") => Promise<[Partial<Applicant>[], number]>;
-  findOne: (id: ApplicationID, findBy?: keyof Applicant) => Promise<Applicant>;
-=======
   getAllAndCountSelection: (
     columns: (keyof Applicant)[],
     orderBy?: keyof Applicant,
     orderType?: "ASC" | "DESC"
   ) => Promise<[Partial<Applicant>[], number]>;
   findOne: (id: ApplicationID) => Promise<Applicant>;
->>>>>>> Update specific applicant page.
   save: (newApplicants: Applicant, file?: Buffer) => Promise<Applicant>;
 }
 
 @injectable()
-export class ApplicantService implements IApplicantService {
+export class ApplicantService implements ApplicantServiceInterface {
   private _applicantRepository: Repository<Applicant>;
 
-  public constructor(
-    @inject(TYPES.ApplicantRepository)
-    applicantRepository: ApplicantRepository
-  ) {
+  public constructor(@inject(TYPES.ApplicantRepository) applicantRepository: ApplicantRepository) {
     this._applicantRepository = applicantRepository.getRepository();
   }
 
-  public getAll = async (
-    columns?: (keyof Applicant)[]
-  ): Promise<Applicant[]> => {
+  public getAll = async (columns?: (keyof Applicant)[]): Promise<Applicant[]> => {
     try {
       const options: object = columns ? { select: columns } : undefined;
       return await this._applicantRepository.find(options);
@@ -52,8 +42,7 @@ export class ApplicantService implements IApplicantService {
     orderType?: "ASC" | "DESC"
   ): Promise<[Partial<Applicant>[], number]> => {
     try {
-      const orderOptions: object =
-        orderBy && orderBy ? { [orderBy]: orderType } : undefined;
+      const orderOptions: object = orderBy && orderBy ? { [orderBy]: orderType } : undefined;
       return await this._applicantRepository.findAndCount({
         select: columns,
         order: orderOptions
@@ -76,10 +65,7 @@ export class ApplicantService implements IApplicantService {
     }
   };
 
-  public save = async (
-    newApplicant: Applicant,
-    file?: Buffer
-  ): Promise<Applicant> => {
+  public save = async (newApplicant: Applicant, file?: Buffer): Promise<Applicant> => {
     try {
       // Validate the new applicant using class-validation and fail if there is an error
       // Hide the target in the report for nicer error messages
@@ -106,33 +92,25 @@ export class ApplicantService implements IApplicantService {
     }
   };
 
-<<<<<<< HEAD
   public remove = async (id: ApplicationID, findBy?: keyof Applicant): Promise<void> => {
-      if (id === undefined) {
-        throw new Error("Applicant ID must be provided");
-      }
+    if (id === undefined) {
+      throw new Error("Applicant ID must be provided");
+    }
 
-      try {
-        const findColumn: keyof Applicant = findBy || "id";
-        await this._applicantRepository.delete({ [findColumn]: id });
-      } catch (err) {
-        throw new Error(`Failed to remove an applicant:\n${err}`);
-      }
-    };
+    try {
+      const findColumn: keyof Applicant = findBy || "id";
+      await this._applicantRepository.delete({ [findColumn]: id });
+    } catch (err) {
+      throw new Error(`Failed to remove an applicant:\n${err}`);
+    }
+  };
 
   private saveToDropbox = async (fileName: string, file: Buffer): Promise<string> => {
-=======
-  private saveToDropbox = async (
-    fileName: string,
-    file: Buffer
-  ): Promise<string> => {
->>>>>>> Update specific applicant page.
-    if (!process.env.DROPBOX_API_TOKEN)
-      throw new Error(
-        "Failed to upload CV to Dropbox, set dropbox envs correctly"
-      );
+    if (!process.env.DROPBOX_API_TOKEN) {
+      throw new Error("Failed to upload CV to Dropbox, set dropbox envs correctly");
+    }
+    if (!process.env.DROPBOX_API_TOKEN) throw new Error("Failed to upload CV to Dropbox, set dropbox envs correctly");
 
-<<<<<<< HEAD
     const result = await request.post("https://content.dropboxapi.com/2/files/upload", {
       headers: {
         "Content-Type": "application/octet-stream",
@@ -141,19 +119,6 @@ export class ApplicantService implements IApplicantService {
       },
       body: file
     });
-=======
-    const result = await request.post(
-      "https://content.dropboxapi.com/2/files/upload",
-      {
-        headers: {
-          "Content-Type": "application/octet-stream",
-          Authorization: "Bearer " + process.env.DROPBOX_API_TOKEN,
-          "Dropbox-API-Arg": `{"path": "/hackathon-cv/${fileName}", "mode": "overwrite", "autorename": true, "mute": false}`
-        },
-        body: file
-      }
-    );
->>>>>>> Update specific applicant page.
 
     return result;
   };

@@ -9,7 +9,7 @@ import * as express from "express";
  * 5. Finally, link to the inversify container using `container.bind<IRouter>(TYPES.Router).to(yourNewRouter);` in inversify.config.ts
  * 6. Create your `@injectable()` controller!
  */
-export interface IRouter {
+export interface RouterInterface {
   /**
    * The initial route for requests to intercept in the router
    */

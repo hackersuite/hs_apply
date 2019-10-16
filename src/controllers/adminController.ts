@@ -5,9 +5,8 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
-import { RequestUser } from "../util/auth";
 
-export interface IAdminController {
+export interface AdminControllerInterface {
   overview: (req: Request, res: Response, next: NextFunction) => void;
   manage: (req: Request, res: Response, next: NextFunction) => void;
 }
@@ -16,7 +15,7 @@ export interface IAdminController {
  * A controller for admin methods
  */
 @injectable()
-export class AdminController {
+export class AdminController implements AdminControllerInterface {
   private _applicantService: ApplicantService;
   private _cache: Cache;
 
@@ -28,13 +27,20 @@ export class AdminController {
     this._applicantService = applicantService;
   }
 
-  public overview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(["gender", "tShirtSize", "createdAt", "dietaryRequirements", "hardwareRequests", "university"], "createdAt", "ASC");
+  public overview = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    let applications: Partial<Applicant>[], totalApplications: number;
+    try {
+      [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(
+        ["gender", "tShirtSize", "createdAt", "dietaryRequirements", "hardwareRequests", "university"],
+        "createdAt",
+        "ASC"
+      );
+    } catch (err) {
+      return next("Failed to get applications overview");
+    }
 
     // Create an array of the application times
-    const createdAtTimes: Date[] = applications.map(
-      applicant => applicant.createdAt
-    );
+    const createdAtTimes: Date[] = applications.map(applicant => applicant.createdAt);
 
     // Create the map of genders and their respective count
     const genders = { Male: 0, Female: 0, Other: 0 };
@@ -60,21 +66,16 @@ export class AdminController {
     const hardwareReq = [];
 
     applications.forEach(applicant => {
-      genderSlice =
-        applicant.gender === "Male" || applicant.gender === "Female"
-          ? applicant.gender
-          : "Other";
+      genderSlice = applicant.gender === "Male" || applicant.gender === "Female" ? applicant.gender : "Other";
       genders[genderSlice]++;
 
       tShirts[applicant.tShirtSize] = 1 + (tShirts[applicant.tShirtSize] || 0);
 
-      dietryReq[applicant.dietaryRequirements] =
-        1 + (dietryReq[applicant.dietaryRequirements] || 0);
+      dietryReq[applicant.dietaryRequirements] = 1 + (dietryReq[applicant.dietaryRequirements] || 0);
 
       if (
         applicant.hardwareRequests &&
-        (applicant.hardwareRequests !== "None" &&
-          applicant.hardwareRequests !== "Nothing")
+        (applicant.hardwareRequests !== "None" && applicant.hardwareRequests !== "Nothing")
       ) {
         hardwareReq.push(applicant.hardwareRequests);
       }
@@ -96,18 +97,24 @@ export class AdminController {
   public manage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let apiResult: any;
     try {
-      apiResult = await request
-        .get(`${process.env.AUTH_URL}/api/v1/users`, {
-          headers: {
-            "Authorization": `${req.cookies["Authorization"]}`
-          }
+      apiResult = await request.get(`${process.env.AUTH_URL}/api/v1/users`, {
+        headers: {
+          Authorization: `${req.cookies["Authorization"]}`
+        }
       });
     } catch (err) {
       // Some internal error has occured
       return next(err);
     }
 
-    const columnsToSelect: (keyof Applicant)[] = ["id", "authId", "university", "yearOfStudy", "applicationStatus", "createdAt"];
+    const columnsToSelect: (keyof Applicant)[] = [
+      "id",
+      "authId",
+      "university",
+      "yearOfStudy",
+      "applicationStatus",
+      "createdAt"
+    ];
     const columnNames: object[] = [
       ["Name"],
       ["Email"],
@@ -116,19 +123,17 @@ export class AdminController {
       ["V/S/I/C", "Verified / Submitted / Invited / Confirmed"],
       ["Manage"]
     ];
-    const applications: Applicant[] = await this._applicantService.getAll(
-      columnsToSelect
-    );
+    const applications: Applicant[] = await this._applicantService.getAll(columnsToSelect);
 
     const authUsersResult: any = JSON.parse(apiResult).users;
     const authUsers = {};
     authUsersResult.forEach(a => {
-      authUsers[a._id] = {...a};
+      authUsers[a._id] = { ...a };
     });
 
     const combinedApplications: any = [];
     applications.forEach(a => {
-      combinedApplications.push({...a, ...authUsers[a.authId]});
+      combinedApplications.push({ ...a, ...authUsers[a.authId] });
     });
 
     res.render("pages/admin/adminManage", {
@@ -137,14 +142,8 @@ export class AdminController {
     });
   };
 
-  public manageApplication = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    const specifiedApplicant: Applicant = await this._applicantService.findOne(
-      req.url.split("/")[2]
-    );
+  public manageApplication = async (req: Request, res: Response): Promise<void> => {
+    const specifiedApplicant: Applicant = await this._applicantService.findOne(req.url.split("/")[2]);
     res.render("pages/manageApplication", {
       applicant: specifiedApplicant
     });

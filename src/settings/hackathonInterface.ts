@@ -1,4 +1,4 @@
-export interface IHackathonSettings {
+export interface HackathonSettingsInterface {
   shortName: string;
   fullName: string;
   rootDomain: string;

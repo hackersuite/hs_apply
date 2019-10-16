@@ -1,3 +1,4 @@
+/* global allApplications */
 var applicationsContainerID = "#applications-container";
 
 function renderApplicationRow(container, applicant) {

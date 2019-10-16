@@ -5,10 +5,10 @@ import * as dotenv from "dotenv";
 import * as path from "path";
 import * as morgan from "morgan";
 import * as cookieParser from "cookie-parser";
-import { IApplicationSection, IHackathonSettings } from "./settings";
+import { ApplicationSectionInterface, HackathonSettingsInterface } from "./settings";
 import { Express, Request, Response, NextFunction } from "express";
 import { ConnectionOptions, createConnections, Connection } from "typeorm";
-import { IRouter } from "./routes";
+import { RouterInterface } from "./routes";
 import { Cache } from "./util/cache";
 import { promisify } from "util";
 import { Sections, HackathonSettings } from "./models";
@@ -41,15 +41,12 @@ export class App {
     await this.loadApplicationSettings(app);
 
     // Connecting to database
-    const databaseConnectionSettings: ConnectionOptions[] =
-      connectionOptions || this.createDatabaseSettings();
+    const databaseConnectionSettings: ConnectionOptions[] = connectionOptions || this.createDatabaseSettings();
 
     createConnections(databaseConnectionSettings)
       .then(async (connections: Connection[]) => {
         connections.forEach(element => {
-          console.log(
-            "  Connection to database (" + element.name + ") established."
-          );
+          console.log("  Connection to database (" + element.name + ") established.");
         });
 
         // Set up passport for authentication
@@ -59,7 +56,7 @@ export class App {
 
         // Routes set up for express, resolving dependencies
         // This is performed after successful DB connection since some routers use TypeORM repositories in their DI
-        const routers: IRouter[] = container.getAll(TYPES.Router);
+        const routers: RouterInterface[] = container.getAll(TYPES.Router);
         routers.forEach(router => {
           app.use(router.getPathRoot(), router.register());
         });
@@ -111,9 +108,7 @@ export class App {
       }
     });
 
-    app.use(
-      express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
-    );
+    app.use(express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }));
 
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
@@ -130,10 +125,7 @@ export class App {
     app.use(morgan("dev"));
     // Disable browser caching
     app.use((req: Request, res: Response, next: NextFunction) => {
-      res.header(
-        "Cache-Control",
-        "private, no-cache, no-store, must-revalidate"
-      );
+      res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
       res.header("Expires", "-1");
       res.header("Pragma", "no-cache");
       next();
@@ -153,7 +145,7 @@ export class App {
    */
   private loadApplicationSettings = async (app: Express): Promise<void> => {
     console.log("Loading hackathon application questions...");
-    const sections: Array<IApplicationSection> = await this.loadSettingsFile("questions.json", "sections");
+    const sections: Array<ApplicationSectionInterface> = await this.loadSettingsFile("questions.json", "sections");
     if (sections) {
       const applicationSections: Sections = new Sections(sections);
       this.cache.set(Sections.name, applicationSections);
@@ -161,7 +153,7 @@ export class App {
     }
 
     console.log("Loading hackathon application settings...");
-    const settings: IHackathonSettings = await this.loadSettingsFile("hackathon.json");
+    const settings: HackathonSettingsInterface = await this.loadSettingsFile("hackathon.json");
     if (settings) {
       // Add the hackathon settings to the cache and add them to app locals
       const hackathonSettings: HackathonSettings = new HackathonSettings(settings);
@@ -172,10 +164,10 @@ export class App {
     } else {
       // We couldn't load the hackathon settings so set some defaults
       app.locals.settings = {
-        "shortName": "Hackathon",
-        "fullName": "Hackathon",
-        "applicationsOpen": new Date().toString(),
-        "applicationsClose": new Date(Date.now() + 10800 * 1000).toString() // 3 hours from now
+        shortName: "Hackathon",
+        fullName: "Hackathon",
+        applicationsOpen: new Date().toString(),
+        applicationsClose: new Date(Date.now() + 10800 * 1000).toString() // 3 hours from now
       };
     }
   };
@@ -183,10 +175,7 @@ export class App {
     // Check if the file exists in the current directory, and if it is writable.
     let settings: T;
     try {
-      const fileBuffer: string = await this.readFileAsync(
-        __dirname + `/settings/${fileName}`,
-        { encoding: "utf8" }
-      );
+      const fileBuffer: string = await this.readFileAsync(__dirname + `/settings/${fileName}`, { encoding: "utf8" });
       settings = obj ? JSON.parse(fileBuffer)[obj] : JSON.parse(fileBuffer);
       // Handle non-exception-throwing cases
       if (!settings && typeof settings !== "object") {
@@ -197,7 +186,7 @@ export class App {
       return undefined;
     }
     return settings;
-  }
+  };
 
   private getSessionOptions = (app: Express): any => {
     return {

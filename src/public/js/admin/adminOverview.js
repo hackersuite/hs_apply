@@ -1,4 +1,7 @@
+/* global Chartist, applicationCreatedAtTimes, applicationGenderStats, applicationUniversity, applicationTShirtStats, applicationDietryReq, moment */
 function lineChartAnimation(e) {
+  var seq = 0;
+  var durations = 50;
   e.on("draw", function(e) {
     "line" === e.type || "area" === e.type ? e.element.animate({
       d: {
@@ -11,7 +14,7 @@ function lineChartAnimation(e) {
     }) : "point" === e.type && (seq++,
     e.element.animate({
       opacity: {
-        begin: seq * delays,
+        begin: seq,
         dur: durations,
         from: 0,
         to: 1,
@@ -23,6 +26,7 @@ function lineChartAnimation(e) {
 }
 
 function pieChartAnimation(event) {
+  var seq2 = 0;
   event.on("draw", function(e) {
     "slice" === e.type && (seq2++,
     e.element.animate({
@@ -34,7 +38,9 @@ function pieChartAnimation(event) {
         easing: "ease"
       }
     }))
-  }, seq2 = 0);
+  },
+  seq2 = 0
+  );
 }
 
 function barChartAnimation(event) {
@@ -53,7 +59,7 @@ function barChartAnimation(event) {
 
 $(document).ready(function () {
   // Create the chart data for applications over time
-  applicantsLineChartData = [];
+  var applicantsLineChartData = [];
   if (applicationCreatedAtTimes) {
     applicationCreatedAtTimes.forEach((createdAt, count) => {
       applicantsLineChartData.push({x: new Date(createdAt), y: count + 1});

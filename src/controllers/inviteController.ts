@@ -6,9 +6,8 @@ import { Applicant } from "../models/db";
 import { RequestUser } from "../util/auth";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 import { HttpResponseCode } from "../util/errorHandling";
-import { HackathonSettings } from "../models";
 
-export interface IInviteController {
+export interface InviteControllerInterface {
   send: (req: Request, res: Response, next: NextFunction) => void;
   confirm: (req: Request, res: Response, next: NextFunction) => void;
 }
@@ -17,7 +16,7 @@ export interface IInviteController {
  * A controller for dashboard methods
  */
 @injectable()
-export class InviteController {
+export class InviteController implements InviteControllerInterface {
   private _emailService: EmailService;
   private _applicantService: ApplicantService;
 
@@ -29,37 +28,46 @@ export class InviteController {
     this._emailService = emailService;
   }
 
-  public send = async (req: Request, res: Response, next: NextFunction) => {
-    const reqUser: RequestUser = (req.user) as RequestUser;
+  public send = async (req: Request, res: Response): Promise<void> => {
+    const reqUser: RequestUser = req.user as RequestUser;
     let applicant: Applicant;
     try {
       applicant = await this._applicantService.findOne(req.params.id, "id");
       if (!applicant) throw new Error("Failed to send invite");
     } catch (err) {
-      return res.status(HttpResponseCode.BAD_REQUEST).send({
+      res.status(HttpResponseCode.BAD_REQUEST).send({
         message: "Failed to send invite"
       });
+      return;
     }
 
     // Check that the chosen user can be invited
-    if (applicant.applicationStatus === ApplicantStatus.Applied || applicant.applicationStatus === ApplicantStatus.Reviewed) {
-      const subject: string = `[${req.app.locals.settings.shortName}] You've been accepted!`;
-      const confirmLink: string = `${req.app.locals.settings.hackathonURL}/invite/${req.params.id}/confirm`;
-      const hackathonLogoURL: string = `${req.app.locals.settings.hackathonURL}/img/logo.png`;
+    if (
+      applicant.applicationStatus === ApplicantStatus.Applied ||
+      applicant.applicationStatus === ApplicantStatus.Reviewed
+    ) {
+      const subject = `[${req.app.locals.settings.shortName}] You've been accepted!`;
+      const confirmLink = `${req.app.locals.settings.hackathonURL}/invite/${req.params.id}/confirm`;
+      const hackathonLogoURL = `${req.app.locals.settings.hackathonURL}/img/logo.png`;
 
       try {
         // Send the email to the user
-        const result: boolean = await this._emailService
-          .sendEmail(req.app.locals.settings.mainEmail, reqUser.email, subject, "invited", {
-            "subject": subject,
-            "settings": req.app.locals.settings,
-            "confirmLink": confirmLink,
-            "hackathonLogoURL": hackathonLogoURL,
-            "applicant": {
-              "id": applicant.id,
-              "name": reqUser.name
+        const result: boolean = await this._emailService.sendEmail(
+          req.app.locals.settings.mainEmail,
+          reqUser.email,
+          subject,
+          "invited",
+          {
+            subject: subject,
+            settings: req.app.locals.settings,
+            confirmLink: confirmLink,
+            hackathonLogoURL: hackathonLogoURL,
+            applicant: {
+              id: applicant.id,
+              name: reqUser.name
             }
-          });
+          }
+        );
 
         if (result) {
           // Create the accept deadline 5 days in the future
@@ -70,23 +78,25 @@ export class InviteController {
           await this._applicantService.save(applicant);
         }
       } catch (err) {
-        return res.status(HttpResponseCode.BAD_REQUEST).send({
+        res.status(HttpResponseCode.BAD_REQUEST).send({
           message: "Failed to send invite"
         });
+        return;
       }
 
-      return res.send({
+      res.send({
         message: "Sent invite successfully!"
       });
+      return;
     } else {
-      return res.send({
+      res.send({
         message: "Applicant cannot be invited yet!"
       });
     }
   };
 
   public confirm = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const reqUser: RequestUser = (req.user) as RequestUser;
+    const reqUser: RequestUser = req.user as RequestUser;
     let applicant: Applicant;
     try {
       applicant = await this._applicantService.findOne(req.params.id, "id");
@@ -100,7 +110,7 @@ export class InviteController {
       // Check that the invite deadline has not expired
       notifyMessage = "This invite has expired, we're sorry you have missed the deadline.";
       applicant.applicationStatus = ApplicantStatus.Rejected;
-    } else if (reqUser.auth_id === applicant.authId && applicant.applicationStatus === ApplicantStatus.Invited) {
+    } else if (reqUser.authId === applicant.authId && applicant.applicationStatus === ApplicantStatus.Invited) {
       // Check that the logged in user can be invited
       notifyMessage = "Thank you! Your attendence has been confirmed!";
       applicant.applicationStatus = ApplicantStatus.Confirmed;

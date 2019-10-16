@@ -1,3 +1,4 @@
+/* global Bloodhound */
 $(document).ready(function() {
   var currentForm, nextForm, previousForm; // Forms
   var left, opacity, scale; // Forms properties which we will animate
@@ -228,7 +229,7 @@ $(document).ready(function() {
         menu: "dropdown-menu",
         open: "inner show",
         suggestion: "dropdown-item",
-        selectable: "list-group-item-action"
+        selectable: "list-group-item-action"
       }
     },
     {

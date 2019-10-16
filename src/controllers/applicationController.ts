@@ -9,7 +9,7 @@ import { HttpResponseCode } from "../util/errorHandling";
 import { RequestUser } from "../util/auth";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 
-export interface IApplicationController {
+export interface ApplicationControllerInterface {
   apply: (req: Request, res: Response, next: NextFunction) => void;
   submitApplication: (req: Request, res: Response, next: NextFunction) => void;
   cancel: (req: Request, res: Response, next: NextFunction) => void;
@@ -19,7 +19,7 @@ export interface IApplicationController {
  * A controller for application methods
  */
 @injectable()
-export class ApplicationController {
+export class ApplicationController implements ApplicationControllerInterface {
   private _cache: Cache;
   private _applicantService: ApplicantService;
 
@@ -32,10 +32,10 @@ export class ApplicationController {
   }
 
   public apply = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    // Check if the user has already made an application using req.user.auth_id
+    // Check if the user has already made an application using req.user.authId
     let application: Applicant;
     try {
-      application = await this._applicantService.findOne((req.user as RequestUser).auth_id, "authId");
+      application = await this._applicantService.findOne((req.user as RequestUser).authId, "authId");
     } catch (err) {
       return next(err);
     }
@@ -50,8 +50,8 @@ export class ApplicationController {
     }
   };
 
-  public submitApplication = async (req: Request, res: Response, next: NextFunction) => {
-    const reqUser: RequestUser = (req.user) as RequestUser;
+  public submitApplication = async (req: Request, res: Response): Promise<void> => {
+    const reqUser: RequestUser = req.user as RequestUser;
 
     const {
       applicantAge,
@@ -89,14 +89,16 @@ export class ApplicationController {
     newApplication.degree = applicantDegree;
     newApplication.workArea = applicantWorkAreaOther || applicantWorkArea || "Other";
     newApplication.skills = applicantSkills;
-    newApplication.hackathonCount = this.isNumeric(applicantHackathonCount) ? Number(applicantHackathonCount) : undefined;
+    newApplication.hackathonCount = this.isNumeric(applicantHackathonCount)
+      ? Number(applicantHackathonCount)
+      : undefined;
     newApplication.whyChooseHacker = applicantWhyChoose;
     newApplication.pastProjects = applicantPastProj;
     newApplication.hardwareRequests = applicantHardwareReq;
     newApplication.dietaryRequirements = applicantDietaryRequirementsOther || applicantDietaryRequirements || "Other";
     newApplication.tShirtSize = applicantTShirt;
     newApplication.hearAbout = applicantHearAboutOther || applicantHearAbout || "Other";
-    newApplication.authId = (req.user as RequestUser).auth_id;
+    newApplication.authId = (req.user as RequestUser).authId;
     newApplication.applicationStatus = ApplicantStatus.Applied;
 
     // Handling the CV file
@@ -109,23 +111,23 @@ export class ApplicationController {
     try {
       await this._applicantService.save(newApplication, cvFile);
     } catch (errors) {
-      return res.status(HttpResponseCode.BAD_REQUEST).send({
+      res.status(HttpResponseCode.BAD_REQUEST).send({
         message: "Could not create application!"
       });
+      return;
     }
     res.send({
       message: "Application recieved!"
     });
   };
 
-  public cancel = async (req: Request, res: Response, next: NextFunction) => {
+  public cancel = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let application: Applicant;
     try {
-      application = await this._applicantService.findOne((req.user as RequestUser).auth_id, "authId");
+      application = await this._applicantService.findOne((req.user as RequestUser).authId, "authId");
     } catch (err) {
       return next(err);
     }
-
 
     if (application.applicationStatus <= ApplicantStatus.Applied) {
       // Delete the application so they can re-apply

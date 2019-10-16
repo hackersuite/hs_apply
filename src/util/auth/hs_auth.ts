@@ -9,18 +9,17 @@ import { injectable, inject } from "inversify";
 import { ApplicantService } from "../../services";
 import { TYPES } from "../../types";
 import { Cache } from "../cache";
-import { HackathonSettings } from "../../models";
 
-export interface IRequestAuthentication {
+export interface RequestAuthenticationInterface {
   passportSetup: (app: Application) => void;
 }
 
 export type RequestUser = {
-  "auth_id": string;
-  "auth_level": number;
-  "name": string;
-  "email": string;
-  "team": string;
+  authId: string;
+  authLevel: number;
+  name: string;
+  email: string;
+  team: string;
 };
 
 @injectable()
@@ -40,103 +39,112 @@ export class RequestAuthentication {
     this._cache = cache;
   }
 
-  private logout = (app: Express) => {
+  private logout = (app: Express): void => {
     let logoutCookieOptions: CookieOptions = undefined;
     if (app.get("env") === "production") {
       logoutCookieOptions = {
-        "domain": app.locals.settings.rootDomain,
-        "secure": true,
-        "httpOnly": true
+        domain: app.locals.settings.rootDomain,
+        secure: true,
+        httpOnly: true
       };
     }
 
-    app.get("/logout", function(req: Request, res: Response, next: NextFunction) {
+    app.get("/logout", function(req: Request, res: Response) {
       res.cookie("Authorization", "", logoutCookieOptions);
       return res.redirect("/");
     });
   };
 
-  public passportSetup = (app: Express) => {
+  public passportSetup = (app: Express): void => {
     this.logout(app);
 
     app.use(passport.initialize());
-    passport.use(new CookieStrategy({
-      cookieName: "Authorization",
-      passReqToCallback: true
-    }, async (req: Request, token: string, done: (error: any, user?: any) => void): Promise<any> => {
+    passport.use(
+      new CookieStrategy(
+        {
+          cookieName: "Authorization",
+          passReqToCallback: true
+        },
+        async (req: Request, token: string, done: (error: string, user?: any) => void): Promise<void> => {
+          let apiResult: string;
+          try {
+            apiResult = await request.get(`${process.env.AUTH_URL}/api/v1/users/me`, {
+              headers: {
+                Authorization: `${token}`,
+                Referer: req.originalUrl
+              }
+            });
+          } catch (err) {
+            // Some internal error has occured
+            return done(err);
+          }
+          // We expect the result to be returned as JSON, parse it
+          const result = JSON.parse(apiResult);
+          if (result.error && result.status === HttpResponseCode.UNAUTHORIZED) {
+            // When there is an error message and the status code is 401
+            return done(undefined, false);
+          } else if (result.status === 0) {
+            // The request has been authorized
 
-      let apiResult: string;
-      try {
-        apiResult = await request
-          .get(`${process.env.AUTH_URL}/api/v1/users/me`, {
-            headers: {
-              "Authorization": `${token}`,
-              "Referer": req.originalUrl
-            }
-        });
-      } catch (err) {
-        // Some internal error has occured
-        return done(err);
-      }
-      // We expect the result to be returned as JSON, parse it
-      const result = JSON.parse(apiResult);
-      if (result.error && result.status === HttpResponseCode.UNAUTHORIZED) {
-        // When there is an error message and the status code is 401
-        return done(undefined, false);
-      } else if (result.status === 0) {
-        // The request has been authorized
-
-        req.user = {
-          "auth_id": result.user._id,
-          "auth_level": result.user.auth_level,
-          "name": result.user.name,
-          "email": result.user.email,
-          "team": result.user.team
-        };
-        return done(undefined, req.user);
-      }
-    }));
+            (req.user as RequestUser) = {
+              authId: result.user._id,
+              authLevel: result.user.auth_level,
+              name: result.user.name,
+              email: result.user.email,
+              team: result.user.team
+            };
+            return done(undefined, req.user);
+          }
+        }
+      )
+    );
   };
 }
 
-export const checkLoggedIn = (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate("cookie", {
-    session: false
-  }, (err, user, info) => {
-    if (err) { return next(err); }
+export const checkLoggedIn = (req: Request, res: Response, next: NextFunction): void => {
+  passport.authenticate(
+    "cookie",
+    {
+      session: false
+    },
+    (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
 
-    // There is not authenticated user, so redirect to logins
-    if (!user) {
-      const queryParam: string = querystring.encode({
-        "returnto": `${process.env.APPLICATION_URL}${req.originalUrl}`
-      });
-      res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
-      return;
+      // There is not authenticated user, so redirect to logins
+      if (!user) {
+        const queryParam: string = querystring.encode({
+          returnto: `${process.env.APPLICATION_URL}${req.originalUrl}`
+        });
+        res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
+        return;
+      }
+      res.locals.authLevel = user.authLevel;
+      return next();
     }
-    res.locals.authLevel = user.auth_level;
-    return next();
-  })(req, res, next);
+  )(req, res, next);
 };
 
-export const checkIsAttendee = (req: Request, res: Response, next: NextFunction) => {
+const checkAuthLevel = (req: Request, res: Response, user: RequestUser, requiredAuth: AuthLevels): boolean => {
+  if (!user || user.authLevel < requiredAuth) {
+    const queryParam: string = querystring.encode({ returnto: `${process.env.APPLICATION_URL}${req.originalUrl}` });
+    res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
+    return;
+  }
+  return true;
+};
+
+export const checkIsAttendee = (req: Request, res: Response, next: NextFunction): void => {
   if (checkAuthLevel(req, res, req.user as RequestUser, AuthLevels.Attendee)) {
     res.locals.isAttendee = true;
     return next();
   }
 };
 
-export const checkIsOrganizer = (req: Request, res: Response, next: NextFunction) => {
+export const checkIsOrganizer = (req: Request, res: Response, next: NextFunction): void => {
   if (checkAuthLevel(req, res, req.user as RequestUser, AuthLevels.Organizer)) {
     res.locals.isOrganizer = true;
     return next();
   }
-};
-
-const checkAuthLevel = (req: Request, res: Response, user: RequestUser, requiredAuth: AuthLevels): boolean => {
-  if (!user || user.auth_level < requiredAuth) {
-    const queryParam: string = querystring.encode({"returnto": `${process.env.APPLICATION_URL}${req.originalUrl}`});
-    res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
-    return;
-  }
-  return true;
 };

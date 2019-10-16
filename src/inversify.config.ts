@@ -2,52 +2,52 @@ import { Container } from "inversify";
 import { TYPES } from "./types";
 
 // Applicants
-import { IApplicantService, ApplicantService } from "./services";
-import { IApplicationController, ApplicationController } from "./controllers";
+import { ApplicantServiceInterface, ApplicantService } from "./services";
+import { ApplicationControllerInterface, ApplicationController } from "./controllers";
 import { ApplicantRepository } from "./repositories";
 
 // Dashboard
-import { IDashboardController, DashboardController } from "./controllers";
+import { DashboardControllerInterface, DashboardController } from "./controllers";
 
 // Admin
-import { IAdminController, AdminController } from "./controllers";
+import { AdminControllerInterface, AdminController } from "./controllers";
 
 // Email
-import { IEmailService, EmailService } from "./services";
-import { IInviteController, InviteController } from "./controllers";
+import { EmailServiceInterface, EmailService } from "./services";
+import { InviteControllerInterface, InviteController } from "./controllers";
 
 // Routers
-import { IRouter, ApplicationRouter, DashboardRouter, InviteRouter, AdminRouter } from "./routes";
-import { ICache, Cache } from "./util/cache";
-import { IRequestAuthentication, RequestAuthentication } from "./util/auth";
+import { RouterInterface, ApplicationRouter, DashboardRouter, InviteRouter, AdminRouter } from "./routes";
+import { CacheInterface, Cache } from "./util/cache";
+import { RequestAuthenticationInterface, RequestAuthentication } from "./util/auth";
 
 const container = new Container();
 
 // Routers
-container.bind<IRouter>(TYPES.Router).to(ApplicationRouter);
-container.bind<IRouter>(TYPES.Router).to(DashboardRouter);
-container.bind<IRouter>(TYPES.Router).to(AdminRouter);
-container.bind<IRouter>(TYPES.Router).to(InviteRouter);
+container.bind<RouterInterface>(TYPES.Router).to(ApplicationRouter);
+container.bind<RouterInterface>(TYPES.Router).to(DashboardRouter);
+container.bind<RouterInterface>(TYPES.Router).to(AdminRouter);
+container.bind<RouterInterface>(TYPES.Router).to(InviteRouter);
 
 // Applications
-container.bind<IApplicantService>(TYPES.ApplicantService).to(ApplicantService);
-container.bind<IApplicationController>(TYPES.ApplicationController).to(ApplicationController);
+container.bind<ApplicantServiceInterface>(TYPES.ApplicantService).to(ApplicantService);
+container.bind<ApplicationControllerInterface>(TYPES.ApplicationController).to(ApplicationController);
 container.bind<ApplicantRepository>(TYPES.ApplicantRepository).to(ApplicantRepository);
 
 // Dashboard
-container.bind<IDashboardController>(TYPES.DashboardController).to(DashboardController);
+container.bind<DashboardControllerInterface>(TYPES.DashboardController).to(DashboardController);
 
 // Admin
-container.bind<IAdminController>(TYPES.AdminController).to(AdminController);
+container.bind<AdminControllerInterface>(TYPES.AdminController).to(AdminController);
 
 // Email
-container.bind<IInviteController>(TYPES.InviteController).to(InviteController);
-container.bind<IEmailService>(TYPES.EmailService).to(EmailService);
+container.bind<InviteControllerInterface>(TYPES.InviteController).to(InviteController);
+container.bind<EmailServiceInterface>(TYPES.EmailService).to(EmailService);
 
 // Request Authentication
-container.bind<IRequestAuthentication>(TYPES.RequestAuthentication).to(RequestAuthentication);
+container.bind<RequestAuthenticationInterface>(TYPES.RequestAuthentication).to(RequestAuthentication);
 
 // Constants
-container.bind<ICache>(TYPES.Cache).toConstantValue(new Cache());
+container.bind<CacheInterface>(TYPES.Cache).toConstantValue(new Cache());
 
 export default container;
