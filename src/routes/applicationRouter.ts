@@ -46,12 +46,24 @@ export class ApplicationRouter implements RouterInterface {
     });
   };
 
-  private checkApplicationsOpen = (req: Request, res: Response, next: NextFunction): void => {
+  private getIfApplicationsStillOpen = (req: Request, res: Response): boolean => {
     const applicationsOpenTime: number = new Date(req.app.locals.settings.applicationsOpen).getTime();
     const applicationsCloseTime: number = new Date(req.app.locals.settings.applicationsClose).getTime();
     const currentTime: number = new Date().getTime();
 
-    if (currentTime >= applicationsOpenTime && currentTime <= applicationsCloseTime) {
+    const applicationsOpen: boolean = currentTime >= applicationsOpenTime && currentTime <= applicationsCloseTime;
+    res.locals.applicationsOpen = applicationsOpen;
+    return applicationsOpen;
+  };
+
+  private doNothingIfApplicationsClosed = (req: Request, res: Response, next: NextFunction): void => {
+    this.getIfApplicationsStillOpen(req, res);
+    next();
+  };
+
+  private redirectIfApplicationsClosed = (req: Request, res: Response, next: NextFunction): void => {
+    const applicationsOpen = this.getIfApplicationsStillOpen(req, res);
+    if (applicationsOpen) {
       next();
     } else {
       return res.redirect("/");
@@ -69,16 +81,16 @@ export class ApplicationRouter implements RouterInterface {
     // Ensure that at a minimum the user is logged in in order to access the apply page
     router.use(checkLoggedIn);
 
-    router.get("/", this.checkApplicationsOpen, this._applicationController.apply);
+    router.get("/", this.redirectIfApplicationsClosed, this._applicationController.apply);
 
     router.post(
       "/",
-      this.checkApplicationsOpen,
+      this.redirectIfApplicationsClosed,
       this.fileCheckMiddleware,
       this._applicationController.submitApplication
     );
 
-    router.get("/cancel", this._applicationController.cancel);
+    router.get("/cancel", this.doNothingIfApplicationsClosed, this._applicationController.cancel);
 
     return router;
   }

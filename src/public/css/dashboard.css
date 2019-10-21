@@ -4,15 +4,19 @@
   letter-spacing: 3px;
   text-align: center !important;
 }
+
 .incomplete-status {
   color: red;
 }
+
 .complete-status {
   color: orange;
 }
+
 .invited-status {
   color: purple;
 }
+
 .confirmed-status {
   color: green;
 }
@@ -29,4 +33,8 @@
 .time-remaining-text {
   padding-top: 15px;
   font-size: 24px
+}
+
+#createJoinTeamBtn {
+  margin-right: 20px;
 }

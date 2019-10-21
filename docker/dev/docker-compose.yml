@@ -1,6 +1,7 @@
 version: "2.1"
 services:
   mysql_db:
+    container_name: mysql_db
     image: mysql:5.7
     command: --default-authentication-plugin=mysql_native_password --log_error_verbosity=1
     env_file:
@@ -26,7 +27,7 @@ volumes:
 
 # The network allows multiple containers to connect together
 networks:
-  # internal network for hs_hub services
+  # internal network for hs_applications services
   internal:
     driver: bridge
   # external network for consumer-facing hacker suite services

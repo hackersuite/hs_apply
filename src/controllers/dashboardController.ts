@@ -37,9 +37,18 @@ export class DashboardController implements DashboardControllerInterface {
 
     const applicationStatus: ApplicantStatus =
       applicant !== undefined ? applicant.applicationStatus : ApplicantStatus.Verified;
+
+    // Check that the applications are still open
+    // Get the open and close time from the predefined settings and compare to the current time
+    const applicationsOpenTime: number = new Date(req.app.locals.settings.applicationsOpen).getTime();
+    const applicationsCloseTime: number = new Date(req.app.locals.settings.applicationsClose).getTime();
+    const currentTime: number = new Date().getTime();
+    const applicationsOpen: boolean = currentTime >= applicationsOpenTime && currentTime <= applicationsCloseTime;
+
     res.render("pages/dashboard", {
       applicationStatus: applicationStatus,
-      applicantName: (req.user as RequestUser).name
+      applicantName: (req.user as RequestUser).name,
+      applicationsOpen: applicationsOpen
     });
   };
 }

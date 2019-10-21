@@ -14,7 +14,7 @@
     <div class="main-panel">
       <div class="content">
         <div class="container-fluid">
-          <% if (applicationStatus >= 2 && applicationStatus <= 4 ) { %>
+          <% if ((applicationStatus >= 2 && applicationStatus <= 4) || !applicationsOpen) { %>
           <div class="modal fade" id="cancelApplicationModelStrong" tabindex="-1" role="dialog" aria-labelledby="cancelApplicationModelLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
@@ -36,25 +36,10 @@
           </div>
           <% } %>
 
-          <% if (new Date().getTime() >= new Date(locals.settings.applicationsOpen).getTime()) { %>
+          <% if (applicationsOpen) { %>
             <% include ../partials/dashboardOpen.ejs %>
           <% } else { %>
-            <div class="row justify-content-center">
-              <div class="col-md-8">
-                <div class="card time-remaining-card">
-                  <p class="time-remaining-text text-center">
-                  Time until applications open:
-                  <strong id="secondsLeftDeadline">
-                  0 days, 0h 0m 0s
-                  </strong>
-                  <script>
-                    var applicationsOpenDate = <%- new Date(locals.settings.applicationsOpen).getTime() %>;
-                    var timeUntilOpen = Math.floor((applicationsOpenDate - new Date().getTime()) / 1000);
-                  </script>
-                  </p>
-                </div>
-              </div>
-            </div>
+            <% include ../partials/dashboardClosed.ejs %>
           <% } %>
         </div>
       </div>

@@ -40,11 +40,7 @@
               <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
             </div>
             <div class="row">
-              <p>Click the button below to fill out your application.</p>
-            </div>
-            <div class="row justify-content-center">
-              <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
-              <a href="/apply" class="btn btn-success text-center">Create your application</a>
+              <p>Applications have now closed.</p>
             </div>
           <% } else if (applicationStatus === 1) { %>
             <div class="row">
@@ -53,31 +49,6 @@
             <div class="row">
               <p>We will be in touch soon with any updates</p>
             </div>
-
-            <div class="row justify-content-center">
-              <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
-              <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModel">Cancel your application</button>
-            </div>
-            
-            <div class="modal fade" id="cancelApplicationModel" tabindex="-1" role="dialog" aria-labelledby="cancelApplicationModelLabel" aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="cancelApplicationModelLabel">Cancel Application</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    Are you sure you want to cancel your application?
-                  </div>
-                  <div class="modal-footer">
-                    <a href="/apply/cancel" class="btn btn-danger">Yes, cancel my application</a>
-                    <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
-                  </div>
-                </div>
-              </div>
-            </div>
           <% } else if (applicationStatus === 2) { %>
             <div class="row">
               <h4 class="font-weight-bold">Thank you for applying!</h4>
@@ -85,20 +56,15 @@
             <div class="row">
               <p>We will be in touch soon with any updates.</p>
             </div>
-            <div class="row justify-content-center">
-              <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
-              <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModelStrong">Cancel your application</button>
-            </div>
           <% } else if (applicationStatus === 3) { %>
             <div class="row">
               <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
             </div>
             <div class="row">
-              <p>Congratulations! You've been accepted, please check your email for the invite, and confirm your attendance</p>
+              <p>Congratulations! You've been accepted, please check your email for the invite, and confirm your attendance.</p>
             </div>
-            <div class="row justify-content-center">
-              <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
-              <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModelStrong">Cancel your application</button>
+            <div class="row">
+              <p>If you can't find the email, please contact us at <a href="mailto:help@unicsmcr.com">help@unicsmcr.com</p>
             </div>
           <% } else if (applicationStatus === 4) { %>
             <div class="row">
@@ -107,9 +73,8 @@
             <div class="row">
               <p>Thank you for confirming! We are excited to see you at the hackathon!</p>
             </div>
-            <div class="row justify-content-center">
-              <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
-              <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModelStrong">Cancel your application</button>
+            <div class="row">
+              <p>If you need help with anything before the hackathon, please contact us at <a href="mailto:help@unicsmcr.com">help@unicsmcr.com</p>
             </div>
           <% } else if (applicationStatus === 6) { %>
             <div class="row">
@@ -124,6 +89,13 @@
             </div>
             <div class="row">
               <p>We're sorry, you haven't been accepted. We wish we could accept everyone but we have limited space at the Hackathon. Please try applying again next time!</p>
+            </div>
+          <% } %>
+
+          <% if (applicationStatus >= 1 && applicationStatus <= 4) { %>
+            <div class="row justify-content-center">
+              <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
+              <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModelStrong">Cancel your application</button>
             </div>
           <% } %>
         </div>
