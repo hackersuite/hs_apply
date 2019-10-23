@@ -104,7 +104,10 @@ export class ApplicationController implements ApplicationControllerInterface {
     // Handling the CV file
     let cvFile: Buffer;
     if (req.files && req.files.length === 1 && req.files[0].fieldname === "applicantCV") {
-      newApplication.cv = `${reqUser.name}.${reqUser.email}.${req.files[0].originalname}`;
+      /*eslint no-control-regex: "off"*/
+      newApplication.cv = `${reqUser.name.replace(/[^\x00-\x7F]/g, "")}.${
+        reqUser.email
+      }.${req.files[0].originalname.replace(/[^\x00-\x7F]/g, "")}`;
       cvFile = req.files[0].buffer;
     }
 
