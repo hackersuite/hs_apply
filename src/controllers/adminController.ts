@@ -153,15 +153,11 @@ export class AdminController implements AdminControllerInterface {
   public downloadCSV = async (req: Request, res: Response): Promise<void> => {
     let allApplicants: Partial<Applicant>[];
     try {
-      const allApplicantsAndCount = await this._applicantService.getAllAndCountSelection([
-        "id",
-        "authId",
-        "whyChooseHacker",
-        "skills",
-        "pastProjects",
-        "degree",
-        "createdAt"
-      ]);
+      const allApplicantsAndCount = await this._applicantService.getAllAndCountSelection(
+        ["id", "authId", "whyChooseHacker", "skills", "pastProjects", "degree", "createdAt"],
+        "createdAt",
+        "ASC"
+      );
       allApplicants = allApplicantsAndCount[0];
     } catch (err) {
       res.send("Failed to get the applications!");
@@ -209,7 +205,7 @@ export class AdminController implements AdminControllerInterface {
       application.pastProjects = this.escapeForCSV(application.pastProjects);
       application.skills = this.escapeForCSV(application.skills);
       stream.write(
-        `${application.id},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree}"\n`
+        `${application.createdAt},${application.id},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree}"\n`
       );
     });
     stream.end();
