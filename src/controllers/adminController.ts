@@ -203,8 +203,10 @@ export class AdminController implements AdminControllerInterface {
       });
     });
     allApplicants.forEach(application => {
+      // UID, TID, WhyChoose?, Proj, Skills, Degree
+      const team: string = authUsers[application.authId] ? authUsers[application.authId].team : "";
       stream.write(
-        `${application.id},${application.whyChooseHacker},${application.pastProjects},${application.skills},${application.degree}\n`
+        `${application.id},${team},${application.whyChooseHacker},${application.pastProjects},${application.skills},${application.degree}\n`
       );
     });
     stream.end();
