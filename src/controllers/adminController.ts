@@ -205,13 +205,17 @@ export class AdminController implements AdminControllerInterface {
     allApplicants.forEach(application => {
       // UID, TID, WhyChoose?, Proj, Skills, Degree
       const team: string = authUsers[application.authId] ? authUsers[application.authId].team : "";
-      application.whyChooseHacker.replace('"', "'");
-      application.pastProjects.replace('"', "'");
-      application.skills.replace('"', "'");
+      application.whyChooseHacker = this.escapeForCSV(application.whyChooseHacker);
+      application.pastProjects = this.escapeForCSV(application.pastProjects);
+      application.skills = this.escapeForCSV(application.skills);
       stream.write(
         `${application.id},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree}"\n`
       );
     });
     stream.end();
+  };
+
+  private escapeForCSV = (input: string): string => {
+    return input ? input.replace(/"/g, "") : "";
   };
 }
