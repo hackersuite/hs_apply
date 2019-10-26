@@ -42,6 +42,29 @@ function renderRows(term) {
   });
 }
 
+function invite(id) {
+  $.ajax({
+    type: 'PUT',
+    url: `/invite/${id}/send`,
+    success: function (data) {
+      $("#" + id + "-btn").prop('disabled', true);
+      $.notify({
+        message: 'Sent invite successfully'
+      }, {
+        type: 'success'
+      });
+    },
+    error: function (error) {
+      $("#submit-form-btn").prop('disabled', false);
+      $.notify({
+        message: error.responseJSON.message
+      }, {
+        type: 'danger'
+      });
+    }
+  })
+}
+
 $(document).ready(function () {
   $('#filterNameInput').on('input', (event) => {
     var elem = $(event.target);

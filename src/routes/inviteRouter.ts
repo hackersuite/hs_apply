@@ -20,9 +20,9 @@ export class InviteRouter implements RouterInterface {
   public register(): Router {
     const router: Router = Router();
 
-    router.get("/:id([a-f0-9-]+)/send", checkLoggedIn, checkIsOrganizer, this._inviteController.send);
+    router.put("/:id([a-f0-9-]+)/send", checkLoggedIn, checkIsOrganizer, this._inviteController.send);
 
-    router.get("/:id([a-f0-9-]+)/confirm", checkLoggedIn, this._inviteController.confirm);
+    router.get("/:id([a-f0-9-]+)/confirm", this._inviteController.confirm);
 
     return router;
   }

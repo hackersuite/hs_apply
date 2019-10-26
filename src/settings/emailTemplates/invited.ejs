@@ -3,18 +3,21 @@
 <p>
     Hey <%= applicant.name %>, we have some good news!
 </p>
-<p>Your application was selected out of more than 500, and we invite you to join us for an amazing hackathon experience at <%= settings.fullName %>!</p>
+<p>Your application was selected out of more than 300, and we invite you to join us for an amazing hackathon experience
+    at <%= settings.fullName %>!</p>
 <p>
 
 </p>
 <p>
-  Respond to this invitation by clicking on the "Confirm" link below.
-  <b>Please confirm your spot within 5 days of receiving this email. Otherwise we will give your spot to another hacker on the waitlist.</b>
+    Respond to this invitation by clicking on the "Confirm" link below.
+    <b>Please confirm your spot within 5 days of receiving this email. Otherwise we will give your spot to another
+        hacker on the waitlist.</b>
 </p>
 <%- include('partials/emailButton', { emailButtonText: 'Confirm', emailButtonLink: confirmLink }); %>
 <p>
-    Bring all your excitement and positive energy (along with all the hackathons essentials of course!), and see you on the [date] at the 
-    <a href="[google maps link]" target="_blank" rel="noopener noreferrer">[building]</a>!
+    Bring all your excitement and positive energy (along with all the hackathons essentials of course!), and see you on
+    the 16<sup>th</sup> November at the
+    <a href="https://goo.gl/maps/xeq1nAiSipAw6YSC7" target="_blank" rel="noopener noreferrer">MMU Business School</a>!
 </p>
 <p>Look out for further emails with important information before the big day!</p>
 <p>

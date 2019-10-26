@@ -41,8 +41,8 @@ export class ApplicantService implements ApplicantServiceInterface {
     orderBy?: keyof Applicant,
     orderType?: "ASC" | "DESC"
   ): Promise<[Partial<Applicant>[], number]> => {
+    const orderOptions: object = orderBy && orderBy ? { [orderBy]: orderType } : undefined;
     try {
-      const orderOptions: object = orderBy && orderBy ? { [orderBy]: orderType } : undefined;
       return await this._applicantRepository.findAndCount({
         select: columns,
         order: orderOptions
