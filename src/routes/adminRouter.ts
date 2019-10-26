@@ -27,7 +27,10 @@ export class AdminRouter implements RouterInterface {
 
     router.get("/manage", this._adminController.manage);
 
+    router.get("/manage/downloadCSV", this._adminController.downloadCSV);
+
     router.get("/manage/[a-z0-9-]+", this._adminController.manageApplication);
+
     return router;
   }
 }

@@ -5,6 +5,7 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
+import * as fs from "fs";
 
 export interface AdminControllerInterface {
   overview: (req: Request, res: Response, next: NextFunction) => void;
@@ -147,5 +148,65 @@ export class AdminController implements AdminControllerInterface {
     res.render("pages/manageApplication", {
       applicant: specifiedApplicant
     });
+  };
+
+  public downloadCSV = async (req: Request, res: Response): Promise<void> => {
+    let allApplicants: Partial<Applicant>[];
+    try {
+      const allApplicantsAndCount = await this._applicantService.getAllAndCountSelection([
+        "id",
+        "authId",
+        "whyChooseHacker",
+        "skills",
+        "pastProjects",
+        "degree",
+        "createdAt"
+      ]);
+      allApplicants = allApplicantsAndCount[0];
+    } catch (err) {
+      res.send("Failed to get the applications!");
+      return;
+    }
+
+    let allAuthUsersFromAPI: any;
+    try {
+      allAuthUsersFromAPI = await request.get(`${process.env.AUTH_URL}/api/v1/users`, {
+        headers: {
+          Authorization: `${req.cookies["Authorization"]}`,
+          Referer: req.originalUrl
+        }
+      });
+    } catch (err) {
+      res.send("Failed to get the users authentication info!");
+    }
+
+    const authUsersResult: any = JSON.parse(allAuthUsersFromAPI).users;
+    const authUsers = {};
+    // Expand the auth user to use the auth id as the key for each object
+    authUsersResult.forEach(a => {
+      authUsers[a._id] = { ...a };
+    });
+
+    const stream = fs.createWriteStream("voting.csv");
+    stream.on("finish", () => {
+      // Once the stream is closed, send the file in the response
+      res.download("voting.csv", err => {
+        if (err) {
+          console.log("File transfer failed!");
+        }
+        // Remove the voting.csv file once the download has either completed or failed
+        fs.unlink("voting.csv", err => {
+          if (err) {
+            console.log(`Failed to remove the voting.csv file! ${err}`);
+          }
+        });
+      });
+    });
+    allApplicants.forEach(application => {
+      stream.write(
+        `${application.id},${application.whyChooseHacker},${application.pastProjects},${application.skills},${application.degree}\n`
+      );
+    });
+    stream.end();
   };
 }
