@@ -205,6 +205,9 @@ export class AdminController implements AdminControllerInterface {
     allApplicants.forEach(application => {
       // UID, TID, WhyChoose?, Proj, Skills, Degree
       const team: string = authUsers[application.authId] ? authUsers[application.authId].team : "";
+      application.whyChooseHacker.replace('"', "'");
+      application.pastProjects.replace('"', "'");
+      application.skills.replace('"', "'");
       stream.write(
         `${application.id},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree}"\n`
       );
