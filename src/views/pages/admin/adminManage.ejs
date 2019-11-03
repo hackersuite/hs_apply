@@ -8,6 +8,29 @@
 </head>
 
 <body>
+  <div class="modal fade" id="batchInviteModal" tabindex="-1" role="dialog" aria-labelledby="batchInviteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="batchInviteModalLabel">Batch invite</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="textAreaInviteIds">Newline seperated list of users to invite by ID</label>
+            <textarea class="form-control" id="textAreaInviteIds" rows="5"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="batchInvite()">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="wrapper">
     <%- include('../../partials/navbar', { currentPage: "admin-manage" }) %>
     <div class="main-panel">
@@ -31,6 +54,12 @@
                   <input id="filterNameInput" type="text" class="form-control" placeholder="Enter name..." aria-label="Type a name to filter applications">
                 </div>
 
+                <div class="form-group input-group">
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#batchInviteModal">
+                    Batch Invite
+                  </button>
+                </div>
+
                 <div class="card-body applicants-scroll">
                   <table class="table">
                     <thead class="text-primary">
@@ -51,12 +80,7 @@
                           <td class="text-center"><%= applicant.email %></td>
                           <td class="text-center"><%= applicant.university %></td>
                           <td class="text-center"><%= applicant.yearOfStudy %></td>
-                          <td class="text-center">
-                            <i class="material-icons applicant-status check-valid">check_circle</i>
-                            <i class="material-icons applicant-status check-valid">check_circle</i>
-                            <i class="material-icons applicant-status check-invalid">error</i>
-                            <i class="material-icons applicant-status check-invalid">error</i>
-                          </td>
+                          <td class="text-center"><%= applicant.applicationStatus %></td>
                           <td class="td-actions text-center">
                             <a class="btn btn-primary" role="button" rel="tooltip" href="manage/<%= applicant.id %>" target="_blank">
                               <i class="material-icons">person</i>

@@ -6,6 +6,7 @@ import { Applicant } from "../models/db";
 import { RequestUser } from "../util/auth";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 import { HttpResponseCode } from "../util/errorHandling";
+import * as request from "request-promise-native";
 
 export interface InviteControllerInterface {
   send: (req: Request, res: Response, next: NextFunction) => void;
@@ -28,8 +29,96 @@ export class InviteController implements InviteControllerInterface {
     this._emailService = emailService;
   }
 
+  private sendInvite = async (req: Request, applicant: Applicant, name: string, email: string): Promise<boolean> => {
+    if (
+      applicant.applicationStatus === ApplicantStatus.Applied ||
+      applicant.applicationStatus === ApplicantStatus.Reviewed
+    ) {
+      const subject = `[${req.app.locals.settings.shortName}] You've been accepted!`;
+      const confirmLink = `${req.app.locals.settings.hackathonURL}/invite/${applicant.id}/confirm`;
+      const hackathonLogoURL = `${req.app.locals.settings.hackathonURL}/img/logo.png`;
+
+      try {
+        // Send the email to the user
+        const result: boolean = await this._emailService.sendEmail(
+          req.app.locals.settings.mainEmail,
+          email,
+          subject,
+          "invited",
+          {
+            subject: subject,
+            settings: req.app.locals.settings,
+            confirmLink: confirmLink,
+            hackathonLogoURL: hackathonLogoURL,
+            applicant: {
+              id: applicant.id,
+              name: name
+            }
+          }
+        );
+
+        if (result) {
+          // Create the accept deadline 5 days in the future
+          const acceptDeadline = new Date();
+          acceptDeadline.setDate(acceptDeadline.getDate() + 5);
+          await this._applicantService.save({
+            ...applicant,
+            inviteAcceptDeadline: acceptDeadline,
+            applicationStatus: ApplicantStatus.Invited
+          });
+        }
+        return result;
+      } catch (err) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  };
+
+  public batchSend = async (req: Request, res: Response): Promise<void> => {
+    const users: string = req.body.users;
+    if (!users) {
+      res.status(HttpResponseCode.BAD_REQUEST).send({
+        message: "Failed to send invites"
+      });
+      return;
+    }
+
+    // Get all of the auth users -- we really need an endpoint to get a single user
+    const apiResult = await request.get(`${process.env.AUTH_URL}/api/v1/users`, {
+      headers: {
+        Authorization: `${req.cookies["Authorization"]}`
+      }
+    });
+    // Mapping like in the admin overvire page for ease of use
+    const authUsersResult: any = JSON.parse(apiResult).users;
+    const authUsers = {};
+    authUsersResult.forEach(a => {
+      authUsers[a._id] = { ...a };
+    });
+
+    // Send the emails to all the users in the list
+    const userIds: Array<string> = users.split("\n");
+    const results: Array<any> = await Promise.all(
+      userIds.map(async (id: string) => {
+        const applicant: Applicant = await this._applicantService.findOne(id);
+        const authUser: any = authUsers[applicant.authId];
+        let result: boolean;
+        try {
+          result = await this.sendInvite(req, applicant, authUser.name, authUser.email);
+        } catch (err) {
+          return { status: "rejected", err };
+        }
+        return result ? { status: "fulfilled", id } : { status: "rejected", err: "Failed to send email." };
+      })
+    );
+    res.send(results);
+  };
+
   public send = async (req: Request, res: Response): Promise<void> => {
     const reqUser: RequestUser = req.user as RequestUser;
+
     let applicant: Applicant;
     try {
       applicant = await this._applicantService.findOne(req.params.id, "id");
@@ -42,52 +131,10 @@ export class InviteController implements InviteControllerInterface {
     }
 
     // Check that the chosen user can be invited
-    if (
-      applicant.applicationStatus === ApplicantStatus.Applied ||
-      applicant.applicationStatus === ApplicantStatus.Reviewed
-    ) {
-      const subject = `[${req.app.locals.settings.shortName}] You've been accepted!`;
-      const confirmLink = `${req.app.locals.settings.hackathonURL}/invite/${req.params.id}/confirm`;
-      const hackathonLogoURL = `${req.app.locals.settings.hackathonURL}/img/logo.png`;
-
-      try {
-        // Send the email to the user
-        const result: boolean = await this._emailService.sendEmail(
-          req.app.locals.settings.mainEmail,
-          reqUser.email,
-          subject,
-          "invited",
-          {
-            subject: subject,
-            settings: req.app.locals.settings,
-            confirmLink: confirmLink,
-            hackathonLogoURL: hackathonLogoURL,
-            applicant: {
-              id: applicant.id,
-              name: reqUser.name
-            }
-          }
-        );
-
-        if (result) {
-          // Create the accept deadline 5 days in the future
-          const acceptDeadline = new Date();
-          acceptDeadline.setDate(acceptDeadline.getDate() + 5);
-          applicant.inviteAcceptDeadline = acceptDeadline;
-          applicant.applicationStatus = ApplicantStatus.Invited;
-          await this._applicantService.save(applicant);
-        }
-      } catch (err) {
-        res.status(HttpResponseCode.BAD_REQUEST).send({
-          message: "Failed to send invite"
-        });
-        return;
-      }
-
+    if (await this.sendInvite(req, applicant, reqUser.name, reqUser.email)) {
       res.send({
         message: "Sent invite successfully!"
       });
-      return;
     } else {
       res.send({
         message: "Applicant cannot be invited yet!"

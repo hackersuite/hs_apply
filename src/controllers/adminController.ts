@@ -6,6 +6,7 @@ import { TYPES } from "../types";
 import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import * as fs from "fs";
+import { ApplicantStatus } from "../services/applications/applicantStatus";
 
 export interface AdminControllerInterface {
   overview: (req: Request, res: Response, next: NextFunction) => void;
@@ -116,14 +117,7 @@ export class AdminController implements AdminControllerInterface {
       "applicationStatus",
       "createdAt"
     ];
-    const columnNames: object[] = [
-      ["Name"],
-      ["Email"],
-      ["University"],
-      ["Year"],
-      ["V/S/I/C", "Verified / Submitted / Invited / Confirmed"],
-      ["Manage"]
-    ];
+    const columnNames: object[] = [["Name"], ["Email"], ["University"], ["Year"], ["Status"], ["Manage"]];
     const applications: Applicant[] = await this._applicantService.getAll(columnsToSelect);
 
     const authUsersResult: any = JSON.parse(apiResult).users;
@@ -134,7 +128,11 @@ export class AdminController implements AdminControllerInterface {
 
     const combinedApplications: any = [];
     applications.forEach(a => {
-      combinedApplications.push({ ...a, ...authUsers[a.authId] });
+      combinedApplications.push({
+        ...a,
+        ...authUsers[a.authId],
+        applicationStatus: ApplicantStatus[a.applicationStatus]
+      });
     });
 
     res.render("pages/admin/adminManage", {
