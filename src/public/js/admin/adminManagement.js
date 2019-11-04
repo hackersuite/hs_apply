@@ -62,10 +62,11 @@ function invite(id) {
 
 function batchInvite() {
   const users = $('#textAreaInviteIds').val();
+  const emailType = $("#emailTypeDropdown").val();
   $.ajax({
     type: 'POST',
     url: `/invite/batchSend`,
-    data: { users },
+    data: { users, emailType },
     success: function (data) {
       $.notify({
         message: 'Sent all invites successfully'

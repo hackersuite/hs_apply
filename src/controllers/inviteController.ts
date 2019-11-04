@@ -76,11 +76,54 @@ export class InviteController implements InviteControllerInterface {
     }
   };
 
+  private sendReject = async (req: Request, applicant: Applicant, name: string, email: string): Promise<boolean> => {
+    if (
+      applicant.applicationStatus === ApplicantStatus.Applied ||
+      applicant.applicationStatus === ApplicantStatus.Reviewed
+    ) {
+      const subject = `[${req.app.locals.settings.shortName}] Application Update`;
+      const hackathonLogoURL = `${req.app.locals.settings.hackathonURL}/img/logo.png`;
+
+      try {
+        // Send the email to the user
+        const result: boolean = await this._emailService.sendEmail(
+          req.app.locals.settings.mainEmail,
+          email,
+          subject,
+          "rejected",
+          {
+            subject: subject,
+            settings: req.app.locals.settings,
+            hackathonLogoURL: hackathonLogoURL,
+            applicant: {
+              id: applicant.id,
+              name: name
+            }
+          }
+        );
+
+        if (result) {
+          // Set the applicant state to be rejected
+          await this._applicantService.save({
+            ...applicant,
+            applicationStatus: ApplicantStatus.Rejected
+          });
+        }
+        return result;
+      } catch (err) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  };
+
   public batchSend = async (req: Request, res: Response): Promise<void> => {
+    const emailType: string = req.body.emailType;
     const users: string = req.body.users;
-    if (!users) {
+    if (!users || !emailType) {
       res.status(HttpResponseCode.BAD_REQUEST).send({
-        message: "Failed to send invites"
+        message: "Failed to send emails"
       });
       return;
     }
@@ -106,7 +149,11 @@ export class InviteController implements InviteControllerInterface {
         const authUser: any = authUsers[applicant.authId];
         let result: boolean;
         try {
-          result = await this.sendInvite(req, applicant, authUser.name, authUser.email);
+          if (emailType === "invite") {
+            result = await this.sendInvite(req, applicant, authUser.name, authUser.email);
+          } else if (emailType === "reject") {
+            result = await this.sendReject(req, applicant, authUser.name, authUser.email);
+          }
         } catch (err) {
           return { status: "rejected", err };
         }
