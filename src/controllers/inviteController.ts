@@ -145,6 +145,7 @@ export class InviteController implements InviteControllerInterface {
     const userIds: Array<string> = users.split("\n");
     const results: Array<any> = await Promise.all(
       userIds.map(async (id: string) => {
+        if (!id || id.length === 0) return { status: "rejected", err: "Not defined id" };
         const applicant: Applicant = await this._applicantService.findOne(id);
         const authUser: any = authUsers[applicant.authId];
         let result: boolean;
@@ -178,7 +179,8 @@ export class InviteController implements InviteControllerInterface {
     }
 
     // Check that the chosen user can be invited
-    if (await this.sendInvite(req, applicant, reqUser.name, reqUser.email)) {
+    const result: boolean = await this.sendInvite(req, applicant, reqUser.name, reqUser.email);
+    if (result) {
       res.send({
         message: "Sent invite successfully!"
       });
