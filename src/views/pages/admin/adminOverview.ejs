@@ -27,6 +27,9 @@
                 </div>
                 <div class="card-body">
                   <h4 class="card-title text-center">Currently  <%= totalApplications %> applications</h4>
+                  <% Object.entries(applicationStatus).forEach((entry) => { %>
+                    <p><%= entry[0] %>: <%= entry[1]%></p>
+                  <% }); %>
                 </div>
               </div>
             </div>

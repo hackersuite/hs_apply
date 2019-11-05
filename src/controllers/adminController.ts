@@ -33,7 +33,15 @@ export class AdminController implements AdminControllerInterface {
     let applications: Partial<Applicant>[], totalApplications: number;
     try {
       [applications, totalApplications] = await this._applicantService.getAllAndCountSelection(
-        ["gender", "tShirtSize", "createdAt", "dietaryRequirements", "hardwareRequests", "university"],
+        [
+          "gender",
+          "tShirtSize",
+          "createdAt",
+          "dietaryRequirements",
+          "hardwareRequests",
+          "university",
+          "applicationStatus"
+        ],
         "createdAt",
         "ASC"
       );
@@ -64,6 +72,10 @@ export class AdminController implements AdminControllerInterface {
     // Create a map to contain the universities and counts
     const university = {};
 
+    // Create a map to contain the application status stats
+    const appStatus = {};
+    let applicationStatusValue: string;
+
     // Create an array with all the hardware requests
     const hardwareReq = [];
 
@@ -83,6 +95,9 @@ export class AdminController implements AdminControllerInterface {
       }
 
       university[applicant.university] = 1 + (university[applicant.university] || 0);
+
+      applicationStatusValue = ApplicantStatus[applicant.applicationStatus];
+      appStatus[applicationStatusValue] = 1 + (appStatus[applicationStatusValue] || 0);
     });
 
     res.render("pages/admin/adminOverview", {
@@ -92,7 +107,8 @@ export class AdminController implements AdminControllerInterface {
       applicationTShirts: tShirts,
       applicationDietry: dietryReq,
       applicationHardwareReq: hardwareReq,
-      applicationUniversity: university
+      applicationUniversity: university,
+      applicationStatus: appStatus
     });
   };
 
