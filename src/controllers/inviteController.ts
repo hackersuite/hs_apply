@@ -202,7 +202,9 @@ export class InviteController implements InviteControllerInterface {
     }
 
     let notifyMessage: string;
-    if (applicant.inviteAcceptDeadline && applicant.inviteAcceptDeadline.getTime() <= new Date().getTime()) {
+    if (applicant.applicationStatus >= ApplicantStatus.Confirmed) {
+      notifyMessage = "The invite is on longer valid.";
+    } else if (applicant.inviteAcceptDeadline && applicant.inviteAcceptDeadline.getTime() <= new Date().getTime()) {
       // Check that the invite deadline has not expired
       notifyMessage = "This invite has expired, we're sorry you have missed the deadline.";
       applicant.applicationStatus = ApplicantStatus.Rejected;
