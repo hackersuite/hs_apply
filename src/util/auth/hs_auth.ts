@@ -142,9 +142,17 @@ export const checkIsAttendee = (req: Request, res: Response, next: NextFunction)
   }
 };
 
+export const checkIsVolunteer = (req: Request, res: Response, next: NextFunction): void => {
+  if (checkAuthLevel(req, res, req.user as RequestUser, AuthLevels.Volunteer)) {
+    res.locals.isVolunteer = true;
+    return next();
+  }
+};
+
 export const checkIsOrganizer = (req: Request, res: Response, next: NextFunction): void => {
   if (checkAuthLevel(req, res, req.user as RequestUser, AuthLevels.Organizer)) {
     res.locals.isOrganizer = true;
+    res.locals.isVolunteer = true;
     return next();
   }
 };

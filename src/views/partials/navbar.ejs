@@ -14,6 +14,8 @@
           <p>Admin | Overview</p>
         </a>
       </li>
+      <% } %>
+      <% if (locals._locals.authLevel >= 2) { %>
       <li id="admin-manage" class="nav-item">
         <a class="nav-link" href="/admin/manage">
           <i class="material-icons">lock</i>
