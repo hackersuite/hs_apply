@@ -16,9 +16,9 @@ function renderApplicationRow(container, applicant) {
       <button id="${applicant.id}-btn" class="btn btn-info" type="button" onclick="invite('${applicant.id}')">
         <i class="material-icons">email</i>
       </button>
-      <a class="btn btn-success" role="button" rel="tooltip">
+      <button id="${applicant.id}-btn-checkin" class="btn btn-success" type="button" onclick="checkin('${applicant.id}')">
         <i class="material-icons">person_add</i>
-      </a>
+      </button>
     </td>
   </tr>
   `;
@@ -53,6 +53,27 @@ function invite(id) {
       $("#submit-form-btn").prop('disabled', false);
       $.notify({
         message: error.responseJSON.message
+      }, {
+        type: 'danger'
+      });
+    }
+  })
+}
+
+function checkin(id) {
+  $.ajax({
+    type: 'PUT',
+    url: `/apply/${id}/checkin`,
+    success: function (data) {
+      $.notify({
+        message: 'Hacker checked in'
+      }, {
+        type: 'success'
+      });
+    },
+    error: function (error) {
+      $.notify({
+        message: error.responseJSON.message || "Hacker could not be checked in"
       }, {
         type: 'danger'
       });

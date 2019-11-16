@@ -5,7 +5,7 @@ import { RouterInterface } from "./registerableRouter";
 import { TYPES } from "../types";
 import * as multer from "multer";
 import { HttpResponseCode } from "../util/errorHandling";
-import { checkLoggedIn } from "../util/auth";
+import { checkLoggedIn, checkIsOrganizer } from "../util/auth";
 
 @injectable()
 export class ApplicationRouter implements RouterInterface {
@@ -91,6 +91,8 @@ export class ApplicationRouter implements RouterInterface {
     );
 
     router.get("/cancel", this.doNothingIfApplicationsClosed, this._applicationController.cancel);
+
+    router.put("/:id([a-f0-9-]+)/checkin", checkIsOrganizer, this._applicationController.checkin);
 
     return router;
   }

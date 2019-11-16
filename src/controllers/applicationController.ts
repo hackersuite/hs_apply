@@ -155,4 +155,39 @@ export class ApplicationController implements ApplicationControllerInterface {
   private isNumeric(n: any): boolean {
     return !isNaN(parseFloat(n)) && isFinite(n);
   }
+
+  public checkin = async (req: Request, res: Response): Promise<void> => {
+    const checkinID: string = req.params.id;
+    let application: Applicant;
+    try {
+      application = await this._applicantService.findOne(checkinID);
+    } catch (err) {
+      res.status(HttpResponseCode.BAD_REQUEST).send({
+        message: "Hacker could not be checked in"
+      });
+      return;
+    }
+
+    if (application.applicationStatus === ApplicantStatus.Confirmed) {
+      // Update the application to state that they have attended the hackathon
+      application.applicationStatus = ApplicantStatus.Admitted;
+      try {
+        await this._applicantService.save(application);
+      } catch (err) {
+        res.status(HttpResponseCode.BAD_REQUEST).send({
+          message: "Hacker could not be checked in"
+        });
+        return;
+      }
+    } else {
+      res.status(HttpResponseCode.BAD_REQUEST).send({
+        message: "Hacker was either rejected or did not confirm"
+      });
+      return;
+    }
+
+    res.send({
+      message: "Hacker checked in!"
+    });
+  };
 }
