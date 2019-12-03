@@ -149,6 +149,37 @@ export class InviteController implements InviteControllerInterface {
     }
   };
 
+  private sendFeedback = async (req: Request, applicant: Applicant, name: string, email: string): Promise<boolean> => {
+    if (applicant.applicationStatus === ApplicantStatus.Confirmed) {
+      const subject = `[${req.app.locals.settings.shortName}] Feedback`;
+      const hackathonLogoURL = `${req.app.locals.settings.hackathonURL}/img/logo.png`;
+
+      try {
+        // Send the email to the user
+        const result: boolean = await this._emailService.sendEmail(
+          `${req.app.locals.settings.shortName} <${req.app.locals.settings.mainEmail}>`,
+          email,
+          subject,
+          "feedback",
+          {
+            subject: subject,
+            settings: req.app.locals.settings,
+            hackathonLogoURL: hackathonLogoURL,
+            applicant: {
+              id: applicant.id,
+              name: name
+            }
+          }
+        );
+        return result;
+      } catch (err) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  };
+
   public batchSend = async (req: Request, res: Response): Promise<void> => {
     const emailType: string = req.body.emailType;
     const users: string = req.body.users;
@@ -187,6 +218,8 @@ export class InviteController implements InviteControllerInterface {
             result = await this.sendReject(req, applicant, authUser.name, authUser.email);
           } else if (emailType === "details") {
             result = await this.sendDetails(req, applicant, authUser.name, authUser.email);
+          } else if (emailType === "feedback") {
+            result = await this.sendFeedback(req, applicant, authUser.name, authUser.email);
           }
         } catch (err) {
           return { status: "rejected", err };
