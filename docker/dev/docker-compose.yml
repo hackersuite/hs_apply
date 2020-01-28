@@ -16,7 +16,7 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - internal
+      - internal_hackathon
     volumes:
       - db_store:/var/lib/mysql
       - ../database/:/docker-entrypoint-initdb.d/:ro
@@ -28,7 +28,7 @@ volumes:
 # The network allows multiple containers to connect together
 networks:
   # internal network for hs_applications services
-  internal:
+  internal_hackathon:
     driver: bridge
   # external network for consumer-facing hacker suite services
   hacker_suite:
