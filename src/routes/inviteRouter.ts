@@ -3,14 +3,19 @@ import { InviteController } from "../controllers";
 import { injectable, inject } from "inversify";
 import { RouterInterface } from "./registerableRouter";
 import { TYPES } from "../types";
-import { checkLoggedIn, checkIsOrganizer } from "../util/auth";
+import { RequestAuthentication } from "../util/auth";
 
 @injectable()
 export class InviteRouter implements RouterInterface {
   private _inviteController: InviteController;
+  private _requestAuth: RequestAuthentication;
 
-  public constructor(@inject(TYPES.InviteController) inviteController: InviteController) {
+  public constructor(
+    @inject(TYPES.InviteController) inviteController: InviteController,
+    @inject(TYPES.RequestAuthentication) requestAuth: RequestAuthentication
+  ) {
     this._inviteController = inviteController;
+    this._requestAuth = requestAuth;
   }
 
   public getPathRoot(): string {
@@ -20,9 +25,19 @@ export class InviteRouter implements RouterInterface {
   public register(): Router {
     const router: Router = Router();
 
-    router.post("/batchSend", checkLoggedIn, checkIsOrganizer, this._inviteController.batchSend);
+    router.post(
+      "/batchSend",
+      this._requestAuth.checkLoggedIn,
+      this._requestAuth.checkIsOrganizer,
+      this._inviteController.batchSend
+    );
 
-    router.put("/:id([a-f0-9-]+)/send", checkLoggedIn, checkIsOrganizer, this._inviteController.send);
+    router.put(
+      "/:id([a-f0-9-]+)/send",
+      this._requestAuth.checkLoggedIn,
+      this._requestAuth.checkIsOrganizer,
+      this._inviteController.send
+    );
 
     router.get("/:id([a-f0-9-]+)/confirm", this._inviteController.confirm);
 

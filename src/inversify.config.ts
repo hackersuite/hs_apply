@@ -21,6 +21,9 @@ import { RouterInterface, ApplicationRouter, DashboardRouter, InviteRouter, Admi
 import { CacheInterface, Cache } from "./util/cache";
 import { RequestAuthenticationInterface, RequestAuthentication } from "./util/auth";
 
+// SettingLoader
+import { SettingLoaderInterface, SettingLoader } from "./util/fs";
+
 const container = new Container();
 
 // Routers
@@ -46,6 +49,9 @@ container.bind<EmailServiceInterface>(TYPES.EmailService).to(EmailService);
 
 // Request Authentication
 container.bind<RequestAuthenticationInterface>(TYPES.RequestAuthentication).to(RequestAuthentication);
+
+// SettingLoader
+container.bind<SettingLoaderInterface>(TYPES.SettingLoader).to(SettingLoader);
 
 // Constants
 container.bind<CacheInterface>(TYPES.Cache).toConstantValue(new Cache());

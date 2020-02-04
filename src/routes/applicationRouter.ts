@@ -5,14 +5,19 @@ import { RouterInterface } from "./registerableRouter";
 import { TYPES } from "../types";
 import * as multer from "multer";
 import { HttpResponseCode } from "../util/errorHandling";
-import { checkLoggedIn, checkIsOrganizer } from "../util/auth";
+import { RequestAuthentication } from "../util/auth";
 
 @injectable()
 export class ApplicationRouter implements RouterInterface {
   private _applicationController: ApplicationController;
+  private _requestAuth: RequestAuthentication;
 
-  public constructor(@inject(TYPES.ApplicationController) applicationController: ApplicationController) {
+  public constructor(
+    @inject(TYPES.ApplicationController) applicationController: ApplicationController,
+    @inject(TYPES.RequestAuthentication) requestAuth: RequestAuthentication
+  ) {
     this._applicationController = applicationController;
+    this._requestAuth = requestAuth;
   }
 
   private fileUploadHandler: RequestHandler = multer({
@@ -40,6 +45,7 @@ export class ApplicationRouter implements RouterInterface {
           error: true,
           message: "File not valid!"
         });
+        return;
       } else {
         next();
       }
@@ -79,7 +85,7 @@ export class ApplicationRouter implements RouterInterface {
 
     // Protect all the following routes in the router
     // Ensure that at a minimum the user is logged in in order to access the apply page
-    router.use(checkLoggedIn);
+    router.use(this._requestAuth.checkLoggedIn);
 
     router.get("/", this.redirectIfApplicationsClosed, this._applicationController.apply);
 
@@ -92,7 +98,7 @@ export class ApplicationRouter implements RouterInterface {
 
     router.get("/cancel", this.doNothingIfApplicationsClosed, this._applicationController.cancel);
 
-    router.put("/:id([a-f0-9-]+)/checkin", checkIsOrganizer, this._applicationController.checkin);
+    router.put("/:id([a-f0-9-]+)/checkin", this._requestAuth.checkIsOrganizer, this._applicationController.checkin);
 
     return router;
   }

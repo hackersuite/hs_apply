@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import { Applicant } from "../../models/db/applicant";
 import { ApplicantRepository } from "../../repositories";
 import { TYPES } from "../../types";
-import { ObjectID, Repository } from "typeorm";
+import { ObjectID, Repository, DeleteResult } from "typeorm";
 import { validateOrReject } from "class-validator";
 import * as request from "request-promise-native";
 
@@ -92,14 +92,14 @@ export class ApplicantService implements ApplicantServiceInterface {
     }
   };
 
-  public remove = async (id: ApplicationID, findBy?: keyof Applicant): Promise<void> => {
+  public remove = async (id: ApplicationID, findBy?: keyof Applicant): Promise<DeleteResult> => {
     if (id === undefined) {
       throw new Error("Applicant ID must be provided");
     }
 
+    const findColumn: keyof Applicant = findBy || "id";
     try {
-      const findColumn: keyof Applicant = findBy || "id";
-      await this._applicantRepository.delete({ [findColumn]: id });
+      return await this._applicantRepository.delete({ [findColumn]: id });
     } catch (err) {
       throw new Error(`Failed to remove an applicant:\n${err}`);
     }
