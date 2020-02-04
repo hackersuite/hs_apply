@@ -10,8 +10,8 @@
     "build": "tsc -p .",
     "postbuild": "gulp",
     "test": "ava",
-    "test:coverage": "nyc ava",
-    "test:watch": "DEBUG=ava:watcher npm test -- --watch --verbose",
+    "test:coverage": "nyc ava --verbose",
+    "test:watch": "DEBUG=ava:watcher ava -- --watch --verbose",
     "start": "ts-node src/server.ts",
     "start:watch": "node ./node_modules/nodemon/bin/nodemon.js"
   },
@@ -91,7 +91,6 @@
     "nyc": "^14.1.1",
     "prettier": "^1.18.2",
     "source-map-support": "^0.5.13",
-    "sqlite3": "^4.1.0",
     "supertest": "^4.0.2",
     "ts-mockito": "^2.4.2",
     "ts-node": "^8.3.0",
