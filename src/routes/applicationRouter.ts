@@ -32,7 +32,7 @@ export class ApplicationRouter implements RouterInterface {
         file.mimetype !== "application/msword" &&
         file.mimetype !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       ) {
-        return cb(new Error("Not valid file format!"), false);
+        return cb(new Error("Unsupported file format"), false);
       }
       cb(undefined, true);
     }
@@ -43,7 +43,7 @@ export class ApplicationRouter implements RouterInterface {
       if (err) {
         res.status(HttpResponseCode.BAD_REQUEST).send({
           error: true,
-          message: "File not valid!"
+          message: err.message
         });
         return;
       } else {

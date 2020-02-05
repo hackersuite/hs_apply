@@ -105,9 +105,11 @@ export class ApplicationController implements ApplicationControllerInterface {
     let cvFile: Buffer;
     if (req.files && req.files.length === 1 && req.files[0].fieldname === "applicantCV") {
       /*eslint no-control-regex: "off"*/
-      newApplication.cv = `${reqUser.name.replace(/[^\x00-\x7F]/g, "")}.${
-        reqUser.email
-      }.${req.files[0].originalname.replace(/[^\x00-\x7F]/g, "")}`;
+      // Remove all non-ascii characters from the name and filename
+      newApplication.cv = `
+      ${reqUser.name.replace(/[^\x00-\x7F]/g, "")}.
+      ${reqUser.email}.
+      ${req.files[0].originalname.replace(/[^\x00-\x7F]/g, "")}`;
       cvFile = req.files[0].buffer;
     }
 
