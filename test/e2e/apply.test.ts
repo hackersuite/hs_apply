@@ -90,9 +90,9 @@ test.before.cb(t => {
     };
   });
 
-  new App().buildApp(async (builtApp: Express, err: Error): Promise<void> => {
+  new App().buildApp((builtApp: Express, err: Error): void => {
     if (err) {
-      throw Error("Failed to setup test");
+      t.end(err.message + "\n" + err.stack);
     } else {
       bApp = builtApp;
 

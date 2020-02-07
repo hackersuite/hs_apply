@@ -32,40 +32,42 @@ export class App {
 
     // Load the hackathon application settings from disk
     const settingLoader: SettingLoader = container.get(TYPES.SettingLoader);
-    await settingLoader.loadApplicationSettings(app);
+    try {
+      await settingLoader.loadApplicationSettings(app);
+    } catch (err) {
+      console.log(err);
+    }
 
     // Connecting to database
     const databaseConnectionSettings: ConnectionOptions[] = connectionOptions || this.createDatabaseSettings();
 
-    createConnections(databaseConnectionSettings)
-      .then(async (connections: Connection[]) => {
-        connections.forEach(element => {
-          console.log("  Connection to database (" + element.name + ") established.");
-        });
-
-        // Set up passport for authentication
-        // Also add the logout route
-        const requestAuth: RequestAuthentication = container.get(TYPES.RequestAuthentication);
-        requestAuth.passportSetup(app);
-
-        // Routes set up for express, resolving dependencies
-        // This is performed after successful DB connection since some routers use TypeORM repositories in their DI
-        const routers: RouterInterface[] = container.getAll(TYPES.Router);
-        routers.forEach(router => {
-          app.use(router.getPathRoot(), router.register());
-        });
-
-        // Setting up error handlers
-        app.use(error404Handler);
-        app.use(errorHandler);
-
-        return callback(app);
-      })
-      .catch((err: any) => {
-        console.error("  Could not connect to database");
-        console.error(err);
-        return callback(app, err);
+    let connections: Connection[];
+    try {
+      connections = await createConnections(databaseConnectionSettings);
+      connections.forEach(element => {
+        console.log("  Connection to database (" + element.name + ") established.");
       });
+    } catch (err) {
+      console.log(err);
+      return callback(app, err);
+    }
+
+    // Set up passport for authentication
+    // Also add the logout route
+    const requestAuth: RequestAuthentication = container.get(TYPES.RequestAuthentication);
+    requestAuth.passportSetup(app);
+
+    // Routes set up for express, resolving dependencies
+    // This is performed after successful DB connection since some routers use TypeORM repositories in their DI
+    const routers: RouterInterface[] = container.getAll(TYPES.Router);
+    routers.forEach(router => {
+      app.use(router.getPathRoot(), router.register());
+    });
+
+    // Setting up error handlers
+    app.use(error404Handler);
+    app.use(errorHandler);
+    return callback(app);
   }
 
   /**

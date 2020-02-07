@@ -5,7 +5,7 @@ export function getTestDatabaseOptions(entities?: (string | Function)[], name?: 
     {
       name: name || "applications",
       type: "mysql",
-      database: "hs_application",
+      database: "hs_applications",
       host: "localhost",
       port: 3306,
       username: "root",

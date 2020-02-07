@@ -7,7 +7,7 @@ services:
     environment:
       MYSQL_USER: root
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
-      MYSQL_DATABASE: hs_application
+      MYSQL_DATABASE: hs_applications
     ports:
       - "3306:3306"
     # The healthcheck is used to ensure the database is running
