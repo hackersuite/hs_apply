@@ -79,16 +79,25 @@ test.before.cb(t => {
   mockCache = mock(Cache);
   mockApplicantService = mock(ApplicantService);
   mockRequestAuth = mock(RequestAuthentication);
-  mockSettingLoader = mock<SettingLoader>(); // For some reason, the settings loader is mocked differently
+  mockSettingLoader = mock(SettingLoader);
 
   container.rebind(TYPES.RequestAuthentication).toConstantValue(instance(mockRequestAuth));
   container.rebind(TYPES.Cache).toConstantValue(instance(mockCache));
   container.rebind(TYPES.ApplicantService).toConstantValue(instance(mockApplicantService));
   container.rebind(TYPES.SettingLoader).toConstantValue(instance(mockSettingLoader));
 
-  when(mockRequestAuth.passportSetup(bApp)).thenReturn();
-  when(mockRequestAuth.checkLoggedIn(anything(), anything(), anything())).thenCall((req, res, next: NextFunction) => {
+  when(mockRequestAuth.passportSetup).thenReturn(() => null);
+  when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
     req.user = requestUser;
+    next();
+  });
+  when(mockRequestAuth.checkIsOrganizer).thenReturn((req, res, next: NextFunction) => {
+    next();
+  });
+  when(mockRequestAuth.checkIsVolunteer).thenReturn((req, res, next: NextFunction) => {
+    next();
+  });
+  when(mockRequestAuth.checkIsAttendee).thenReturn((req, res, next: NextFunction) => {
     next();
   });
   when(mockSettingLoader.loadApplicationSettings(anything())).thenCall((app: Express) => {

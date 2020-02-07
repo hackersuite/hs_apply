@@ -76,11 +76,11 @@ export class ApplicationRouter implements RouterInterface {
     }
   };
 
-  public getPathRoot(): string {
+  public getPathRoot = (): string => {
     return "/apply";
-  }
+  };
 
-  public register(): Router {
+  public register = (): Router => {
     const router: Router = Router();
 
     // Protect all the following routes in the router
@@ -101,5 +101,5 @@ export class ApplicationRouter implements RouterInterface {
     router.put("/:id([a-f0-9-]+)/checkin", this._requestAuth.checkIsOrganizer, this._applicationController.checkin);
 
     return router;
-  }
+  };
 }

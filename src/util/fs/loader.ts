@@ -9,6 +9,7 @@ import { injectable, inject } from "inversify";
 
 export interface SettingLoaderInterface {
   loadApplicationSettings: (app: Express) => Promise<void>;
+  loadSettingsFile: <T>(fileName: string, obj?: string) => Promise<T>;
 }
 
 @injectable()
@@ -18,6 +19,7 @@ export class SettingLoader implements SettingLoaderInterface {
 
   public constructor(@inject(TYPES.Cache) _cache: Cache) {
     this.cache = _cache;
+    this.loadApplicationSettings = this.loadApplicationSettings.bind(this);
   }
 
   /**
@@ -31,7 +33,7 @@ export class SettingLoader implements SettingLoaderInterface {
    *
    * If you update the hackathon settings, you need to restart the application
    */
-  public loadApplicationSettings = async (app: Express): Promise<void> => {
+  public async loadApplicationSettings(app: Express): Promise<void> {
     console.log("Loading hackathon application questions...");
     const sections: Array<ApplicationSectionInterface> = await this.loadSettingsFile("questions.json", "sections");
     if (sections) {
@@ -58,8 +60,8 @@ export class SettingLoader implements SettingLoaderInterface {
         applicationsClose: new Date(Date.now() + 10800 * 1000).toString() // 3 hours from now
       };
     }
-  };
-  private loadSettingsFile = async <T>(fileName: string, obj?: string): Promise<T> => {
+  }
+  public loadSettingsFile = async <T>(fileName: string, obj?: string): Promise<T> => {
     // Check if the file exists in the current directory, and if it is writable.
     let settings: T;
     try {

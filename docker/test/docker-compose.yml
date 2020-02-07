@@ -12,9 +12,9 @@ services:
       - "3306:3306"
     # The healthcheck is used to ensure the database is running
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
-      timeout: 5s
-      retries: 10
+      test: "/usr/bin/mysql --user=root --execute \"SHOW DATABASES;\""
+      interval: 1s
+      retries: 120
     networks:
       - internal_hackathon_test
     volumes:

@@ -18,11 +18,11 @@ export class AdminRouter implements RouterInterface {
     this._requestAuth = requestAuth;
   }
 
-  public getPathRoot(): string {
+  public getPathRoot = (): string => {
     return "/admin";
-  }
+  };
 
-  public register(): Router {
+  public register = (): Router => {
     const router: Router = Router();
 
     router.use(this._requestAuth.checkLoggedIn);
@@ -36,5 +36,5 @@ export class AdminRouter implements RouterInterface {
     router.get("/manage/[a-z0-9-]+", this._requestAuth.checkIsOrganizer, this._adminController.manageApplication);
 
     return router;
-  }
+  };
 }

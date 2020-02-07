@@ -15,6 +15,9 @@ build:
 # run all tests
 tests:
 	docker-compose -f $(test_docker_compose_file) up -d
+	while ! docker exec mysql_db_test mysql --user=root -e "SELECT 1" >/dev/null 2>&1; do \
+    sleep 1; \
+	done
 	-npm run test
 	docker-compose -f $(test_docker_compose_file) down -v
 

@@ -18,11 +18,11 @@ export class DashboardRouter implements RouterInterface {
     this._requestAuth = requestAuth;
   }
 
-  public getPathRoot(): string {
+  public getPathRoot = (): string => {
     return "/";
-  }
+  };
 
-  public register(): Router {
+  public register = (): Router => {
     const router: Router = Router();
 
     router.use(this._requestAuth.checkLoggedIn);
@@ -30,5 +30,5 @@ export class DashboardRouter implements RouterInterface {
     router.get("/", this._dashboardController.dashboard);
 
     return router;
-  }
+  };
 }

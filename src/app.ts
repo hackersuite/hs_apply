@@ -17,12 +17,6 @@ import { SettingLoader } from "./util/fs/loader";
 dotenv.config({ path: ".env" });
 
 export class App {
-  private _settingLoader: SettingLoader;
-
-  public constructor() {
-    this._settingLoader = container.get(TYPES.SettingLoader);
-  }
-
   public async buildApp(
     callback: (app: Express, err?: Error) => void,
     connectionOptions?: ConnectionOptions[]
@@ -37,7 +31,8 @@ export class App {
     }
 
     // Load the hackathon application settings from disk
-    await this._settingLoader.loadApplicationSettings(app);
+    const settingLoader: SettingLoader = container.get(TYPES.SettingLoader);
+    await settingLoader.loadApplicationSettings(app);
 
     // Connecting to database
     const databaseConnectionSettings: ConnectionOptions[] = connectionOptions || this.createDatabaseSettings();

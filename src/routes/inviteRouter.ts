@@ -18,11 +18,11 @@ export class InviteRouter implements RouterInterface {
     this._requestAuth = requestAuth;
   }
 
-  public getPathRoot(): string {
+  public getPathRoot = (): string => {
     return "/invite";
-  }
+  };
 
-  public register(): Router {
+  public register = (): Router => {
     const router: Router = Router();
 
     router.post(
@@ -42,5 +42,5 @@ export class InviteRouter implements RouterInterface {
     router.get("/:id([a-f0-9-]+)/confirm", this._inviteController.confirm);
 
     return router;
-  }
+  };
 }
