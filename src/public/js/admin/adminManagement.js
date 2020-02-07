@@ -105,6 +105,22 @@ function batchInvite() {
   })
 }
 
+
+//Khesim
+function exportCSV() {
+  let csvContent = "data:text/csv;charset=utf-8,"; 
+
+  allApplications.forEach((applicant) => {
+    let applicantInfo = "\"" + applicant.name + "\"" + ", " + "\"" +  applicant.email + "\"" + ", " + "\"" + applicant.university + "\"" + ", " + "\"" + applicant.degree + "\"" +  ", " + "\"" +  applicant.yearOfStudy + "\"" + ", " + "\"" + applicant.workArea + "\"" + ", " + "\"" + applicant.skills + "\"" + ", " + "\"" + applicant.hackathonCount + "\"" + ", " + "\"" + applicant.whyChooseHacker + "\"" + ", " + "\"" + applicant.pastProjects + "\"" + "\r\n";
+    csvContent += applicantInfo; 
+  });
+
+  var encodedUri = encodeURI(csvContent);
+  window.open(encodedUri);
+}
+//Khesim 
+
+
 $(document).ready(function () {
   $('#filterNameInput').on('input', (event) => {
     var elem = $(event.target);
