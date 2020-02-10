@@ -2,12 +2,6 @@
   "sections": [{
       "name": "Basic Information",
       "questions": [{
-          "questionName": "applicantName",
-          "questionText": "What is your name?",
-          "answerType": "short",
-          "required": true
-        },
-        {
           "questionName": "applicantAge",
           "questionText": "How old are you?",
           "answerType": "number",
@@ -488,9 +482,23 @@
           "required": true
         },
         {
+          "questionName": "applicantDegree",
+          "questionText": "What's your major/degree?",
+          "answerType": "short",
+          "required": true
+        },
+        {
           "questionName": "applicantStudyYear",
           "questionText": "Which year of study are you in?",
-          "answerType": "short",
+          "answerType": "dropdown",
+          "answerOptions": [
+            "Foundation",
+            "1",
+            "2",
+            "3",
+            "4",
+            "Postgraduate"
+          ],
           "required": true
         },
         {
@@ -552,7 +560,7 @@
       "questions": [{
           "questionName": "applicantHearAbout",
           "questionText": "How did you hear about <hackathon-name>?",
-          "answerType": "multi",
+          "answerType": "radio",
           "answerOptions": [
             "Facebook",
             "Friends",
@@ -594,12 +602,14 @@
           "questionName": "applicantAcceptDataSharing",
           "questionText": "Acceptance of Data sharing with Companies",
           "answerType": "tick",
+          "answerLink": "https://docs.google.com/document/d/1s9mMUc1zjVtSv-8fh4jEcDIgd9cKTkrkgwqX6aBGHLE/edit?usp=sharing",
           "required": true
         },
         {
           "questionName": "applicantCodeConduct",
           "questionText": "Code of conduct",
           "answerType": "tick",
+          "answerLink": "https://docs.google.com/document/d/1neir7QKGEWbZyrwSQKiKFdiU8LpORQvENTtGRbUisFU/edit?usp=sharing",
           "required": true
         }
       ]

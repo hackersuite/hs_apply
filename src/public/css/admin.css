@@ -1,0 +1,60 @@
+.applicant-total {
+  font-size: 1em;
+}
+
+.breakdown-scroll {
+  overflow: auto;
+  max-height: 18vh;
+}
+
+.applicants-scroll {
+  overflow: auto;
+}
+
+.search-icon {
+  padding-top: 9px;
+  padding-right: 5px;
+}
+
+.applicant-status {
+  font-size: 16px;
+}
+
+.applicant-status.check-valid {
+  color: green;
+}
+
+.applicant-status.check-invalid {
+  color: red;
+}
+
+text.ct-label {
+  color: black !important;
+  fill: black !important;
+}
+
+span.ct-label.ct-horizontal,span.ct-vertical {
+  color: white !important;
+}
+
+.search-input {
+  left: 15px;
+}
+
+@media only screen and (max-width: 768px) {
+  .search-input {
+    max-width: 50%;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .search-input {
+    max-width: 30%;
+  }
+}
+
+/* @media only screen and (min-width: 992px) {
+  .search-input {
+    max-width: 25%;
+  }
+} */

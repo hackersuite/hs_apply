@@ -1,13 +1,25 @@
 import { Router, Request, Response, RequestHandler, NextFunction } from "express";
 import { ApplicationController } from "../controllers";
 import { injectable, inject } from "inversify";
-import { IRouter } from "./registerableRouter";
+import { RouterInterface } from "./registerableRouter";
 import { TYPES } from "../types";
 import * as multer from "multer";
 import { HttpResponseCode } from "../util/errorHandling";
+import { RequestAuthentication } from "../util/auth";
 
 @injectable()
-export class ApplicationRouter implements IRouter {
+export class ApplicationRouter implements RouterInterface {
+  private _applicationController: ApplicationController;
+  private _requestAuth: RequestAuthentication;
+
+  public constructor(
+    @inject(TYPES.ApplicationController) applicationController: ApplicationController,
+    @inject(TYPES.RequestAuthentication) requestAuth: RequestAuthentication
+  ) {
+    this._applicationController = applicationController;
+    this._requestAuth = requestAuth;
+  }
+
   private fileUploadHandler: RequestHandler = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -15,48 +27,79 @@ export class ApplicationRouter implements IRouter {
     },
     fileFilter: function(req, file, cb) {
       // Only allow .pdf, .doc and .docx
-      if (file.mimetype !== "application/pdf" && file.mimetype !== "application/msword" && file.mimetype !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-        return cb(new Error("Not valid file format!"), false);
+      if (
+        file.mimetype !== "application/pdf" &&
+        file.mimetype !== "application/msword" &&
+        file.mimetype !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ) {
+        return cb(new Error("Unsupported file format"), false);
       }
       cb(undefined, true);
     }
   }).any();
-  private fileCheckMiddleware = (req: Request, res: Response, next: NextFunction) => {
+
+  private fileCheckMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     this.fileUploadHandler(req, res, (err: Error) => {
       if (err) {
         res.status(HttpResponseCode.BAD_REQUEST).send({
           error: true,
-          message: "File not valid!"
+          message: err.message
         });
+        return;
       } else {
         next();
       }
     });
   };
 
-  private _applicationController: ApplicationController;
+  private getIfApplicationsStillOpen = (req: Request, res: Response): boolean => {
+    const applicationsOpenTime: number = new Date(req.app.locals.settings.applicationsOpen).getTime();
+    const applicationsCloseTime: number = new Date(req.app.locals.settings.applicationsClose).getTime();
+    const currentTime: number = new Date().getTime();
 
-  public constructor(
-    @inject(TYPES.ApplicationController)
-    applicationController: ApplicationController
-  ) {
-    this._applicationController = applicationController;
-  }
+    const applicationsOpen: boolean = currentTime >= applicationsOpenTime && currentTime <= applicationsCloseTime;
+    res.locals.applicationsOpen = applicationsOpen;
+    return applicationsOpen;
+  };
 
-  public getPathRoot(): string {
+  private doNothingIfApplicationsClosed = (req: Request, res: Response, next: NextFunction): void => {
+    this.getIfApplicationsStillOpen(req, res);
+    next();
+  };
+
+  private redirectIfApplicationsClosed = (req: Request, res: Response, next: NextFunction): void => {
+    const applicationsOpen = this.getIfApplicationsStillOpen(req, res);
+    if (applicationsOpen) {
+      next();
+    } else {
+      return res.redirect("/");
+    }
+  };
+
+  public getPathRoot = (): string => {
     return "/apply";
-  }
+  };
 
-  public register(): Router {
+  public register = (): Router => {
     const router: Router = Router();
 
-    router.get("/", this._applicationController.apply);
+    // Protect all the following routes in the router
+    // Ensure that at a minimum the user is logged in in order to access the apply page
+    router.use(this._requestAuth.checkLoggedIn);
 
-    router.post("/",
+    router.get("/", this.redirectIfApplicationsClosed, this._applicationController.apply);
+
+    router.post(
+      "/",
+      this.redirectIfApplicationsClosed,
       this.fileCheckMiddleware,
       this._applicationController.submitApplication
     );
 
+    router.get("/cancel", this.doNothingIfApplicationsClosed, this._applicationController.cancel);
+
+    router.put("/:id([a-f0-9-]+)/checkin", this._requestAuth.checkIsOrganizer, this._applicationController.checkin);
+
     return router;
-  }
+  };
 }

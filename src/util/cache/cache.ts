@@ -1,10 +1,10 @@
 import { Cacheable } from "./";
-import { ICache } from "./cacheInterface";
+import { CacheInterface } from "./cacheInterface";
 
 /**
  * Class for a memory cache that stores objects with interface Cacheable
  */
-export class Cache implements ICache {
+export class Cache implements CacheInterface {
   /**
    * The container for all items in the cache.
    * The 1st level key is the name of the class of the stored object.
@@ -37,8 +37,7 @@ export class Cache implements ICache {
   public get<T extends Cacheable>(className: string, id: number): T {
     const selectedCollection: Map<number, Cacheable> = this.items.get(className);
 
-    if (!selectedCollection)
-      return undefined;
+    if (!selectedCollection) return undefined;
 
     const selectedElement: Cacheable = selectedCollection.get(id);
     if (!selectedElement || this.objectIsExpired(selectedElement)) {
@@ -57,8 +56,7 @@ export class Cache implements ICache {
   public getAll<T extends Cacheable>(className: string): T[] {
     const selectedCollection: Map<number, Cacheable> = this.items.get(className);
 
-    if (!selectedCollection)
-      return [];
+    if (!selectedCollection) return [];
 
     const resultArray: T[] = [];
     const collectionIterator: IterableIterator<Cacheable> = selectedCollection.values();
@@ -129,8 +127,7 @@ export class Cache implements ICache {
   public delete(className: string, id: number): void {
     const selectedCollection: Map<number, Cacheable> = this.items.get(className);
 
-    if (!selectedCollection)
-      return;
+    if (!selectedCollection) return;
 
     selectedCollection.delete(id);
   }
@@ -148,8 +145,7 @@ export class Cache implements ICache {
    * @param obj The object
    */
   private objectIsExpired(obj: Cacheable): boolean {
-    if (obj.expiresIn < 0)
-      return false;
+    if (obj.expiresIn < 0) return false;
     return obj.syncedAt + obj.expiresIn <= Date.now();
   }
 }

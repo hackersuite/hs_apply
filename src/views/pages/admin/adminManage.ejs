@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <% include ../../partials/head.ejs %>
+  <link type="text/css" href="/css/admin.css" rel="stylesheet" />
+  <title>Applications | Admin</title>
+</head>
+
+<body>
+  <div class="modal fade" id="batchInviteModal" tabindex="-1" role="dialog" aria-labelledby="batchInviteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="batchInviteModalLabel">Batch invite</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="" for="emailTypeDropdown">Email type</label>
+            <select class="custom-select my-1 mr-sm-2" id="emailTypeDropdown">
+              <option value="invite">Invite</option>
+              <option value="reject">Reject</option>
+              <option value="details">Details</option>
+              <option value="feedback">Feedback</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="textAreaInviteIds">Newline seperated list of users to  email by ID</label>
+            <textarea class="form-control" id="textAreaInviteIds" rows="5"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="batchInvite()">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrapper">
+    <%- include('../../partials/navbar', { currentPage: "admin-manage" }) %>
+    <div class="main-panel">
+      <div class="content">
+        <div class="container-fluid">
+
+          <div class="row justify-content-center">
+            <h1 style="display: none;">Applications Management</h1>
+          </div>
+
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header card-header-primary">
+                  <h2 class="card-title text-center">Applications Management</h2>
+                </div>
+                
+                <div class="form-group input-group search-input">
+                  <span class="search-icon">
+                      <i class="material-icons">search</i>
+                  </span>
+                  <input id="filterNameInput" type="text" class="form-control" placeholder="Enter name..." aria-label="Type a name to filter applications">
+                </div>
+
+                <div class="form-group input-group">
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#batchInviteModal">
+                    Batch Invite
+                  </button>
+                </div>
+
+                <div class="card-body applicants-scroll">
+                  <table class="table">
+                    <thead class="text-primary">
+                      <tr>
+                        <% applicationRows.forEach((row) => { %>
+                          <% if (row.length > 1) { %>
+                            <th class="text-center" data-toggle="tooltip" data-placement="top" title="<%= row[1] %>"><%= row[0] %></th>
+                          <% } else { %>
+                            <th class="text-center"><%= row[0] %></th>
+                          <% } %>
+                        <% }) %>
+                      </tr>
+                    </thead>
+                    <tbody id="applications-container">
+                      <% applications.forEach((applicant, index) => { %>
+                        <tr>
+                          <td class="text-center"><%= applicant.name %></td>
+                          <td class="text-center"><%= applicant.email %></td>
+                          <td class="text-center"><%= applicant.university %></td>
+                          <td class="text-center"><%= applicant.yearOfStudy %></td>
+                          <td class="text-center"><%= applicant.applicationStatus %></td>
+                          <td class="td-actions text-center">
+                            <a class="btn btn-primary" role="button" rel="tooltip" href="manage/<%= applicant.id %>" target="_blank">
+                              <i class="material-icons">person</i>
+                            </a>
+                            <button id="<%= applicant.id %>-btn" class="btn btn-info" type="button" onclick="invite('<%= applicant.id %>')">
+                              <i class="material-icons">email</i>
+                            </button>
+                            <button id="<%= applicant.id %>-btn-checkin" class="btn btn-success" type="button" onclick="checkin('<%= applicant.id %>')">
+                              <i class="material-icons">person_add</i>
+                            </button>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- end row -->
+
+        </div>
+      </div>
+      <% include ../../partials/footer.ejs %>
+    </div>
+  </div>
+  <script>
+    var allApplications = <%- JSON.stringify(applications || null) %>;
+    
+    // Enable the tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+  </script>
+  <script src="/js/admin/adminManagement.js"></script>
+</body>
+
+</html>

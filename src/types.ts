@@ -6,5 +6,14 @@ export const TYPES = {
 
   DashboardController: Symbol.for("DashboardController"),
 
+  AdminController: Symbol.for("AdminController"),
+
+  InviteController: Symbol.for("InviteController"),
+  EmailService: Symbol.for("EmailService"),
+
+  RequestAuthentication: Symbol.for("RequestAuthentication"),
+
+  SettingLoader: Symbol.for("SettingLoader"),
+
   Cache: Symbol.for("Cache")
 };

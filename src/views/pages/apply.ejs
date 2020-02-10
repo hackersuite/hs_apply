@@ -10,7 +10,7 @@
 
 <body>
   <div class="wrapper">
-    <% include ../partials/navbar.ejs %>
+    <%- include('../partials/navbar', { currentPage: "apply", hasApplied: false }); %>
     <div class="main-panel">
       <div class="content">
         <div class="container-fluid">
@@ -27,7 +27,7 @@
                 <% }) %>
               </ul>
 
-              <form id="applyForm" action="/apply" method="post" enctype="multipart/form-data">
+              <form id="applyForm" action="javascript:;" method="post" enctype="multipart/form-data">
                 <% sections.forEach((section, sectionIndex) => { %>
                 <div class="card apply-form-card">
                   <div class="card-header card-header-tabs card-header-primary">
@@ -36,6 +36,7 @@
                   <div class="card-body">
                     <div class="apply-form-section">
                       <% section.questions.forEach((question, questionIndex) => { %>
+                        <% question.questionText = question.questionText.replace("<hackathon-name>", locals.settings.shortName) %>
                         <% var currentID = `section${sectionIndex}-question${questionIndex}`; %>
                         <% if (question.answerType === "short") { %>
                         <div class="form-group">
@@ -43,14 +44,11 @@
                           <%= question.questionText %>
                           <%- question.required ? "<span class='label-req'> *</span>" : "" %>
                           </label>
-                          <input autocomplete="false" spellcheck="false" type="text" class="form-control" for="<%= currentID %>" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
+                          <input autocomplete="off" type="text" class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
                         </div>
                         <% } else if (question.answerType == "long") { %>
                         <div class="form-group">
-                          <label class="bmd-label-floating apply-label" for="<%= currentID %>">
-                          <%= question.questionText %>
-                          <%- question.required ? "<span class='label-req'> *</span>" : "" %>
-                          </label>
+                          <label class="bmd-label-floating apply-label" for="<%= currentID %>"><%= question.questionText %></label>
                           <textarea class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" rows="3" <%= question.required ? "required" : "" %>></textarea>
                         </div>
                         <% } else if (question.answerType == "number") { %>
@@ -111,6 +109,42 @@
                             </div>
                           <% } %>
                           </div>
+                        <% } else if (question.answerType == "multi") { %>
+                        <div class="form-group bmd-form-group">
+                          <label class="apply-form-radio-label apply-label">
+                            <%= question.questionText %>
+                            <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+                          </label>
+                          <% if (question.hasOwnProperty('answerOptions')) { %>
+                            <% question.answerOptions.forEach((multiradio, index) => { %>
+                              <div class="form-check">
+                                <label class="form-check-label">
+                                  <input class="form-check-input" type="checkbox" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
+                                  <%= multiradio %>
+                                  <span class="form-check-sign">
+                                    <span class="check"></span>
+                                  </span>
+                                </label>
+                              </div>
+                            <% }); %>
+                            <div class="form-check form-check-radio">
+                              <div class="form-row">
+                                <div class="col-auto">
+                                  <label class="form-check-label">
+                                      <input class="form-check-input" type="checkbox" name="<%= question.questionName %>" value="Other" id="<%= `${currentID}` %>-radio-other" <%= question.required ? "required" : "" %>>
+                                      Other
+                                      <span class="form-check-sign">
+                                          <span class="check"></span>
+                                      </span>
+                                  </label>
+                                </div>
+                                <div class="col-auto apply-form-radio-input-other">
+                                  <input class="form-control" type="text" name="<%= question.questionName %>Other" placeholder="Please specify"/>
+                                </div>
+                              </div>
+                            </div>
+                          <% } %>
+                        </div>
                         <% } else if (question.answerType == "tick") { %>
                         <div class="form-check">
                           <label class="form-check-label">
@@ -121,16 +155,21 @@
                             </span>
                           </label>
                           <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+                          <% if(question.hasOwnProperty("answerLink")) { %>
+                            (<a href="<%- question.answerLink %>" target="_blank" rel="noopener noreferrer">Read here</a>)
+                          <% } %>
                         </div>
                         <% } else if (question.answerType == "file") { %>
-                        <div class="form-group">
-                          <label class="apply-form-radio-label apply-label">
-                          <%= question.questionText %>
-                          <%- question.required ? "<span class='label-req'> *</span>" : "" %>
-                          </label>
-                          <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="customFile" name="<%= question.questionName %>" <%= question.required ? "required" : "" %> accept=".pdf,.doc,.docx">
-                            <label class="custom-file-label" for="customFile">Choose file</label>
+                        <div class="form-group form-file-upload form-file-simple bmd-form-group">
+                          <label class="apply-form-radio-label apply-label"><%= question.questionText %></label>
+                          <input type="file" class="inputFileHidden" id="customFile" name="<%= question.questionName %>" <%= question.required ? "required" : "" %> accept=".pdf,.doc,.docx">
+                          <div class="input-group">
+                            <input type="text" class="form-control inputFileVisible" placeholder="Choose file" aria-label="Choose CV to upload">
+                            <span class="input-group-btn">
+                              <button type="button" class="btn btn-fab btn-round btn-primary">
+                                <i class="material-icons">attach_file</i>
+                              </button>
+                            </span>
                           </div>
                         </div>
                         <% } %>
@@ -139,7 +178,7 @@
                         <input type="button" name="previous" class="btn btn-danger previous-form-stage" value="Previous" />
                       <% } %>
                       <% if (sectionIndex == sections.length - 1) { %>
-                        <input type="submit" name="submit" class="btn btn-success submit-form" value="Submit" />
+                        <input id="submit-form-btn" type="submit" name="submit" class="btn btn-success submit-form" value="Submit" />
                       <% } else { %>
                         <input type="button" name="next" class="btn btn-primary next-form-stage" value="Next" />
                       <% } %>
@@ -156,6 +195,7 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"
       integrity="sha256-tw5/wId1F+4LyUF2ZJnpRoHNXJ66jrK3IGhfq4LhLjY=" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.10/js/bootstrap-select.min.js" integrity="sha256-FXzZGmaRFZngOjUKy3lWZJq/MflaMpffBbu3lPT0izE=" crossorigin="anonymous"></script>
+      <script src="/js/external/typeahead.min.js"></script>
       <script src="/js/apply.js"></script>
     </div>
   </div>

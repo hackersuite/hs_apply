@@ -3,28 +3,48 @@
 
 <head>
   <% include ../partials/head.ejs %>
+  <link type="text/css" href="/css/dashboard.css" rel="stylesheet" />
   <title>Applications | Dashboard</title>
 </head>
 
 <body>
   <div class="wrapper">
-    <% include ../partials/navbar.ejs %>
+    <% var hasApplied = applicationStatus !== 0; %>
+    <%- include('../partials/navbar', { currentPage: "dashboard", hasApplied: hasApplied }); %>
     <div class="main-panel">
       <div class="content">
         <div class="container-fluid">
-          <div class="row justify-content-center">
-            <h2>You haven't created an application yet!</h2>
+          <% if ((applicationStatus >= 2 && applicationStatus <= 4) || !applicationsOpen) { %>
+          <div class="modal fade" id="cancelApplicationModelStrong" tabindex="-1" role="dialog" aria-labelledby="cancelApplicationModelLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="cancelApplicationModelLabel">Cancel Application</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  Are you sure you want to cancel your application? <strong>You won't be able to re-apply!</strong>
+                </div>
+                <div class="modal-footer">
+                  <a href="/apply/cancel" class="btn btn-danger">Yes, cancel my application</a>
+                  <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="row justify-content-center">
-            <a href="/apply">
-              <button type="button" class="btn btn-info text-center">Create Application</button>
-            </a>
-          </div>
+          <% } %>
+
+          <% if (applicationsOpen) { %>
+            <% include ../partials/dashboardOpen.ejs %>
+          <% } else { %>
+            <% include ../partials/dashboardClosed.ejs %>
+          <% } %>
         </div>
       </div>
       <% include ../partials/footer.ejs %>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"
-      integrity="sha256-tw5/wId1F+4LyUF2ZJnpRoHNXJ66jrK3IGhfq4LhLjY=" crossorigin="anonymous"></script>
+      <script src="/js/timer.js"></script>
     </div>
   </div>
 </body>

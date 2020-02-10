@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <% include ../../partials/head.ejs %>
+  <link type="text/css" href="/css/admin.css" rel="stylesheet" />
+  <title>Applications | Admin</title>
+</head>
+
+<body>
+  <div class="wrapper">
+    <%- include('../../partials/navbar', { currentPage: "admin-overview" }) %>
+    <div class="main-panel">
+      <div class="content">
+        <div class="container-fluid">
+
+          <div class="row justify-content-center">
+            <h1>Applications Overview</h1>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 col-lg-12">
+              <div class="card card-chart">
+                <div class="card-header card-header-primary">
+                  <div class="ct-chart" id="applicants-over-time-chart">
+                  </div>
+                </div>
+                <div class="card-body">
+                  <h4 class="card-title text-center">Currently  <%= totalApplications %> applications</h4>
+                  <% Object.entries(applicationStatus).forEach((entry) => { %>
+                    <p><%= entry[0] %>: <%= entry[1]%></p>
+                  <% }); %>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-6 col-md-6 col-lg-6">
+              <div class="card card-chart">
+                <div class="card-header card-header-info">
+                  <div class="ct-chart" id="applicants-gender">
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="card card-collapse">
+                    <div class="card-header" role="tab" id="genderBreakdownLabel">
+                      <h5 class="mb-0">
+                        <a data-toggle="collapse" href="#genderBreakdown" aria-expanded="true" aria-controls="genderBreakdown">
+                          View gender breakdown
+                          <i class="material-icons">keyboard_arrow_down</i>
+                        </a>
+                      </h5>
+                    </div>
+
+                    <div id="genderBreakdown" class="collapse" role="tabpanel" aria-labelledby="genderBreakdownLabel" data-parent="#accordion">
+                      <div class="card-body">
+                        <% Object.entries(applicationGenders).forEach((entry) => { %>
+                          <p><%= entry[0] %>: <%= entry[1]%></p>
+                        <% }); %>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-6 col-md-6 col-lg-6">
+              <div class="card card-chart">
+                <div class="card-header card-header-info">
+                  <div class="ct-chart" id="applicants-university">
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="card card-collapse">
+                    <div class="card-header" role="tab" id="universityBreakdownLabel">
+                      <h5 class="mb-0">
+                        <a data-toggle="collapse" href="#universityBreakdown" aria-expanded="true" aria-controls="universityBreakdown">
+                          View University breakdown
+                          <i class="material-icons">keyboard_arrow_down</i>
+                        </a>
+                      </h5>
+                    </div>
+
+                    <div id="universityBreakdown" class="collapse" role="tabpanel" aria-labelledby="universityBreakdownLabel" data-parent="#accordion">
+                      <div class="card-body">
+                        <% Object.entries(applicationUniversity).forEach((entry) => { %>
+                          <p><%= entry[0] %>: <%= entry[1]%></p>
+                        <% }); %>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+
+            <div class="col-sm-6 col-md-6 col-lg-6">
+              <div class="card card-chart">
+                <div class="card-header card-header-success">
+                  <div class="ct-chart" id="applicants-tshirts">
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="card card-collapse">
+                    <div class="card-header" role="tab" id="tShirtBreakdownLabel">
+                      <h5 class="mb-0">
+                        <a data-toggle="collapse" href="#tShirtBreakdown" aria-expanded="true" aria-controls="tShirtBreakdown">
+                          View T-Shirt breakdown
+                          <i class="material-icons">keyboard_arrow_down</i>
+                        </a>
+                      </h5>
+                    </div>
+
+                    <div id="tShirtBreakdown" class="collapse" role="tabpanel" aria-labelledby="tShirtBreakdownLabel" data-parent="#accordion">
+                      <div class="card-body">
+                        <% Object.entries(applicationTShirts).forEach((entry) => { %>
+                          <p><%= entry[0] %>: <%= entry[1]%></p>
+                        <% }); %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-lg-6">
+              <div class="card card-chart">
+                <div class="card-header card-header-success">
+                  <div class="ct-chart" id="applicants-dietry">
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="card card-collapse">
+                    <div class="card-header" role="tab" id="dietryBreakdownLabel">
+                      <h5 class="mb-0">
+                        <a data-toggle="collapse" href="#dietryBreakdown" aria-expanded="true" aria-controls="dietryBreakdown">
+                          View dietry requirements breakdown
+                          <i class="material-icons">keyboard_arrow_down</i>
+                        </a>
+                      </h5>
+                    </div>
+
+                    <div id="dietryBreakdown" class="collapse" role="tabpanel" aria-labelledby="dietryBreakdownLabel" data-parent="#accordion">
+                      <div class="card-body">
+                        <% Object.entries(applicationDietry).forEach((entry) => { %>
+                          <p><%= entry[0] %>: <%= entry[1]%></p>
+                        <% }); %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-lg-6">
+              <div class="card card-chart">
+                <div class="card-header card-header-primary">
+                  <h4 class="card-title text-center">Requested hardware</h4>
+                </div>
+                <div class="card-body">
+                  <div class="card card-collapse">
+                    <div class="card-header" role="tab" id="hardwareLabel">
+                      <h5 class="mb-0">
+                        <a data-toggle="collapse" href="#hardwareBreakdown" aria-expanded="true" aria-controls="hardwareBreakdown">
+                          View requested hardware
+                          <i class="material-icons">keyboard_arrow_down</i>
+                        </a>
+                      </h5>
+                    </div>
+
+                    <div id="hardwareBreakdown" class="collapse" role="tabpanel" aria-labelledby="hardwareLabel" data-parent="#accordion">
+                      <div class="card-body breakdown-scroll">
+                        <% applicationHardwareReq.forEach((hardwareItem) => { %>
+                          <p><%= hardwareItem %></p>
+                        <% }) %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+          </div> <!-- end row -->
+
+        </div>
+      </div>
+      <% include ../../partials/footer.ejs %>
+    </div>
+  </div>
+  <script>
+    var applicationCreatedAtTimes = <%- JSON.stringify(applicationTimes || null) %>;
+    var applicationGenderStats = <%- JSON.stringify(applicationGenders || null) %>;
+    var applicationTShirtStats = <%- JSON.stringify(applicationTShirts || null) %>;
+    var applicationDietryReq = <%- JSON.stringify(applicationDietry || null) %>;
+    var applicationUniversity = <%- JSON.stringify(applicationUniversity || null) %>;
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.11.4/chartist.min.js" integrity="sha256-xNhpuwaNiVdna6L8Wy3GNuQz1z+SCmo4NY1c7cJ9Vdc=" crossorigin="anonymous"></script>
+  <script src="/js/admin/adminOverview.js"></script>
+</body>
+
+</html>

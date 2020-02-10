@@ -1,14 +1,15 @@
+/* global md */
 $(document).ready(function () {
   $().ready(function () {
-    $sidebar = $('.sidebar');
+    var $sidebar = $('.sidebar');
 
-    $sidebar_img_container = $sidebar.find('.sidebar-background');
+    var $sidebar_img_container = $sidebar.find('.sidebar-background');
 
-    $full_page = $('.full-page');
+    var $full_page = $('.full-page');
 
-    $sidebar_responsive = $('body > .navbar-collapse');
+    var $sidebar_responsive = $('body > .navbar-collapse');
 
-    window_width = $(window).width();
+    var window_width = $(window).width();
 
     $('.fixed-plugin a').click(function (event) {
       // Alex if we click on switch, stop propagation of the event, so the dropdown will not be hide, otherwise we set the  section active
@@ -22,7 +23,7 @@ $(document).ready(function () {
     });
 
     $('.fixed-plugin .active-color span').click(function () {
-      $full_page_background = $('.full-page-background');
+      var $full_page_background = $('.full-page-background');
 
       $(this).siblings().removeClass('active');
       $(this).addClass('active');
@@ -54,7 +55,7 @@ $(document).ready(function () {
     });
 
     $('.fixed-plugin .img-holder').click(function () {
-      $full_page_background = $('.full-page-background');
+      var $full_page_background = $('.full-page-background');
 
       $(this).parent('li').siblings().removeClass('active');
       $(this).parent('li').addClass('active');
@@ -79,8 +80,8 @@ $(document).ready(function () {
       }
 
       if ($('.switch-sidebar-image input:checked').length == 0) {
-        var new_image = $('.fixed-plugin li.active .img-holder').find("img").attr('src');
-        var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
+        new_image = $('.fixed-plugin li.active .img-holder').find("img").attr('src');
+        new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
 
         $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
         $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
@@ -92,9 +93,9 @@ $(document).ready(function () {
     });
 
     $('.switch-sidebar-image input').change(function () {
-      $full_page_background = $('.full-page-background');
+      var $full_page_background = $('.full-page-background');
 
-      $input = $(this);
+      var $input = $(this);
 
       if ($input.is(':checked')) {
         if ($sidebar_img_container.length != 0) {
@@ -107,7 +108,7 @@ $(document).ready(function () {
           $full_page.attr('data-image', '#');
         }
 
-        background_image = true;
+        var background_image = true;
       } else {
         if ($sidebar_img_container.length != 0) {
           $sidebar.removeAttr('data-image');
@@ -124,10 +125,6 @@ $(document).ready(function () {
     });
 
     $('.switch-sidebar-mini input').change(function () {
-      $body = $('body');
-
-      $input = $(this);
-
       if (md.misc.sidebar_mini_active == true) {
         $('body').removeClass('sidebar-mini');
         md.misc.sidebar_mini_active = false;

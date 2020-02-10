@@ -189,3 +189,17 @@ div.custom-file {
   border-left: 1px solid #ced4da;
   border-radius: 0 .25rem .25rem 0;
 }
+
+span.twitter-typeahead {
+  width: 100%
+}
+
+.list-group {
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  width: 100%;
+}
+
+.tt-menu {
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  width: 100%;
+}

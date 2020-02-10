@@ -1,0 +1,40 @@
+.application-status {
+  font-size: 250%;
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-align: center !important;
+}
+
+.incomplete-status {
+  color: red;
+}
+
+.complete-status {
+  color: orange;
+}
+
+.invited-status {
+  color: purple;
+}
+
+.confirmed-status {
+  color: green;
+}
+
+.status-footer {
+  border-top: 1px solid #dcdcdc !important;
+}
+
+.status-footer>.row {
+  padding-top: 15px;
+  padding-left: 15px;
+}
+
+.time-remaining-text {
+  padding-top: 15px;
+  font-size: 24px
+}
+
+#createJoinTeamBtn {
+  margin-right: 20px;
+}

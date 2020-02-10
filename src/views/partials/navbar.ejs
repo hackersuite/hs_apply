@@ -7,21 +7,45 @@
   </div>
   <div class="sidebar-wrapper">
     <ul class="nav">
-      <li class="nav-item">
+      <% if (locals._locals.authLevel == 3) { %>
+      <li id="admin-overview" class="nav-item">
+        <a class="nav-link" href="/admin/overview">
+          <i class="material-icons">lock</i>
+          <p>Admin | Overview</p>
+        </a>
+      </li>
+      <% } %>
+      <% if (locals._locals.authLevel >= 2) { %>
+      <li id="admin-manage" class="nav-item">
+        <a class="nav-link" href="/admin/manage">
+          <i class="material-icons">lock</i>
+          <p>Admin | Manage</p>
+        </a>
+      </li>
+      <% } %>
+      <li id="dashboard" class="nav-item">
         <a class="nav-link" href="/">
           <i class="material-icons">dashboard</i>
           <p>Dashboard</p>
         </a>
       </li>
-      <li class="nav-item">
+      <% if (locals.hasOwnProperty("hasApplied") && hasApplied === false) { %>
+      <li id="apply" class="nav-item">
         <a class="nav-link" href="/apply">
           <i class="material-icons">person</i>
           <p>Application</p>
         </a>
       </li>
+      <% } %>
     </ul>
   </div>
 </div>
+<script>
+  var currentPage = "<%- locals.currentPage || null %>";
+  if (document.getElementById(currentPage) !== null) {
+    document.getElementById(currentPage).classList.add("active");
+  }
+</script>
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top " id="navigation-bar">
   <div class="container-fluid">
@@ -37,7 +61,7 @@
     <div class="collapse navbar-collapse justify-content-end">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" href="/user/logout">
+          <a class="nav-link" href="/logout">
             <i class="fas fa-sign-out-alt fa-3x"></i>
             <p class="d-lg-none d-md-block">
               Logout
