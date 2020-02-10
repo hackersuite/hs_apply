@@ -83,7 +83,7 @@ export class RequestAuthentication {
           if (result.error && result.status === HttpResponseCode.UNAUTHORIZED) {
             // When there is an error message and the status code is 401
             return done(undefined, false);
-          } else if (result.status === 0) {
+          } else if (result.status === HttpResponseCode.OK) {
             // The request has been authorized
 
             (req.user as RequestUser) = {
