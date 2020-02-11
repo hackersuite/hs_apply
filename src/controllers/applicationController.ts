@@ -8,6 +8,7 @@ import { Applicant } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
 import { RequestUser } from "../util/auth";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
+import { applicationMapping } from "../models/db";
 
 export interface ApplicationControllerInterface {
   apply: (req: Request, res: Response, next: NextFunction) => void;
@@ -53,63 +54,30 @@ export class ApplicationController implements ApplicationControllerInterface {
   public submitApplication = async (req: Request, res: Response): Promise<void> => {
     const reqUser: RequestUser = req.user as RequestUser;
 
-    const {
-      applicantAge,
-      applicantGender,
-      applicantGenderOther,
-      applicantNationality,
-      applicantCountry,
-      applicantCity,
-      applicantUniversity,
-      applicantStudyYear,
-      applicantDegree,
-      applicantWorkArea,
-      applicantWorkAreaOther,
-      applicantSkills,
-      applicantHackathonCount,
-      applicantWhyChoose,
-      applicantPastProj,
-      applicantHardwareReq,
-      applicantDietaryRequirements,
-      applicantDietaryRequirementsOther,
-      applicantTShirt,
-      applicantHearAbout,
-      applicantHearAboutOther
-    } = req.body;
-
-    // TODO: Rewrite this to make it easier to add more attributes
+    const applicationFields: any = req.body;
     const newApplication: Applicant = new Applicant();
-    newApplication.age = Number(applicantAge);
-    newApplication.gender = applicantGenderOther || applicantGender || "Other";
-    newApplication.nationality = applicantNationality;
-    newApplication.country = applicantCountry;
-    newApplication.city = applicantCity;
-    newApplication.university = applicantUniversity;
-    newApplication.yearOfStudy = applicantStudyYear;
-    newApplication.degree = applicantDegree;
-    newApplication.workArea = applicantWorkAreaOther || applicantWorkArea || "Other";
-    newApplication.skills = applicantSkills;
-    newApplication.hackathonCount = this.isNumeric(applicantHackathonCount)
-      ? Number(applicantHackathonCount)
-      : undefined;
-    newApplication.whyChooseHacker = applicantWhyChoose;
-    newApplication.pastProjects = applicantPastProj;
-    newApplication.hardwareRequests = applicantHardwareReq;
-    newApplication.dietaryRequirements = applicantDietaryRequirementsOther || applicantDietaryRequirements || "Other";
-    newApplication.tShirtSize = applicantTShirt;
-    newApplication.hearAbout = applicantHearAboutOther || applicantHearAbout || "Other";
+
+    for (const [name, options] of applicationMapping.entries()) {
+      if (options && options.hasOther) {
+        newApplication[name] = applicationFields[`${name}Other`] || applicationFields[name] || "Other";
+      } else if (options && options.isNumeric) {
+        const fieldToCastNumeric = applicationFields[name];
+        newApplication[name] = this.isNumeric(fieldToCastNumeric) ? Number(fieldToCastNumeric) : undefined;
+      } else {
+        newApplication[name] = applicationFields[name];
+      }
+    }
     newApplication.authId = (req.user as RequestUser).authId;
     newApplication.applicationStatus = ApplicantStatus.Applied;
 
     // Handling the CV file
     let cvFile: Buffer;
-    if (req.files && req.files.length === 1 && req.files[0].fieldname === "applicantCV") {
-      /*eslint no-control-regex: "off"*/
+    if (req.files && req.files.length === 1 && req.files[0].fieldname === "cv") {
       // Remove all non-ascii characters from the name and filename
-      newApplication.cv = `
-      ${reqUser.name.replace(/[^\x00-\x7F]/g, "")}.
-      ${reqUser.email}.
-      ${req.files[0].originalname.replace(/[^\x00-\x7F]/g, "")}`;
+      /* eslint no-control-regex: "off" */
+      const nameCleaned: string = reqUser.name.replace(/[^\x00-\x7F]/g, "");
+      const fileNameCleaned: string = req.files[0].originalname.replace(/[^\x00-\x7F]/g, "");
+      newApplication.cv = `${nameCleaned}.${reqUser.email}.${fileNameCleaned}`;
       cvFile = req.files[0].buffer;
     }
 
