@@ -1,7 +1,10 @@
 prod_docker_compose_file=./docker-compose.yml
 dev_docker_compose_file=./docker/dev/docker-compose.yml
+test_docker_compose_file=./docker/test/docker-compose.yml
 
 prod_docker_file=./docker/prod/Dockerfile
+
+NODE_MODULES_DIR = './node_modules'
 
 default: build test
 
@@ -9,9 +12,14 @@ default: build test
 build:
 	npm run build
 
-# runs test
-test:
-	npm run test
+# run all tests
+tests:
+	docker-compose -f $(test_docker_compose_file) up -d
+	while ! docker exec mysql_db_test mysql --user=root -e "SELECT 1" >/dev/null 2>&1; do \
+    sleep 10; \
+	done
+	-npm run test
+	docker-compose -f $(test_docker_compose_file) down -v
 
 # builds the docker image
 build-docker:
@@ -35,7 +43,22 @@ up-dev: export DB_HOST=localhost
 up-dev: setup-network
 	@echo "=============starting hs_application (dev)============="
 	docker-compose -f $(dev_docker_compose_file) up -d
-	npm i && npm run start:watch
+	if [ ! -d $(NODE_MODULES_DIR) ]; then \
+		@echo "node_modules does not exist, installing dependencies..."; \
+		npm i; \
+	else \
+			npm run start:watch; \
+	fi
+
+ci:
+	docker-compose -f $(test_docker_compose_file) up -d
+	while ! docker exec mysql_db_test mysql --user=root -e "SELECT 1" >/dev/null 2>&1; do \
+    sleep 30; \
+	done
+	docker exec mysql_db_test mysql --user=root -e "CREATE DATABASE IF NOT EXISTS hs_applications;"
+	-npm run test:coverage
+	docker-compose -f $(test_docker_compose_file) down -v
+	
 
 # prints the logs from all containers
 logs:

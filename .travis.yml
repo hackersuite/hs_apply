@@ -1,14 +1,15 @@
+dist: xenial
+
 language: node_js
 
 node_js:
-  - "9"
+  - '10'
 
-services:
-  - mysql
+git:
+  depth: 1
 
 before_install:
  - npm i -g npm@6.5.0
- - mysql -e 'CREATE DATABASE IF NOT EXISTS applications;'
 
 # Use npm ci to ensure a clean install of dependencies
 install:
@@ -19,7 +20,7 @@ install:
 cache: npm
 
 script:
- - npm run test:coverage
+ - make ci
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

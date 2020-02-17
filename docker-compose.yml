@@ -5,8 +5,6 @@ services:
     depends_on:
       mysql_db:
         condition: service_healthy
-    env_file:
-      - ./.env
     volumes:
       - .:/home/node/app/
       - /home/node/app/node_modules
@@ -17,6 +15,7 @@ services:
       - hacker_suite
 
   mysql_db:
+    container_name: mysql_db
     image: mysql:5.7
     command: --default-authentication-plugin=mysql_native_password --log_error_verbosity=1
     environment:
@@ -26,11 +25,12 @@ services:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
       timeout: 5s
       retries: 10
+    ports:
+      - "${DB_PORT}:3306"
     networks:
-      - internal
+      - internal_hackathon
     volumes:
       - db_store:/var/lib/mysql
-      - ./docker/database/:/docker-entrypoint-initdb.d/:ro
 
 # The volume for the database is persistent across launches
 volumes:
@@ -38,10 +38,11 @@ volumes:
 
 # The network allows multiple containers to connect together
 networks:
-  # internal network for hacker suite services
+  # internal network for hs_applications services
   internal:
     driver: bridge
-    name: internal
+  internal_hackathon:
+    driver: bridge
   # external network for consumer-facing hacker suite services
   hacker_suite:
     external:

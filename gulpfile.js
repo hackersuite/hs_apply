@@ -35,7 +35,7 @@ const paths = {
     dest: 'dist/public/'
   },
   hackathonSettings: {
-    src: 'src/settings/*.json',
+    src: ['src/settings/**/*', '!src/settings/**/*.ts'],
     dest: 'dist/settings/'
   },
   autocompleteJSON: {

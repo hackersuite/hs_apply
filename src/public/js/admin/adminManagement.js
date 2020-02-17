@@ -8,22 +8,17 @@ function renderApplicationRow(container, applicant) {
     <td class="text-center">${applicant.email}</td>
     <td class="text-center">${applicant.university}</td>
     <td class="text-center">${applicant.yearOfStudy}</td>
-    <td class="text-center">
-      <i class="material-icons applicant-status check-valid">check_circle</i>
-      <i class="material-icons applicant-status check-valid">check_circle</i>
-      <i class="material-icons applicant-status check-invalid">error</i>
-      <i class="material-icons applicant-status check-invalid">error</i>
-    </td>
+    <td class="text-center">${applicant.applicationStatus}</td>
     <td class="td-actions text-center">
       <a class="btn btn-primary" role="button" rel="tooltip" href="manage/${applicant.id}" target="_blank">
         <i class="material-icons">person</i>
       </a>
-      <a class="btn btn-info" role="button" rel="tooltip" href="invite/${applicant.id}/send">
+      <button id="${applicant.id}-btn" class="btn btn-info" type="button" onclick="invite('${applicant.id}')">
         <i class="material-icons">email</i>
-      </a>
-      <a class="btn btn-success" role="button" rel="tooltip">
+      </button>
+      <button id="${applicant.id}-btn-checkin" class="btn btn-success" type="button" onclick="checkin('${applicant.id}')">
         <i class="material-icons">person_add</i>
-      </a>
+      </button>
     </td>
   </tr>
   `;
@@ -40,6 +35,74 @@ function renderRows(term) {
       renderApplicationRow(container, applicant);
     }
   });
+}
+
+function invite(id) {
+  $.ajax({
+    type: 'PUT',
+    url: `/invite/${id}/send`,
+    success: function (data) {
+      $("#" + id + "-btn").prop('disabled', true);
+      $.notify({
+        message: 'Sent invite successfully'
+      }, {
+        type: 'success'
+      });
+    },
+    error: function (error) {
+      $("#submit-form-btn").prop('disabled', false);
+      $.notify({
+        message: error.responseJSON.message
+      }, {
+        type: 'danger'
+      });
+    }
+  })
+}
+
+function checkin(id) {
+  $.ajax({
+    type: 'PUT',
+    url: `/apply/${id}/checkin`,
+    success: function (data) {
+      $.notify({
+        message: 'Hacker checked in'
+      }, {
+        type: 'success'
+      });
+    },
+    error: function (error) {
+      $.notify({
+        message: error.responseJSON.message || "Hacker could not be checked in"
+      }, {
+        type: 'danger'
+      });
+    }
+  })
+}
+
+function batchInvite() {
+  const users = $('#textAreaInviteIds').val();
+  const emailType = $("#emailTypeDropdown").val();
+  $.ajax({
+    type: 'POST',
+    url: `/invite/batchSend`,
+    data: { users, emailType },
+    success: function (data) {
+      $.notify({
+        message: 'Sent all invites successfully'
+      }, {
+        type: 'success'
+      });
+    },
+    error: function (error) {
+      $.notify({
+        message: error.responseJSON.message
+      }, {
+        type: 'danger'
+      });
+    }
+  })
 }
 
 $(document).ready(function () {

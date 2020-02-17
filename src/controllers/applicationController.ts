@@ -105,9 +105,11 @@ export class ApplicationController implements ApplicationControllerInterface {
     let cvFile: Buffer;
     if (req.files && req.files.length === 1 && req.files[0].fieldname === "applicantCV") {
       /*eslint no-control-regex: "off"*/
-      newApplication.cv = `${reqUser.name.replace(/[^\x00-\x7F]/g, "")}.${
-        reqUser.email
-      }.${req.files[0].originalname.replace(/[^\x00-\x7F]/g, "")}`;
+      // Remove all non-ascii characters from the name and filename
+      newApplication.cv = `
+      ${reqUser.name.replace(/[^\x00-\x7F]/g, "")}.
+      ${reqUser.email}.
+      ${req.files[0].originalname.replace(/[^\x00-\x7F]/g, "")}`;
       cvFile = req.files[0].buffer;
     }
 
@@ -115,6 +117,7 @@ export class ApplicationController implements ApplicationControllerInterface {
       await this._applicantService.save(newApplication, cvFile);
     } catch (errors) {
       res.status(HttpResponseCode.BAD_REQUEST).send({
+        error: true,
         message: "Could not create application!"
       });
       return;
@@ -155,4 +158,39 @@ export class ApplicationController implements ApplicationControllerInterface {
   private isNumeric(n: any): boolean {
     return !isNaN(parseFloat(n)) && isFinite(n);
   }
+
+  public checkin = async (req: Request, res: Response): Promise<void> => {
+    const checkinID: string = req.params.id;
+    let application: Applicant;
+    try {
+      application = await this._applicantService.findOne(checkinID);
+    } catch (err) {
+      res.status(HttpResponseCode.BAD_REQUEST).send({
+        message: "Hacker could not be checked in"
+      });
+      return;
+    }
+
+    if (application.applicationStatus === ApplicantStatus.Confirmed) {
+      // Update the application to state that they have attended the hackathon
+      application.applicationStatus = ApplicantStatus.Admitted;
+      try {
+        await this._applicantService.save(application);
+      } catch (err) {
+        res.status(HttpResponseCode.BAD_REQUEST).send({
+          message: "Hacker could not be checked in"
+        });
+        return;
+      }
+    } else {
+      res.status(HttpResponseCode.BAD_REQUEST).send({
+        message: "Hacker was either rejected or did not confirm"
+      });
+      return;
+    }
+
+    res.send({
+      message: "Hacker checked in!"
+    });
+  };
 }

@@ -13,5 +13,7 @@ export const TYPES = {
 
   RequestAuthentication: Symbol.for("RequestAuthentication"),
 
+  SettingLoader: Symbol.for("SettingLoader"),
+
   Cache: Symbol.for("Cache")
 };

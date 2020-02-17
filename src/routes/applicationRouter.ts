@@ -5,14 +5,19 @@ import { RouterInterface } from "./registerableRouter";
 import { TYPES } from "../types";
 import * as multer from "multer";
 import { HttpResponseCode } from "../util/errorHandling";
-import { checkLoggedIn } from "../util/auth";
+import { RequestAuthentication } from "../util/auth";
 
 @injectable()
 export class ApplicationRouter implements RouterInterface {
   private _applicationController: ApplicationController;
+  private _requestAuth: RequestAuthentication;
 
-  public constructor(@inject(TYPES.ApplicationController) applicationController: ApplicationController) {
+  public constructor(
+    @inject(TYPES.ApplicationController) applicationController: ApplicationController,
+    @inject(TYPES.RequestAuthentication) requestAuth: RequestAuthentication
+  ) {
     this._applicationController = applicationController;
+    this._requestAuth = requestAuth;
   }
 
   private fileUploadHandler: RequestHandler = multer({
@@ -27,7 +32,7 @@ export class ApplicationRouter implements RouterInterface {
         file.mimetype !== "application/msword" &&
         file.mimetype !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       ) {
-        return cb(new Error("Not valid file format!"), false);
+        return cb(new Error("Unsupported file format"), false);
       }
       cb(undefined, true);
     }
@@ -38,8 +43,9 @@ export class ApplicationRouter implements RouterInterface {
       if (err) {
         res.status(HttpResponseCode.BAD_REQUEST).send({
           error: true,
-          message: "File not valid!"
+          message: err.message
         });
+        return;
       } else {
         next();
       }
@@ -70,16 +76,16 @@ export class ApplicationRouter implements RouterInterface {
     }
   };
 
-  public getPathRoot(): string {
+  public getPathRoot = (): string => {
     return "/apply";
-  }
+  };
 
-  public register(): Router {
+  public register = (): Router => {
     const router: Router = Router();
 
     // Protect all the following routes in the router
     // Ensure that at a minimum the user is logged in in order to access the apply page
-    router.use(checkLoggedIn);
+    router.use(this._requestAuth.checkLoggedIn);
 
     router.get("/", this.redirectIfApplicationsClosed, this._applicationController.apply);
 
@@ -92,6 +98,8 @@ export class ApplicationRouter implements RouterInterface {
 
     router.get("/cancel", this.doNothingIfApplicationsClosed, this._applicationController.cancel);
 
+    router.put("/:id([a-f0-9-]+)/checkin", this._requestAuth.checkIsOrganizer, this._applicationController.checkin);
+
     return router;
-  }
+  };
 }
