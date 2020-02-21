@@ -11,6 +11,11 @@ export const TYPES = {
   InviteController: Symbol.for("InviteController"),
   EmailService: Symbol.for("EmailService"),
 
+  ReviewService: Symbol.for("ReviewService"),
+  ReviewController: Symbol.for("ReviewController"),
+  ReviewRepository: Symbol.for("ReviewRepository"),
+  ReviewerRepository: Symbol.for("ReviewerRepository"),
+
   RequestAuthentication: Symbol.for("RequestAuthentication"),
 
   SettingLoader: Symbol.for("SettingLoader"),

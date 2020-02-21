@@ -23,6 +23,24 @@
         </a>
       </li>
       <% } %>
+
+      <% if (locals._locals.authLevel == 3) { %>
+      <li id="review-overview" class="nav-item">
+        <a class="nav-link" href="/review/overview">
+          <i class="material-icons">gavel</i>
+          <p>Review | Overview</p>
+        </a>
+      </li>
+      <% } %>
+      <% if (locals._locals.authLevel >= 2) { %>
+      <li id="review-application" class="nav-item">
+        <a class="nav-link" href="/review">
+          <i class="material-icons">gavel</i>
+          <p>Review | Application</p>
+        </a>
+      </li>
+      <% } %>
+
       <li id="dashboard" class="nav-item">
         <a class="nav-link" href="/">
           <i class="material-icons">dashboard</i>

@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Min, IsDefined, IsInt, IsNotEmpty, IsOptional } from "class-validator";
-import { ApplicantStatus } from "../../services/applications/applicantStatus";
+import { ApplicantStatus } from "../../../services/applications/applicantStatus";
+import { Review } from "../reviews";
 
 export interface ApplicationMappingOptions {
   /**
@@ -150,6 +151,12 @@ export class Applicant {
     default: ApplicantStatus.Applied
   })
   applicationStatus: ApplicantStatus;
+
+  @OneToMany(
+    () => Review,
+    review => review.applicant
+  )
+  reviews: Review[];
 
   @Column("datetime", { nullable: false, default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
