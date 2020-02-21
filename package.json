@@ -11,7 +11,7 @@
     "postbuild": "gulp",
     "test": "ava -c 1",
     "test:coverage": "nyc ava --concurrency=1 --timeout=2m",
-    "test:watch": "DEBUG=ava:watcher ava -- --watch --verbose",
+    "test:watch": "DEBUG=ava:watcher ava --watch --verbose",
     "start": "ts-node src/server.ts",
     "start:watch": "node ./node_modules/nodemon/bin/nodemon.js"
   },
@@ -93,7 +93,6 @@
     "source-map-support": "^0.5.13",
     "supertest": "^4.0.2",
     "ts-mockito": "^2.4.2",
-    "ts-node": "^8.3.0",
-    "tslint": "^5.18.0"
+    "ts-node": "^8.3.0"
   }
 }
