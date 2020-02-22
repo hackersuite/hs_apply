@@ -11,7 +11,7 @@
     "postbuild": "gulp",
     "test": "ava -c 1",
     "test:coverage": "nyc ava --concurrency=1 --timeout=2m",
-    "test:watch": "DEBUG=ava:watcher ava -- --watch --verbose",
+    "test:watch": "DEBUG=ava:watcher ava --watch --verbose",
     "start": "ts-node src/server.ts",
     "start:watch": "node ./node_modules/nodemon/bin/nodemon.js"
   },

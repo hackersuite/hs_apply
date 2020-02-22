@@ -23,21 +23,22 @@ let mockRequestAuth: RequestAuthentication;
 let mockSettingLoader: SettingLoader;
 
 const newApplicantRequest: any = {
-  applicantAge: 20,
-  applicantGender: "Other",
-  applicantGenderOther: "Test",
-  applicantNationality: "UK",
-  applicantCountry: "UK",
-  applicantCity: "Manchester",
-  applicantUniversity: "UoM",
-  applicantDegree: "CS",
-  applicantStudyYear: "Foundation",
-  applicantWorkArea: "Other",
-  applicantWorkAreaOther: "This",
-  applicantHackathonCount: 0,
-  applicantDietaryRequirements: "Other",
-  applicantDietaryRequirementsOther: "Test",
-  applicantTShirt: "M"
+  age: 20,
+  gender: "Other",
+  genderOther: "Test",
+  nationality: "UK",
+  country: "UK",
+  city: "Manchester",
+  university: "UoM",
+  degree: "CS",
+  yearOfStudy: "Foundation",
+  workArea: "Other",
+  workAreaOther: "This",
+  hackathonCount: 0,
+  dietaryRequirements: "Other",
+  dietaryRequirementsOther: "Test",
+  tShirtSize: "M",
+  hearAbout: "Other"
 };
 const testApplicant: Applicant = new Applicant();
 testApplicant.age = 20;
@@ -65,7 +66,7 @@ const getUniqueApplicant = (): { applicantRequest: any; applicant: Applicant } =
   // Create a unique applicant using current time
   const applicantIdentifier = new Date().getTime().toString();
   const applicant: Applicant = { ...testApplicant, city: applicantIdentifier };
-  const applicantRequest = { ...newApplicantRequest, applicantCity: applicantIdentifier };
+  const applicantRequest = { ...newApplicantRequest, city: applicantIdentifier };
 
   // Add fields that are added in the controller
   applicant.authId = requestUser.authId;
@@ -196,8 +197,8 @@ test("Test applicant created with valid request (using Other input options)", as
     .post("/apply")
     .send({
       ...applicantRequest,
-      applicantWorkArea: "Other",
-      applicantWorkAreaOther: workArea
+      workArea: "Other",
+      workAreaOther: workArea
     });
 
   // Check that we get a OK (200) response code
@@ -215,8 +216,8 @@ test("Test applicant created with valid request (with no Other input provided)",
     .post("/apply")
     .send({
       ...applicantRequest,
-      applicantGender: undefined,
-      applicantGenderOther: undefined
+      gender: undefined,
+      genderOther: undefined
     });
 
   // Check that we get a OK (200) response code
@@ -242,7 +243,7 @@ test("Test applicant not created with cv too large", async t => {
   // Perform the request along /apply
   const response = await request(bApp)
     .post("/apply")
-    .attach("applicantCV", Buffer.alloc(5 * (1 << 21)), { filename: "cv.pdf", contentType: "application/pdf" }) // Create buffer of >5MB
+    .attach("cv", Buffer.alloc(5 * (1 << 21)), { filename: "cv.pdf", contentType: "application/pdf" }) // Create buffer of >5MB
     .field(newApplicantRequest);
 
   // Check that we get a BAD_REQUEST (400) response code
@@ -255,7 +256,7 @@ test("Test applicant not created with unsupported cv format", async t => {
   // Perform the request along .../apply
   const response = await request(bApp)
     .post("/apply")
-    .attach("applicantCV", Buffer.from(""), { filename: "cv.txt" })
+    .attach("cv", Buffer.from(""), { filename: "cv.txt" })
     .field(newApplicantRequest);
 
   // Check that we get a BAD_REQUEST (400) response code
@@ -272,7 +273,7 @@ test("Test applicant created with doc cv", async t => {
   // Perform the request along /apply
   const response = await request(bApp)
     .post("/apply")
-    .attach("applicantCV", cvFile, { filename: "cv.doc" })
+    .attach("cv", cvFile, { filename: "cv.doc" })
     .field(applicantRequest);
 
   // Check that we get a OK (200) response code
@@ -287,7 +288,7 @@ test("Test applicant created with pdf cv", async t => {
   // Perform the request along .../apply
   const response = await request(bApp)
     .post("/apply")
-    .attach("applicantCV", cvFile, "cv.pdf")
+    .attach("cv", cvFile, "cv.pdf")
     .field(applicantRequest);
 
   // Check that we get a OK (200) response code
@@ -302,7 +303,7 @@ test("Test applicant created with docx cv", async t => {
   // Perform the request along .../apply
   const response = await request(bApp)
     .post("/apply")
-    .attach("applicantCV", cvFile, "cv.docx")
+    .attach("cv", cvFile, "cv.docx")
     .field(applicantRequest);
 
   // Check that we get a OK (200) response code

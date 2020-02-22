@@ -26,6 +26,7 @@ testApplicantMale.pastProjects = "";
 testApplicantMale.hardwareRequests = "";
 testApplicantMale.dietaryRequirements = "Halal";
 testApplicantMale.tShirtSize = "M";
+testApplicantMale.hearAbout = "IDK";
 
 const testApplicantFemale: Applicant = new Applicant();
 testApplicantFemale.id = "7479a451-e826-4271-8073-929ccef522ee";
@@ -40,6 +41,7 @@ testApplicantFemale.yearOfStudy = "1";
 testApplicantFemale.hackathonCount = 0;
 testApplicantFemale.dietaryRequirements = "Halal";
 testApplicantFemale.tShirtSize = "M";
+testApplicantFemale.hearAbout = "IDK";
 
 const testApplicantInvalid: Applicant = new Applicant();
 testApplicantInvalid.id = "7479a451-e826-4271-8073-929ccef522ee";
@@ -53,6 +55,7 @@ testApplicantInvalid.yearOfStudy = "1";
 testApplicantInvalid.hackathonCount = 0;
 testApplicantInvalid.dietaryRequirements = "Halal";
 testApplicantInvalid.tShirtSize = "M";
+testApplicantInvalid.hearAbout = "IDK";
 
 let applicantService: ApplicantService;
 let mockApplicantRepository: Repository<Applicant>;

@@ -84,6 +84,7 @@ export class ApplicationController implements ApplicationControllerInterface {
     try {
       await this._applicantService.save(newApplication, cvFile);
     } catch (errors) {
+      console.log(errors);
       res.status(HttpResponseCode.BAD_REQUEST).send({
         error: true,
         message: "Could not create application!"
