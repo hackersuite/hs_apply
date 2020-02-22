@@ -98,7 +98,7 @@ export class ApplicationRouter implements RouterInterface {
 
     router.get("/cancel", this.doNothingIfApplicationsClosed, this._applicationController.cancel);
 
-    router.put("/:id([a-f0-9-]+)/checkin", this._requestAuth.checkIsOrganizer, this._applicationController.checkin);
+    router.put("/:id([a-f0-9-]+)/checkin", this._requestAuth.checkIsVolunteer, this._applicationController.checkin);
 
     return router;
   };
