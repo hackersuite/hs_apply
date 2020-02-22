@@ -84,7 +84,6 @@ export class ApplicationController implements ApplicationControllerInterface {
     try {
       await this._applicantService.save(newApplication, cvFile);
     } catch (errors) {
-      console.log(errors);
       res.status(HttpResponseCode.BAD_REQUEST).send({
         error: true,
         message: "Could not create application!"
@@ -107,7 +106,7 @@ export class ApplicationController implements ApplicationControllerInterface {
     if (application.applicationStatus <= ApplicantStatus.Applied && res.locals.applicationsOpen) {
       // Delete the application so they can re-apply
       try {
-        await this._applicantService.remove(application.id);
+        await this._applicantService.delete(application.id);
       } catch (err) {
         return next(err);
       }
@@ -153,7 +152,7 @@ export class ApplicationController implements ApplicationControllerInterface {
       }
     } else {
       res.status(HttpResponseCode.BAD_REQUEST).send({
-        message: "Hacker was either rejected or did not confirm"
+        message: "Hacker cannot be accepted! Please notify organiser!"
       });
       return;
     }

@@ -1,20 +1,20 @@
 import test from "ava";
 import * as request from "supertest";
-import { App } from "../../src/app";
+import { App } from "../../../src/app";
 import { Express, NextFunction } from "express";
-import { initEnv, getTestDatabaseOptions } from "../util/testUtils";
-import { HttpResponseCode } from "../../src/util/errorHandling";
-import { instance, mock, when, reset, anything, objectContaining, anyOfClass } from "ts-mockito";
-import container from "../../src/inversify.config";
-import { TYPES } from "../../src/types";
-import { Cache } from "../../src/util/cache";
-import { ApplicantService } from "../../src/services";
-import { Sections } from "../../src/models/sections";
-import { Applicant } from "../../src/models/db";
-import { RequestAuthentication } from "../../src/util/auth";
-import { SettingLoader } from "../../src/util/fs/loader";
-import { AuthLevels } from "../../src/util/auth/authLevels";
-import { ApplicantStatus } from "../../src/services/applications/applicantStatus";
+import { initEnv, getTestDatabaseOptions } from "../../util/testUtils";
+import { HttpResponseCode } from "../../../src/util/errorHandling";
+import { instance, mock, when, reset, anything, objectContaining, anyOfClass, verify } from "ts-mockito";
+import container from "../../../src/inversify.config";
+import { TYPES } from "../../../src/types";
+import { Cache } from "../../../src/util/cache";
+import { ApplicantService } from "../../../src/services";
+import { Sections } from "../../../src/models/sections";
+import { Applicant } from "../../../src/models/db";
+import { RequestAuthentication } from "../../../src/util/auth";
+import { SettingLoader } from "../../../src/util/fs/loader";
+import { AuthLevels } from "../../../src/util/auth/authLevels";
+import { ApplicantStatus } from "../../../src/services/applications/applicantStatus";
 
 let bApp: Express;
 let mockCache: Cache;
@@ -62,7 +62,7 @@ const requestUser = {
   authLevel: AuthLevels.Organizer
 };
 
-const getUniqueApplicant = (): { applicantRequest: any; applicant: Applicant } => {
+const getUniqueApplicant = (options?: { needsID: boolean }): { applicantRequest: any; applicant: Applicant } => {
   // Create a unique applicant using current time
   const applicantIdentifier = new Date().getTime().toString();
   const applicant: Applicant = { ...testApplicant, city: applicantIdentifier };
@@ -71,6 +71,8 @@ const getUniqueApplicant = (): { applicantRequest: any; applicant: Applicant } =
   // Add fields that are added in the controller
   applicant.authId = requestUser.authId;
   applicant.applicationStatus = ApplicantStatus.Applied;
+
+  if (options && options.needsID) applicant.id = "11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000";
 
   return { applicantRequest, applicant };
 };
@@ -158,19 +160,20 @@ test.serial("Test application page redirects, applications open, application sub
   t.is(response.status, HttpResponseCode.REDIRECT);
 });
 
-// test.serial("Test application page redirects, applications closed", async t => {
-//   // Mock out the cache and question loader
-//   when(mockCache.getAll(Sections.name)).thenReturn([new Sections([])]);
-//   const requestApp = bApp;
-//   requestApp.locals.settings["applicationsClose"] = new Date(Date.now()).toString();
+test.serial("Test applicant deleted when application open", async t => {
+  const { applicantRequest, applicant } = getUniqueApplicant();
+  when(mockApplicantService.findOne(requestUser.authId, "authId")).thenResolve(applicant);
+  when(mockApplicantService.delete(applicant.id)).thenResolve();
 
-//   // Perform the request along /apply
-//   const response = await request(requestApp).get("/apply");
+  // Perform the request along /apply/cancel
+  const response = await request(bApp).get("/apply/cancel");
 
-//   // Check that we get a REDIRECT (302) response code
-//   verify(mockApplicantService.findOne(requestUser.authId, "authId")).never();
-//   t.is(response.status, HttpResponseCode.REDIRECT);
-// });
+  // Check that we get a REDIRECT (302) response code
+  verify(mockApplicantService.findOne(requestUser.authId, "authId")).once();
+  verify(mockApplicantService.save(objectContaining(applicant))).never();
+  verify(mockApplicantService.delete(applicant.id)).once();
+  t.is(response.status, HttpResponseCode.REDIRECT);
+});
 
 test("Test applicant created with valid request, applications open", async t => {
   const { applicantRequest, applicant } = getUniqueApplicant();
@@ -308,4 +311,46 @@ test("Test applicant created with docx cv", async t => {
 
   // Check that we get a OK (200) response code
   t.is(response.status, HttpResponseCode.OK);
+});
+
+// Checkin Tests
+test.serial("Test checkin performed by organiser on confirmed applicant", async t => {
+  const { applicantRequest, applicant } = getUniqueApplicant({ needsID: true });
+  const testApplicant: Applicant = { ...applicant, applicationStatus: ApplicantStatus.Confirmed };
+  when(mockApplicantService.findOne(applicant.id)).thenResolve(testApplicant);
+
+  // Perform the request along /apply/:id/checkin
+  const response = await request(bApp).put(`/apply/${applicant.id}/checkin`);
+
+  // Check that we get a OK (200) response code
+  t.is(response.status, HttpResponseCode.OK);
+  t.is(testApplicant.applicationStatus, ApplicantStatus.Admitted);
+});
+
+test.serial("Test checkin not allowed on rejected applicant", async t => {
+  const { applicantRequest, applicant } = getUniqueApplicant({ needsID: true });
+  when(mockApplicantService.findOne(applicant.id)).thenResolve({
+    ...applicant,
+    applicationStatus: ApplicantStatus.Rejected
+  });
+
+  // Perform the request along /apply/:id/checkin
+  const response = await request(bApp).put(`/apply/${applicant.id}/checkin`);
+
+  // Check that we get a BAD_REQUEST (400) response code
+  t.is(response.status, HttpResponseCode.BAD_REQUEST);
+});
+
+test.serial("Test checkin not allowed on invited applicant", async t => {
+  const { applicantRequest, applicant } = getUniqueApplicant({ needsID: true });
+  when(mockApplicantService.findOne(applicant.id)).thenResolve({
+    ...applicant,
+    applicationStatus: ApplicantStatus.Invited
+  });
+
+  // Perform the request along /apply/:id/checkin
+  const response = await request(bApp).put(`/apply/${applicant.id}/checkin`);
+
+  // Check that we get a BAD_REQUEST (400) response code
+  t.is(response.status, HttpResponseCode.BAD_REQUEST);
 });

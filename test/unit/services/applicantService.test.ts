@@ -198,7 +198,7 @@ test("Test that error thrown when API keys not set-up for file upload", async t 
 test("Test that error thrown when delete is rejected", async t => {
   when(mockApplicantRepository.delete(objectContaining({ id: "0" }))).thenReject(new Error());
 
-  const errors: Error = await t.throwsAsync(applicantService.remove("0"));
+  const errors: Error = await t.throwsAsync(applicantService.delete("0"));
 
   // Check the delete function was called in the mock
   t.truthy(errors);
@@ -208,7 +208,7 @@ test("Test that error thrown when delete is rejected", async t => {
 test("Test that remove rejected when applicant id not provided", async t => {
   when(mockApplicantRepository.delete(undefined)).thenResolve();
 
-  await t.throwsAsync(applicantService.remove(undefined));
+  await t.throwsAsync(applicantService.delete(undefined));
 
   // Check the delete function was called in the mock
   verify(mockApplicantRepository.delete(undefined)).never();
@@ -217,7 +217,7 @@ test("Test that remove rejected when applicant id not provided", async t => {
 test("Test that applicant can be removed by using the id", async t => {
   when(mockApplicantRepository.delete(objectContaining({ id: testApplicantMale.id }))).thenResolve();
 
-  await t.notThrowsAsync(applicantService.remove(testApplicantMale.id));
+  await t.notThrowsAsync(applicantService.delete(testApplicantMale.id));
 
   // Check the delete function was called in the mock
   verify(mockApplicantRepository.delete(objectContaining({ id: testApplicantMale.id }))).once();

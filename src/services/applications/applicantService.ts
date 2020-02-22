@@ -73,7 +73,6 @@ export class ApplicantService implements ApplicantServiceInterface {
         validationError: { target: false }
       });
     } catch (errors) {
-      console.log(errors);
       throw new Error("Failed to validate applicant");
     }
 
@@ -93,7 +92,7 @@ export class ApplicantService implements ApplicantServiceInterface {
     }
   };
 
-  public remove = async (id: ApplicationID, findBy?: keyof Applicant): Promise<DeleteResult> => {
+  public delete = async (id: ApplicationID, findBy?: keyof Applicant): Promise<DeleteResult> => {
     if (id === undefined) {
       throw new Error("Applicant ID must be provided");
     }
