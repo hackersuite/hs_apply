@@ -1,13 +1,8 @@
 import { injectable, inject } from "inversify";
-import { Applicant } from "../../models/db/applicant";
-import { ApplicantRepository } from "../../repositories";
-import { TYPES } from "../../types";
-import { ObjectID, Repository, DeleteResult } from "typeorm";
-import { validateOrReject } from "class-validator";
-import * as request from "request-promise-native";
+import { Repository } from "typeorm";
 import { Review, Reviewer } from "../../models/db";
-
-type ApplicationID = string | number | Date | ObjectID;
+import { TYPES } from "../../types";
+import { ReviewRepository, ReviewerRepository } from "../../repositories/repositories";
 
 export interface ReviewServiceInterface {
   getAll: () => Promise<Review[]>;
@@ -18,9 +13,13 @@ export class ReviewService implements ReviewServiceInterface {
   private _reviewRepository: Repository<Review>;
   private _reviewerRepository: Repository<Reviewer>;
 
-  // public constructor(@inject(TYPES.ApplicantRepository) applicantRepository: ApplicantRepository) {
-  //   this._applicantRepository = applicantRepository.getRepository();
-  // }
+  public constructor(
+    @inject(TYPES.ReviewRepository) reviewRepository: ReviewRepository,
+    @inject(TYPES.ReviewerRepository) reviewerRepository: ReviewerRepository
+  ) {
+    this._reviewRepository = reviewRepository.getRepository();
+    this._reviewerRepository = reviewerRepository.getRepository();
+  }
 
   public getAll = async (columns?: (keyof Review)[]): Promise<Review[]> => {
     try {

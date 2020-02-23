@@ -1,5 +1,5 @@
 /**
- * The authorization levels of the user's on the hubs
+ * The authorization levels of the user
  */
 export enum AuthLevels {
   // NOTE: the auth levels must be ordered in ascending order
