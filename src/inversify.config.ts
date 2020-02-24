@@ -15,7 +15,7 @@ import { AdminControllerInterface, AdminController } from "./controllers";
 // Review
 import { ReviewService } from "./services";
 import { ReviewController } from "./controllers";
-import { ReviewRepository, ReviewerRepository } from "./repositories";
+import { ReviewRepository } from "./repositories";
 
 // Email
 import { EmailServiceInterface, EmailService } from "./services";
@@ -57,7 +57,6 @@ container.bind<EmailServiceInterface>(TYPES.EmailService).to(EmailService);
 container.bind<ReviewController>(TYPES.ReviewController).to(ReviewController);
 container.bind<ReviewService>(TYPES.ReviewService).to(ReviewService);
 container.bind<ReviewRepository>(TYPES.ReviewRepository).to(ReviewRepository);
-container.bind<ReviewerRepository>(TYPES.ReviewerRepository).to(ReviewerRepository);
 
 // Request Authentication
 container.bind<RequestAuthenticationInterface>(TYPES.RequestAuthentication).to(RequestAuthentication);

@@ -1,14 +1,16 @@
-import { Entity, Column, ManyToOne } from "typeorm";
+import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Applicant } from "../applicant";
-import { Reviewer } from "./reviewer";
 
 @Entity()
 export class Review {
-  @ManyToOne(() => Applicant, { primary: true })
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
+
+  @ManyToOne(() => Applicant)
   applicant: Applicant;
 
-  @ManyToOne(() => Reviewer, { primary: true })
-  reviewer: Reviewer;
+  @Column()
+  createdByAuthID: string;
 
   @Column()
   averageScore: number;
