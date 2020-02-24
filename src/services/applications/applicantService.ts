@@ -5,6 +5,7 @@ import { TYPES } from "../../types";
 import { ObjectID, Repository, DeleteResult } from "typeorm";
 import { validateOrReject } from "class-validator";
 import * as request from "request-promise-native";
+import { Review } from "../../models/db";
 
 type ApplicationID = string | number | Date | ObjectID;
 
@@ -103,6 +104,70 @@ export class ApplicantService implements ApplicantServiceInterface {
     } catch (err) {
       throw new Error(`Failed to remove an applicant:\n${err}`);
     }
+  };
+
+  public getKRandomToReview = async (reviewerID: string, chooseFromK = 5): Promise<Applicant[]> => {
+    // const applications = this._applicantRepository.find({
+    //   join: {
+    //     alias: "applicants",
+    //     innerJoin: { reviews: "applicants.reviews" }
+    //   },
+    //   where: {
+    //     reviews
+    //   },
+    //   order: {
+    //     createdAt: "ASC"
+    //   },
+    //   take: chooseFromK
+    // });
+    // const subQuery = qb.subQuery()
+    //   .select("COUNT(review.id)", "totalReviews")
+    //   .from(Review, "review")
+    //   .where("review.createdByAuthID = :reviewerID")
+    //   .getQuery();
+    // const applications = await this._applicantRepository
+    //   .createQueryBuilder("application")
+    //   .addFrom(subQuery => {
+    //     return subQuery
+    //       .select("COUNT(review.id)", "numberOfReviews")
+    //       .from(Review, "review")
+    //       .where("review.createdByAuthID != :reviewerID", { reviewerID });
+    //   }, "reviewCounts")
+    //   .where("reviewCounts.numberOfReviews < 2")
+    //   .limit(chooseFromK)
+    //   .getSql();
+    let applications;
+    try {
+      applications = await this._applicantRepository
+        .createQueryBuilder("application")
+        .where(qb => {
+          const subQuery = qb
+            .subQuery()
+            .select("review.applicantId")
+            .from(Review, "review")
+            .groupBy("review.applicantId")
+            .having("COUNT(review.applicantId) >= 2")
+            .getQuery();
+          return "id NOT IN " + subQuery;
+        })
+        .andWhere(qb => {
+          const subQuery = qb
+            .subQuery()
+            .select("review.applicantId")
+            .from(Review, "review")
+            .where("review.createdByAuthID = :authID", { authID: reviewerID })
+            .getQuery();
+          return "id NOT IN " + subQuery;
+        })
+        .orderBy("application.createdAt", "ASC")
+        .take(chooseFromK)
+        .getMany();
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+
+    return applications;
   };
 
   private saveToDropbox = async (fileName: string, file: Buffer): Promise<string> => {

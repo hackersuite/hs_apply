@@ -25,6 +25,12 @@ export class ReviewRouter implements RouterInterface {
   public register = (): Router => {
     const router: Router = Router();
 
+    router.use(this._requestAuth.checkLoggedIn);
+
+    router.get("/", this._requestAuth.checkIsVolunteer, this._reviewController.reviewPage);
+
+    router.get("/next", this._requestAuth.checkIsVolunteer, this._reviewController.nextReview);
+
     router.post(
       "/submit",
       this._requestAuth.checkLoggedIn,
