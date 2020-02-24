@@ -7,6 +7,7 @@ import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import * as fs from "fs";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
+import { getAllUsers, RequestUser } from "hs_auth_api_ts"
 
 export interface AdminControllerInterface {
   overview: (req: Request, res: Response, next: NextFunction) => void;
@@ -114,16 +115,12 @@ export class AdminController implements AdminControllerInterface {
   };
 
   public manage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    let apiResult: any;
+
+    let authUsersResult: RequestUser[];
     try {
-      apiResult = await request.get(`${process.env.AUTH_URL}/api/v1/users`, {
-        headers: {
-          Authorization: `${req.cookies["Authorization"]}`
-        }
-      });
+      authUsersResult = await getAllUsers(req.cookies["Authorization"])
     } catch (err) {
-      // Some internal error has occured
-      return next(err);
+      next(err)
     }
 
     const columnsToSelect: (keyof Applicant)[] = [
@@ -137,10 +134,9 @@ export class AdminController implements AdminControllerInterface {
     const columnNames: object[] = [["Name"], ["Email"], ["University"], ["Year"], ["Status"], ["Manage"]];
     const applications: Applicant[] = await this._applicantService.getAll(columnsToSelect);
 
-    const authUsersResult: any = JSON.parse(apiResult).users;
     const authUsers = {};
     authUsersResult.forEach(a => {
-      authUsers[a._id] = { ...a };
+      authUsers[a.authId] = { ...a };
     });
 
     const combinedApplications: any = [];
@@ -179,24 +175,19 @@ export class AdminController implements AdminControllerInterface {
       return;
     }
 
-    let allAuthUsersFromAPI: any;
+    let authUsersResult: RequestUser[];
     try {
-      allAuthUsersFromAPI = await request.get(`${process.env.AUTH_URL}/api/v1/users`, {
-        headers: {
-          Authorization: `${req.cookies["Authorization"]}`,
-          Referer: req.originalUrl
-        }
-      });
+      authUsersResult = await getAllUsers(req.cookies["Authorization"])
     } catch (err) {
       res.send("Failed to get the users authentication info!");
     }
 
-    const authUsersResult: any = JSON.parse(allAuthUsersFromAPI).users;
     const authUsers = {};
     // Expand the auth user to use the auth id as the key for each object
     authUsersResult.forEach(a => {
-      authUsers[a._id] = { ...a };
+      authUsers[a.authId] = { ...a };
     });
+
 
     const stream = fs.createWriteStream("voting.csv");
     stream.on("finish", () => {

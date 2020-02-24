@@ -6,7 +6,7 @@ import { TYPES } from "../types";
 import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
-import { RequestUser } from "../util/auth";
+import { RequestUser } from "hs_auth_api_ts";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 import { applicationMapping } from "../models/db";
 

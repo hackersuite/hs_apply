@@ -3,10 +3,10 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { EmailService, ApplicantService } from "../services";
 import { Applicant } from "../models/db";
-import { RequestUser } from "../util/auth";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 import { HttpResponseCode } from "../util/errorHandling";
-import * as request from "request-promise-native";
+import { getAllUsers, RequestUser } from "hs_auth_api_ts"
+
 
 export interface InviteControllerInterface {
   send: (req: Request, res: Response, next: NextFunction) => void;
@@ -189,18 +189,18 @@ export class InviteController implements InviteControllerInterface {
       });
       return;
     }
+    
+    let authUsersResult: RequestUser[];
+    try {
+      authUsersResult = await getAllUsers(req.cookies["Authorization"])
+    } catch (err) {
+      throw(err);
+    }
 
-    // Get all of the auth users -- we really need an endpoint to get a single user
-    const apiResult = await request.get(`${process.env.AUTH_URL}/api/v1/users`, {
-      headers: {
-        Authorization: `${req.cookies["Authorization"]}`
-      }
-    });
     // Mapping like in the admin overvire page for ease of use
-    const authUsersResult: any = JSON.parse(apiResult).users;
     const authUsers = {};
     authUsersResult.forEach(a => {
-      authUsers[a._id] = { ...a };
+      authUsers[a.authId] = { ...a };
     });
 
     // Send the emails to all the users in the list

@@ -1,5 +1,5 @@
 import * as passport from "passport";
-import * as request from "request-promise-native";
+import * as req from "request-promise-native";
 import * as querystring from "querystring";
 import { Express, Request, Response, Application, NextFunction, CookieOptions } from "express";
 import { HttpResponseCode } from "../errorHandling";
@@ -9,18 +9,12 @@ import { injectable, inject } from "inversify";
 import { ApplicantService } from "../../services";
 import { TYPES } from "../../types";
 import { Cache } from "../cache";
+import { getCurrentUser, RequestUser } from "hs_auth_api_ts";
 
 export interface RequestAuthenticationInterface {
   passportSetup: (app: Application) => void;
 }
 
-export type RequestUser = {
-  authId: string;
-  authLevel: number;
-  name: string;
-  email: string;
-  team: string;
-};
 
 @injectable()
 export class RequestAuthentication {
@@ -66,35 +60,16 @@ export class RequestAuthentication {
           passReqToCallback: true
         },
         async (req: Request, token: string, done: (error: string, user?: any) => void): Promise<void> => {
-          let apiResult: string;
+          let apiResult: RequestUser;
           try {
-            apiResult = await request.get(`${process.env.AUTH_URL}/api/v1/users/me`, {
-              headers: {
-                Authorization: `${token}`,
-                Referer: req.originalUrl
-              }
-            });
-          } catch (err) {
-            // Some internal error has occured
-            return done(err);
+            apiResult = await getCurrentUser(token, req.originalUrl);
+          } catch(err) {
+            return done(undefined, false)
           }
-          // We expect the result to be returned as JSON, parse it
-          const result = JSON.parse(apiResult);
-          if (result.error && result.status === HttpResponseCode.UNAUTHORIZED) {
-            // When there is an error message and the status code is 401
-            return done(undefined, false);
-          } else if (result.status === HttpResponseCode.OK) {
-            // The request has been authorized
 
-            (req.user as RequestUser) = {
-              authId: result.user._id,
-              authLevel: result.user.auth_level,
-              name: result.user.name,
-              email: result.user.email,
-              team: result.user.team
-            };
-            return done(undefined, req.user);
-          }
+
+          req.user = apiResult;
+          return done(undefined, apiResult);
         }
       )
     );
