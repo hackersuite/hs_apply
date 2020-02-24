@@ -107,35 +107,7 @@ export class ApplicantService implements ApplicantServiceInterface {
   };
 
   public getKRandomToReview = async (reviewerID: string, chooseFromK = 5): Promise<Applicant[]> => {
-    // const applications = this._applicantRepository.find({
-    //   join: {
-    //     alias: "applicants",
-    //     innerJoin: { reviews: "applicants.reviews" }
-    //   },
-    //   where: {
-    //     reviews
-    //   },
-    //   order: {
-    //     createdAt: "ASC"
-    //   },
-    //   take: chooseFromK
-    // });
-    // const subQuery = qb.subQuery()
-    //   .select("COUNT(review.id)", "totalReviews")
-    //   .from(Review, "review")
-    //   .where("review.createdByAuthID = :reviewerID")
-    //   .getQuery();
-    // const applications = await this._applicantRepository
-    //   .createQueryBuilder("application")
-    //   .addFrom(subQuery => {
-    //     return subQuery
-    //       .select("COUNT(review.id)", "numberOfReviews")
-    //       .from(Review, "review")
-    //       .where("review.createdByAuthID != :reviewerID", { reviewerID });
-    //   }, "reviewCounts")
-    //   .where("reviewCounts.numberOfReviews < 2")
-    //   .limit(chooseFromK)
-    //   .getSql();
+    // TODO: Refactor query below to make it more readable, there must be a better way...
     let applications;
     try {
       applications = await this._applicantRepository
