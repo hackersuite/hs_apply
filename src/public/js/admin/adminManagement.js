@@ -116,7 +116,7 @@ $(document).ready(function () {
 });
 
 var current_page = 1;
-var records_per_page = 5;
+var records_per_page = 20;
 
 function prevPage() {
   if (current_page > 1) {
