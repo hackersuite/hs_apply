@@ -35,8 +35,13 @@ export class ReviewRouter implements RouterInterface {
       "/submit",
       this._requestAuth.checkLoggedIn,
       this._requestAuth.checkIsVolunteer,
-      this._reviewController.submit
+      this._reviewController.submit,
+      this._reviewController.nextReview,
     );
+
+    router.get(
+      "/getListing", this._reviewController.getReviews
+    )
 
     return router;
   };

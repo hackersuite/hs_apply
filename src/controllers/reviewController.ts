@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { ReviewService } from "../services";
-import { Applicant } from "../models/db";
+import { Applicant, Review } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
 import { RequestUser } from "../util";
 
@@ -43,4 +43,9 @@ export class ReviewController implements ReviewControllerInterface {
   public submit = async (req: Request, res: Response, next: NextFunction): Promise<boolean> => {
     return false;
   };
+
+  public getReviews = async (req: Request, res: Response): Promise<void> => {
+    console.log(this._reviewService.getAverageRatings());
+  }
+
 }

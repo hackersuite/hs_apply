@@ -45,4 +45,25 @@ export class ReviewService implements ReviewServiceInterface {
     // Pick a random application from the top k
     return applications[(Math.random() * (numberOfApplications + 1)) | 0];
   };
+
+  public getAverageRatings = async (): Promise<Partial<Review>[]> => {
+    // SELECT `applicantId`, AVG(`averageScore`) FROM hs_application.review GROUP BY `applicantId`;
+    let reviews;
+    try {
+      reviews = await this._reviewRepository
+        .createQueryBuilder()
+        .select("applicantId")
+        .addSelect("AVG(averageScore)")
+        .groupBy("applicantId")
+        .orderBy("AVG(averageScore)", "DESC")
+        .getMany();
+    } catch(err) {
+      console.log(err);
+      return undefined;
+    }
+
+    console.log(reviews);
+    console.log(reviews);
+    return reviews;
+  }
 }
