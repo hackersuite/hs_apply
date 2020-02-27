@@ -1,20 +1,16 @@
 import * as passport from "passport";
-import * as req from "request-promise-native";
 import * as querystring from "querystring";
 import { Express, Request, Response, Application, NextFunction, CookieOptions } from "express";
-import { HttpResponseCode } from "../errorHandling";
 import * as CookieStrategy from "passport-cookie";
-import { AuthLevels } from "./authLevels";
 import { injectable, inject } from "inversify";
 import { ApplicantService } from "../../services";
 import { TYPES } from "../../types";
 import { Cache } from "../cache";
-import { getCurrentUser, RequestUser } from "hs_auth_api_ts";
+import { getCurrentUser, RequestUser, AuthLevels } from "@unicsmcr/hs_auth_client";
 
 export interface RequestAuthenticationInterface {
   passportSetup: (app: Application) => void;
 }
-
 
 @injectable()
 export class RequestAuthentication {
@@ -63,10 +59,9 @@ export class RequestAuthentication {
           let apiResult: RequestUser;
           try {
             apiResult = await getCurrentUser(token, req.originalUrl);
-          } catch(err) {
-            return done(undefined, false)
+          } catch (err) {
+            return done(undefined, false);
           }
-
 
           req.user = apiResult;
           return done(undefined, apiResult);
@@ -123,9 +118,9 @@ export class RequestAuthentication {
     }
   };
 
-  public checkIsOrganizer = (req: Request, res: Response, next: NextFunction): void => {
-    if (this.checkAuthLevel(req, res, req.user as RequestUser, AuthLevels.Organizer)) {
-      res.locals.isOrganizer = true;
+  public checkIsOrganiser = (req: Request, res: Response, next: NextFunction): void => {
+    if (this.checkAuthLevel(req, res, req.user as RequestUser, AuthLevels.Organiser)) {
+      res.locals.isOrganiser = true;
       res.locals.isVolunteer = true;
       return next();
     }

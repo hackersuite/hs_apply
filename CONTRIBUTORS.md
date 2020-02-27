@@ -1,2 +1,4 @@
 - Sean Parker - <https://github.com/seanjparker>
-  Khesim Reid - <https://github.com/KhesimReid>
+- Khesim Reid - <https://github.com/KhesimReid>
+- Heido Nõmm - <https://github.com/heidonomm>
+- Khesim Reid - <https://github.com/KhesimReid>

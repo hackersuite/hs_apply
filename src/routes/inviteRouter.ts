@@ -28,14 +28,14 @@ export class InviteRouter implements RouterInterface {
     router.post(
       "/batchSend",
       this._requestAuth.checkLoggedIn,
-      this._requestAuth.checkIsOrganizer,
+      this._requestAuth.checkIsOrganiser,
       this._inviteController.batchSend
     );
 
     router.put(
       "/:id([a-f0-9-]+)/send",
       this._requestAuth.checkLoggedIn,
-      this._requestAuth.checkIsOrganizer,
+      this._requestAuth.checkIsOrganiser,
       this._inviteController.send
     );
 

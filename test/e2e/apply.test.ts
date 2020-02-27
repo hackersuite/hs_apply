@@ -8,7 +8,7 @@ import container from "../../src/inversify.config";
 import { Applicant } from "../../src/models/db";
 import { RequestAuthentication } from "../../src/util/auth";
 import { SettingLoader } from "../../src/util/fs";
-import { AuthLevels } from "../../src/util/auth/authLevels";
+import { AuthLevels } from "@unicsmcr/hs_auth_client";
 import { mock, instance, when, anything } from "ts-mockito";
 import { TYPES } from "../../src/types";
 import { Repository } from "typeorm";
@@ -57,7 +57,7 @@ const requestUser = {
   name: "Test",
   email: "test@test.com",
   authId: "010101",
-  authLevel: AuthLevels.Organizer
+  authLevel: AuthLevels.Organiser
 };
 
 test.before.cb(t => {
@@ -74,7 +74,7 @@ test.before.cb(t => {
     req.user = requestUser;
     next();
   });
-  when(mockRequestAuth.checkIsOrganizer).thenReturn((req, res, next: NextFunction) => {
+  when(mockRequestAuth.checkIsOrganiser).thenReturn((req, res, next: NextFunction) => {
     next();
   });
   when(mockRequestAuth.checkIsVolunteer).thenReturn((req, res, next: NextFunction) => {

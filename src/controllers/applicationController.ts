@@ -6,7 +6,7 @@ import { TYPES } from "../types";
 import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
-import { RequestUser } from "hs_auth_api_ts";
+import { RequestUser } from "@unicsmcr/hs_auth_client";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 import { applicationMapping } from "../models/db";
 
@@ -84,6 +84,7 @@ export class ApplicationController implements ApplicationControllerInterface {
     try {
       await this._applicantService.save(newApplication, cvFile);
     } catch (errors) {
+      console.log(errors);
       res.status(HttpResponseCode.BAD_REQUEST).send({
         error: true,
         message: "Could not create application!"

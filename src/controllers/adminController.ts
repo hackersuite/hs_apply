@@ -7,7 +7,7 @@ import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import * as fs from "fs";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
-import { getAllUsers, RequestUser } from "hs_auth_api_ts"
+import { getAllUsers, RequestUser } from "@unicsmcr/hs_auth_client"
 
 export interface AdminControllerInterface {
   overview: (req: Request, res: Response, next: NextFunction) => void;
