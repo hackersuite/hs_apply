@@ -89,7 +89,8 @@ export class AdminController implements AdminControllerInterface {
 
       if (
         applicant.hardwareRequests &&
-        (applicant.hardwareRequests !== "None" && applicant.hardwareRequests !== "Nothing")
+        applicant.hardwareRequests !== "None" &&
+        applicant.hardwareRequests !== "Nothing"
       ) {
         hardwareReq.push(applicant.hardwareRequests);
       }
