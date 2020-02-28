@@ -60,13 +60,6 @@ const requestUser = {
   authLevel: AuthLevels.Organizer
 };
 
-const requestUser = {
-  name: "Test",
-  email: "test@test.com",
-  authId: "010101",
-  authLevel: AuthLevels.Organizer
-};
-
 test.before.cb(t => {
   initEnv();
 
