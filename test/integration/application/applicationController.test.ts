@@ -13,7 +13,7 @@ import { Sections } from "../../../src/models/sections";
 import { Applicant } from "../../../src/models/db";
 import { RequestAuthentication } from "../../../src/util/auth";
 import { SettingLoader } from "../../../src/util/fs/loader";
-import { AuthLevels } from "../../../src/util/auth/authLevels";
+import { AuthLevels } from "@unicsmcr/hs_auth_client";
 import { ApplicantStatus } from "../../../src/services/applications/applicantStatus";
 
 let bApp: Express;
@@ -59,7 +59,7 @@ const requestUser = {
   name: "Test",
   email: "test@test.com",
   authId: "010101",
-  authLevel: AuthLevels.Organizer
+  authLevel: AuthLevels.Organiser
 };
 
 const getUniqueApplicant = (options?: { needsID: boolean }): { applicantRequest: any; applicant: Applicant } => {
@@ -94,7 +94,7 @@ test.before.cb(t => {
     req.user = requestUser;
     next();
   });
-  when(mockRequestAuth.checkIsOrganizer).thenReturn((req, res, next: NextFunction) => {
+  when(mockRequestAuth.checkIsOrganiser).thenReturn((req, res, next: NextFunction) => {
     next();
   });
   when(mockRequestAuth.checkIsVolunteer).thenReturn((req, res, next: NextFunction) => {

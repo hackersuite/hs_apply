@@ -73,6 +73,7 @@ export class ApplicantService implements ApplicantServiceInterface {
         validationError: { target: false }
       });
     } catch (errors) {
+      console.log(errors);
       throw new Error("Failed to validate applicant");
     }
 

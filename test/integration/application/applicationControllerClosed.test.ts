@@ -4,7 +4,7 @@ import { App } from "../../../src/app";
 import { Express, NextFunction } from "express";
 import { initEnv, getTestDatabaseOptions } from "../../util/testUtils";
 import { HttpResponseCode } from "../../../src/util/errorHandling";
-import { instance, mock, when, reset, anything, objectContaining, verify, anyOfClass } from "ts-mockito";
+import { instance, mock, when, reset, anything, objectContaining, verify } from "ts-mockito";
 import container from "../../../src/inversify.config";
 import { TYPES } from "../../../src/types";
 import { Cache } from "../../../src/util/cache";
@@ -13,7 +13,7 @@ import { Sections } from "../../../src/models/sections";
 import { Applicant } from "../../../src/models/db";
 import { RequestAuthentication } from "../../../src/util/auth";
 import { SettingLoader } from "../../../src/util/fs/loader";
-import { AuthLevels } from "../../../src/util/auth/authLevels";
+import { AuthLevels } from "@unicsmcr/hs_auth_client";
 import { ApplicantStatus } from "../../../src/services/applications/applicantStatus";
 
 let bApp: Express;
@@ -59,7 +59,7 @@ const requestUser = {
   name: "Test",
   email: "test@test.com",
   authId: "01010111",
-  authLevel: AuthLevels.Organizer
+  authLevel: AuthLevels.Organiser
 };
 
 const getUniqueApplicant = (): { applicantRequest: any; applicant: Applicant } => {
@@ -92,7 +92,7 @@ test.before.cb(t => {
     req.user = requestUser;
     next();
   });
-  when(mockRequestAuth.checkIsOrganizer).thenReturn((req, res, next: NextFunction) => {
+  when(mockRequestAuth.checkIsOrganiser).thenReturn((req, res, next: NextFunction) => {
     next();
   });
   when(mockRequestAuth.checkIsVolunteer).thenReturn((req, res, next: NextFunction) => {

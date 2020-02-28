@@ -27,13 +27,13 @@ export class AdminRouter implements RouterInterface {
 
     router.use(this._requestAuth.checkLoggedIn);
 
-    router.get("/overview", this._requestAuth.checkIsOrganizer, this._adminController.overview);
+    router.get("/overview", this._requestAuth.checkIsOrganiser, this._adminController.overview);
 
     router.get("/manage", this._requestAuth.checkIsVolunteer, this._adminController.manage);
 
-    router.get("/manage/downloadCSV", this._requestAuth.checkIsOrganizer, this._adminController.downloadCSV);
+    router.get("/manage/downloadCSV", this._requestAuth.checkIsOrganiser, this._adminController.downloadCSV);
 
-    router.get("/manage/[a-z0-9-]+", this._requestAuth.checkIsOrganizer, this._adminController.manageApplication);
+    router.get("/manage/[a-z0-9-]+", this._requestAuth.checkIsOrganiser, this._adminController.manageApplication);
 
     return router;
   };
