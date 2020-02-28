@@ -83,7 +83,7 @@
                       </tr>
                     </thead>
                     <tbody id="applications-container">
-                      <% applications.forEach((applicant, index) => { %>
+                      <% applications.forEach((applicant, index) => { %> 
                         <tr>
                           <td class="text-center"><%= applicant.name %></td>
                           <td class="text-center"><%= applicant.email %></td>
@@ -105,6 +105,18 @@
                       <% }) %>
                     </tbody>
                   </table>
+                  <!--Add button for loading more results-->
+                  <div class="row page-select-row">
+                    <div>
+                      <a href="javascript:prevPage()" id="btn_prev">Prev Page</a> 
+                    </div>
+                    <div>
+                      <span id="page"></span>
+                    </div>
+                    <div>
+                      <a href="javascript:nextPage()" id="btn_next">Next Page</a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
