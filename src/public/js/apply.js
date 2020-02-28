@@ -49,7 +49,7 @@ $(document).ready(function() {
     if (animating) return false;
   
     // Check the age input
-    var ageInput = $(currentForm).find(":input[name='applicantAge']");
+    var ageInput = $(currentForm).find(":input[name='age']");
     if (ageInput.length > 0) {
       if (ageInput.val() < 18) {
         $.notify({
@@ -219,8 +219,8 @@ $(document).ready(function() {
     $(this).parent().siblings().trigger('focusout');
   });
   
-  makeTypeahead('university', 'applicantUniversity', '/js/external/universities.json');
-  makeTypeahead('degree', 'applicantDegree', '/js/external/degrees.json');
+  makeTypeahead('university', 'university', '/js/external/universities.json');
+  makeTypeahead('degree', 'degree', '/js/external/degrees.json');
 
   function makeTypeahead(name, field, url) {
     $(`input[name="${field}"]`).typeahead({

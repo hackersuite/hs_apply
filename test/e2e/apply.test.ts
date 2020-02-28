@@ -20,21 +20,22 @@ let mockRequestAuth: RequestAuthentication;
 let mockSettingLoader: SettingLoader;
 
 const newApplicantRequest: any = {
-  applicantAge: 20,
-  applicantGender: "Other",
-  applicantGenderOther: "Test",
-  applicantNationality: "UK",
-  applicantCountry: "UK",
-  applicantCity: "Manchester",
-  applicantUniversity: "UoM",
-  applicantDegree: "CS",
-  applicantStudyYear: "Foundation",
-  applicantWorkArea: "Other",
-  applicantWorkAreaOther: "This",
-  applicantHackathonCount: 0,
-  applicantDietaryRequirements: "Other",
-  applicantDietaryRequirementsOther: "Test",
-  applicantTShirt: "M"
+  age: 20,
+  gender: "Other",
+  genderOther: "Test",
+  nationality: "UK",
+  country: "UK",
+  city: "Manchester",
+  university: "UoM",
+  degree: "CS",
+  yearOfStudy: "Foundation",
+  workArea: "Other",
+  workAreaOther: "This",
+  hackathonCount: 0,
+  dietaryRequirements: "Other",
+  dietaryRequirementsOther: "Test",
+  tShirtSize: "M",
+  hearAbout: "IDK"
 };
 
 const testApplicant: Applicant = new Applicant();
@@ -50,6 +51,14 @@ testApplicant.workArea = "This";
 testApplicant.hackathonCount = 0;
 testApplicant.dietaryRequirements = "Test";
 testApplicant.tShirtSize = "M";
+testApplicant.hearAbout = "IDK";
+
+const requestUser = {
+  name: "Test",
+  email: "test@test.com",
+  authId: "010101",
+  authLevel: AuthLevels.Organizer
+};
 
 const requestUser = {
   name: "Test",
@@ -132,7 +141,7 @@ test.only("Test applicant created with valid request", async t => {
   // Check that the application has been added to the database
   const createdApplicant: Applicant = await applicantRepository.findOne({ authId: requestUser.authId });
   t.is(createdApplicant.authId, requestUser.authId);
-  t.is(createdApplicant.age, newApplicantRequest.applicantAge);
-  t.is(createdApplicant.city, newApplicantRequest.applicantCity);
-  t.is(createdApplicant.degree, newApplicantRequest.applicantDegree);
+  t.is(createdApplicant.age, newApplicantRequest.age);
+  t.is(createdApplicant.city, newApplicantRequest.city);
+  t.is(createdApplicant.degree, newApplicantRequest.degree);
 });

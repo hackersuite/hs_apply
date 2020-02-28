@@ -26,6 +26,7 @@ testApplicantMale.pastProjects = "";
 testApplicantMale.hardwareRequests = "";
 testApplicantMale.dietaryRequirements = "Halal";
 testApplicantMale.tShirtSize = "M";
+testApplicantMale.hearAbout = "IDK";
 
 const testApplicantFemale: Applicant = new Applicant();
 testApplicantFemale.id = "7479a451-e826-4271-8073-929ccef522ee";
@@ -40,6 +41,7 @@ testApplicantFemale.yearOfStudy = "1";
 testApplicantFemale.hackathonCount = 0;
 testApplicantFemale.dietaryRequirements = "Halal";
 testApplicantFemale.tShirtSize = "M";
+testApplicantFemale.hearAbout = "IDK";
 
 const testApplicantInvalid: Applicant = new Applicant();
 testApplicantInvalid.id = "7479a451-e826-4271-8073-929ccef522ee";
@@ -53,6 +55,7 @@ testApplicantInvalid.yearOfStudy = "1";
 testApplicantInvalid.hackathonCount = 0;
 testApplicantInvalid.dietaryRequirements = "Halal";
 testApplicantInvalid.tShirtSize = "M";
+testApplicantInvalid.hearAbout = "IDK";
 
 let applicantService: ApplicantService;
 let mockApplicantRepository: Repository<Applicant>;
@@ -195,7 +198,7 @@ test("Test that error thrown when API keys not set-up for file upload", async t 
 test("Test that error thrown when delete is rejected", async t => {
   when(mockApplicantRepository.delete(objectContaining({ id: "0" }))).thenReject(new Error());
 
-  const errors: Error = await t.throwsAsync(applicantService.remove("0"));
+  const errors: Error = await t.throwsAsync(applicantService.delete("0"));
 
   // Check the delete function was called in the mock
   t.truthy(errors);
@@ -205,7 +208,7 @@ test("Test that error thrown when delete is rejected", async t => {
 test("Test that remove rejected when applicant id not provided", async t => {
   when(mockApplicantRepository.delete(undefined)).thenResolve();
 
-  await t.throwsAsync(applicantService.remove(undefined));
+  await t.throwsAsync(applicantService.delete(undefined));
 
   // Check the delete function was called in the mock
   verify(mockApplicantRepository.delete(undefined)).never();
@@ -214,7 +217,7 @@ test("Test that remove rejected when applicant id not provided", async t => {
 test("Test that applicant can be removed by using the id", async t => {
   when(mockApplicantRepository.delete(objectContaining({ id: testApplicantMale.id }))).thenResolve();
 
-  await t.notThrowsAsync(applicantService.remove(testApplicantMale.id));
+  await t.notThrowsAsync(applicantService.delete(testApplicantMale.id));
 
   // Check the delete function was called in the mock
   verify(mockApplicantRepository.delete(objectContaining({ id: testApplicantMale.id }))).once();

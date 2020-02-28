@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
+    "target": "es2017",
     "moduleResolution": "node",
-    "lib": ["dom", "es2015.promise", "es2015"],
+    "lib": ["dom"],
     "noImplicitAny": false,
     "outDir": "dist",
     "types": ["reflect-metadata"],
