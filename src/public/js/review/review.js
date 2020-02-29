@@ -7,32 +7,27 @@ $(document).ready(function () {
 
   // When the review is submitted, submit the review and try to get the next one
   $('#reviewForm').submit(function () {
-    var form = $(this)[0];
-    var data = new FormData(form);
-    console.log(data);
+    var form = $(this).serialize();
     $("#submit-form-btn").prop('disabled', true);
 
     $.ajax({
       type: 'POST',
       url: '/review/submit',
-      cache: false,
-      data: data,
-      success: function () {
-        $.notify({
-          message: 'Review submitted successfully'
-        }, {
-          type: 'success'
-        });
-        getNextApplication();
-      },
-      error: function (error) {
-        $('#submit-form-btn').prop('disabled', false);
-        $.notify({
-          message: error.responseJSON.message
-        }, {
-          type: 'danger'
-        });
-      }
+      data: form
+    }).done(function () {
+      $.notify({
+        message: 'Review submitted successfully'
+      }, {
+        type: 'success'
+      });
+      getNextApplication();
+    }).fail(function (error) {
+      $('#submit-form-btn').prop('disabled', false);
+      $.notify({
+        message: error.responseJSON.message
+      }, {
+        type: 'danger'
+      });
     });
   });
 });
@@ -56,16 +51,14 @@ function showApplication(applicationData) {
 function getNextApplication() {
   $.ajax({
     type: 'GET',
-    url: '/review/next',
-    success: function (applicationData) {
+    url: '/review/next'
+  }).done(function (applicationData) {
       showApplication(applicationData);
-    },
-    error: function (error) {
-      $.notify({
-        message: error.responseJSON.message
-      }, {
-        type: 'danger'
-      });
-    }
+  }).fail(function (error) {
+    $.notify({
+      message: error.responseJSON.message
+    }, {
+      type: 'danger'
+    });
   });
 }
