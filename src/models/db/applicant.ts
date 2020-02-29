@@ -95,7 +95,12 @@ export class Applicant {
   @Column("varchar", { nullable: true })
   @IsOptional()
   @ApplicationMapped({ isOptional: true })
-  skills: string;
+  skillsTechnical: string;
+
+  @Column("varchar", { nullable: true })
+  @IsOptional()
+  @ApplicationMapped({ isOptional: true })
+  skillsNonTechnical: string;
 
   @Column("integer", { nullable: true })
   @IsInt()

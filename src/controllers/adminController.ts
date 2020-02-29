@@ -7,7 +7,7 @@ import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import * as fs from "fs";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
-import { getAllUsers, RequestUser } from "@unicsmcr/hs_auth_client"
+import { getAllUsers, RequestUser } from "@unicsmcr/hs_auth_client";
 
 export interface AdminControllerInterface {
   overview: (req: Request, res: Response, next: NextFunction) => void;
@@ -115,12 +115,11 @@ export class AdminController implements AdminControllerInterface {
   };
 
   public manage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-
     let authUsersResult: RequestUser[];
     try {
-      authUsersResult = await getAllUsers(req.cookies["Authorization"])
+      authUsersResult = await getAllUsers(req.cookies["Authorization"]);
     } catch (err) {
-      next(err)
+      next(err);
     }
 
     const columnsToSelect: (keyof Applicant)[] = [
@@ -165,7 +164,7 @@ export class AdminController implements AdminControllerInterface {
     let allApplicants: Partial<Applicant>[];
     try {
       const allApplicantsAndCount = await this._applicantService.getAllAndCountSelection(
-        ["id", "authId", "whyChooseHacker", "skills", "pastProjects", "degree", "createdAt"],
+        ["id", "authId", "whyChooseHacker", "skillsTechnical", "pastProjects", "degree", "createdAt"],
         "createdAt",
         "ASC"
       );
@@ -177,7 +176,7 @@ export class AdminController implements AdminControllerInterface {
 
     let authUsersResult: RequestUser[];
     try {
-      authUsersResult = await getAllUsers(req.cookies["Authorization"])
+      authUsersResult = await getAllUsers(req.cookies["Authorization"]);
     } catch (err) {
       res.send("Failed to get the users authentication info!");
     }
@@ -187,7 +186,6 @@ export class AdminController implements AdminControllerInterface {
     authUsersResult.forEach(a => {
       authUsers[a.authId] = { ...a };
     });
-
 
     const stream = fs.createWriteStream("voting.csv");
     stream.on("finish", () => {
@@ -209,9 +207,9 @@ export class AdminController implements AdminControllerInterface {
       const team: string = authUsers[application.authId] ? authUsers[application.authId].team : "";
       application.whyChooseHacker = this.escapeForCSV(application.whyChooseHacker);
       application.pastProjects = this.escapeForCSV(application.pastProjects);
-      application.skills = this.escapeForCSV(application.skills);
+      application.skillsTechnical = this.escapeForCSV(application.skillsTechnical);
       stream.write(
-        `${application.createdAt},${application.id},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree}"\n`
+        `${application.createdAt},${application.id},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skillsTechnical}","${application.degree}"\n`
       );
     });
     stream.end();
