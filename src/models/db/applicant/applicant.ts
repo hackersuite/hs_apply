@@ -52,7 +52,7 @@ export class Applicant {
 
   @Column("varchar")
   @IsNotEmpty({ message: "The applicants year of study is required" })
-  @ApplicationMapped()
+  @ApplicationMapped({ reviewed: { isSeparateScore: false } })
   yearOfStudy: string;
 
   @Column("varchar", { nullable: true })

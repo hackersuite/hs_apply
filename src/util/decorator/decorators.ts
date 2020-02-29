@@ -32,6 +32,8 @@ export interface ReviewApplicationOptions {
 
   /**
    * Specifies if the question is separately scored rather than in a combined group
+   *
+   * Set to false to include as extra information for the review
    */
   isSeparateScore?: boolean;
 }
@@ -47,7 +49,7 @@ export function ApplicationMapped(options?: ApplicationMappingOptions) {
   return function(object: Record<string, any>, propertyName: string): void {
     if (options && options.reviewed) {
       // Add mapping for all the properties that are to be included in the review
-      const groupKey = options.reviewed.group || (options.reviewed.isSeparateScore && "individual") || undefined;
+      const groupKey = options.reviewed.group || (options.reviewed.isSeparateScore && "ungrouped") || "extra";
       if (groupKey === undefined) return;
 
       const currentGroupArray = reviewApplicationMapping.get(groupKey);
