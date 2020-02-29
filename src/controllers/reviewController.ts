@@ -1,14 +1,15 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { ReviewService } from "../services";
 import { Applicant } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
-import { RequestUser } from "../util";
+import { RequestUser } from "@unicsmcr/hs_auth_client";
+import { reviewApplicationMapping } from "../util";
 
 export interface ReviewControllerInterface {
-  submit: (req: Request, res: Response, next: NextFunction) => Promise<boolean>;
-  reviewPage: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+  submit: (req: Request, res: Response) => Promise<void>;
+  reviewPage: (req: Request, res: Response) => Promise<void>;
   nextReview: (req: Request, res: Response) => Promise<void>;
 }
 
@@ -23,7 +24,7 @@ export class ReviewController implements ReviewControllerInterface {
     this._reviewService = reviewService;
   }
 
-  public reviewPage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  public reviewPage = async (req: Request, res: Response): Promise<void> => {
     res.render("pages/review/review");
     return;
   };
@@ -36,11 +37,18 @@ export class ReviewController implements ReviewControllerInterface {
       res.status(HttpResponseCode.INTERNAL_ERROR).send({ message: "Failed to get another application" });
       return;
     }
-    res.send(nextApplication);
+
+    res.send({
+      application: nextApplication,
+      reviewFields: Array.from(reviewApplicationMapping)
+    });
     return;
   };
 
-  public submit = async (req: Request, res: Response, next: NextFunction): Promise<boolean> => {
-    return false;
+  public submit = async (req: Request, res: Response): Promise<void> => {
+    const review = req.body;
+    console.log(review);
+
+    res.send();
   };
 }
