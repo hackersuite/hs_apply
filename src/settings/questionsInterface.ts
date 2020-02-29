@@ -5,6 +5,7 @@ type answerTypeOptions = "short" | "long" | "radio" | "multi" | "dropdown" | "nu
 export interface ApplicationQuestionInterface extends Cacheable {
   questionName: string;
   questionText: string;
+  maxLength: number; // Only applies to 'long' answers
   answerType: answerTypeOptions;
   answerOptions?: Array<string>;
   answerLink?: string;
