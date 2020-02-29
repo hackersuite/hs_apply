@@ -8,7 +8,7 @@ import { Applicant } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
 import { RequestUser } from "@unicsmcr/hs_auth_client";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
-import { applicationMapping } from "../models/db";
+import { applicationMapping } from "../util/decorator";
 
 export interface ApplicationControllerInterface {
   apply: (req: Request, res: Response, next: NextFunction) => void;

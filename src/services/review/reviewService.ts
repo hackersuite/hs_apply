@@ -8,6 +8,7 @@ import { ApplicantService } from "../applications/applicantService";
 export interface ReviewServiceInterface {
   getAll: () => Promise<Review[]>;
   getNextApplication: (reviewerID: string, chooseFromK: number) => Promise<Applicant>;
+  save: (newReview: Review) => Promise<Review>;
 }
 
 @injectable()
@@ -45,5 +46,13 @@ export class ReviewService implements ReviewServiceInterface {
 
     // Pick a random application from the top k
     return applications[(Math.random() * numberOfApplications) | 0];
+  };
+
+  public save = async (newReview: Review): Promise<Review> => {
+    try {
+      return await this._reviewRepository.save(newReview);
+    } catch (err) {
+      throw new Error(`Failed to save review:\n${err}`);
+    }
   };
 }

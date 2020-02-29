@@ -2,35 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Min, IsDefined, IsInt, IsNotEmpty, IsOptional } from "class-validator";
 import { ApplicantStatus } from "../../../services/applications/applicantStatus";
 import { Review } from "../reviews";
-
-export interface ApplicationMappingOptions {
-  /**
-   * Specifies if the property is optional in the application
-   */
-  isOptional?: boolean;
-
-  /**
-   * Specifies if the property has an "Other" option in the application form
-   */
-  hasOther?: boolean;
-
-  /**
-   * Specifies if the property is to be casted into a number
-   */
-  isNumeric?: boolean;
-}
-
-export const applicationMapping: Map<string, ApplicationMappingOptions> = new Map();
-/**
- * Maps the applicant property to the application in a post request
- *
- * Include the properties that are found in the POST request
- */
-export function ApplicationMapped(options?: ApplicationMappingOptions) {
-  return function(object: Record<string, any>, propertyName: string): void {
-    applicationMapping.set(propertyName, options);
-  };
-}
+import { ApplicationMapped } from "../../../util";
 
 @Entity()
 export class Applicant {
@@ -95,24 +67,24 @@ export class Applicant {
 
   @Column("varchar", { nullable: true })
   @IsOptional()
-  @ApplicationMapped({ isOptional: true })
+  @ApplicationMapped({ isOptional: true, reviewed: { group: "Enthusiasm" } })
   skills: string;
 
   @Column("integer", { nullable: true })
   @IsInt()
   @Min(0, { message: "Minimum number of hackathons is zero" })
   @IsOptional()
-  @ApplicationMapped({ isOptional: true, isNumeric: true })
+  @ApplicationMapped({ isOptional: true, isNumeric: true, reviewed: { group: "Enthusiasm" } })
   hackathonCount: number;
 
   @Column("text", { nullable: true })
   @IsOptional()
-  @ApplicationMapped({ isOptional: true })
+  @ApplicationMapped({ isOptional: true, reviewed: { isSeparateScore: true } })
   whyChooseHacker: string;
 
   @Column("text", { nullable: true })
   @IsOptional()
-  @ApplicationMapped({ isOptional: true })
+  @ApplicationMapped({ isOptional: true, reviewed: { isSeparateScore: true } })
   pastProjects: string;
 
   @Column("text", { nullable: true })
