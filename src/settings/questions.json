@@ -545,18 +545,21 @@
           "questionName": "whyChooseHacker",
           "questionText": "Why do you want to come?",
           "answerType": "long",
+          "maxLength": 800,
           "required": false
         },
         {
           "questionName": "pastProjects",
           "questionText": "Tell us about any projects you have worked on (they don’t need to be technical/CS related)",
           "answerType": "long",
+          "maxLength": 800,
           "required": false
         },
         {
           "questionName": "hardwareRequests",
           "questionText": "What hardware would you like to have available at the hackathon?",
           "answerType": "long",
+          "maxLength": 800,
           "required": false
         }
       ]
