@@ -38,3 +38,8 @@
 #createJoinTeamBtn {
   margin-right: 20px;
 }
+
+.applications-closed-text {
+  font-weight: bold;
+  color: red;
+}

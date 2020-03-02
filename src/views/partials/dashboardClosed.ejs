@@ -1,19 +1,25 @@
+<% var afterClosed = new Date().getTime() >= new Date(locals.settings.applicationsClose).getTime(); %>
 <div class="row justify-content-center">
   <div class="col-md-8">
     <div class="card time-remaining-card">
-      <p class="time-remaining-text text-center">
-        Time until applications close:
+      <p class="time-remaining-text text-center <%= afterClosed ? "applications-closed-text" : "" %>">
+      <% if (afterClosed) { %>
+        Applications have closed!
+      <% } else { %>
+        Time until applications open:
         <strong id="secondsLeftDeadline">
           0 days, 0h 0m 0s
         </strong>
         <script>
-          var applicationsCloseDate = <%- new Date(locals.settings.applicationsClose).getTime() %>;
-          var timeUntilClose = Math.floor((applicationsCloseDate - new Date().getTime()) / 1000);
+          var applicationsOpenDate = <%- new Date(locals.settings.applicationsOpen).getTime() %>;
+          var timeUntilOpen = Math.floor((applicationsOpenDate - new Date().getTime()) / 1000);
         </script>
+      <% } %>
       </p>
     </div>
   </div>
 </div>
+<% if (afterClosed) { %>
 <div class="row justify-content-center">
   <div class="col-md-8">
     <div class="card card-nav-tabs">
@@ -111,3 +117,4 @@
     </div>
   </div>
 </div>
+<% } %>
