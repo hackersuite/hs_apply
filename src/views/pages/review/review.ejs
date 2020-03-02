@@ -22,7 +22,7 @@
                   <h2 class="card-title text-center">Application</h2>
                 </div>
                 <div id="application-data-container" class="card-body">
-                  <!-- Application is injected here -->
+                  <!-- Application is injected here, see review.js -->
                 </div>
               </div>
             </div>
@@ -34,12 +34,10 @@
                 </div>
                 <div class="card-body">
                   <form id="reviewForm" action="javascript:;" method="post">
-                    <label for="enthusiasm">Enthusiasm (between 1 and 5):</label>
-                    <input type="number" name="enthusiasm" min="1" max="5" value="0">
-
-                    <label for="score">Score (between 1 and 5):</label>
-                    <input type="number" name="score" min="1" max="5" value="0">
-
+                    <!-- Review form is injected here -->
+                    <div class="form-group">
+                      <input class="form-control" type="text" name="id" value="">
+                    </div>
                     <input type="submit" name="submit" id="submit-review-btn" class="btn btn-success submit-btn" value="Submit Review"/>
                   </form>
                 </div>

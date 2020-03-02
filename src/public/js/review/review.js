@@ -1,4 +1,10 @@
 const applicationQuestionTemplate = '<p><strong>#questionText</strong>: #questionAnswer</p><br>';
+const applicationFormQuestionTemplate = `
+<div class="form-group">
+  <label for="#scoreName">#scoreName:</label>
+  <input class="form-control" type="number" name="#scoreName" min="1" max="5" value="0">
+</div>`
+const applicationFormIDTemplate = `<input class="input-hidden" type="text" name="id" value="#applicationID">`;
 const applicationContainerID = 'application-data-container';
 
 $(document).ready(function () {
@@ -11,12 +17,16 @@ $(document).ready(function () {
     var allInputs = document.querySelectorAll("#reviewForm input[type='number']");
     var totalScore = Array.from(allInputs).reduce((runningTotal, input) => runningTotal + Number(input.value), 0);
     var averageScore = totalScore / allInputs.length;
+    var applicationID = document.querySelector("#reviewForm input[name='id']").value;
 
-    $("#submit-form-btn").prop('disabled', true);
+    $('#submit-form-btn').prop('disabled', true);
     $.ajax({
       type: 'POST',
       url: '/review/submit',
-      data: { "averageScore": averageScore }
+      data: {
+        'applicationID': applicationID,
+        'averageScore': averageScore
+      }
     }).done(function () {
       $.notify({
         message: 'Review submitted successfully'
@@ -42,36 +52,53 @@ function makeGroupQuestionString(application, group) {
   group[1].forEach((property) => {
     var questionString = applicationQuestionTemplate
       .replace(/#questionText/g, property)
-      .replace(/#questionAnswer/g, application[property] || "Not Provided");
+      .replace(/#questionAnswer/g, application[property] || 'Not Provided');
     reviewGroup += (questionString);
   });
   return reviewGroup;
 }
 
-function makeGroupScoreString(group) {
-  // var questionString = applicationQuestionTemplate
-  //   .replace(/#question/g, question.title)
-  //   .replace(/#questionAnswer/g, question.answer);
-  // return questionString;
+function makeGroupScoreInputString(group) {
+  return applicationFormQuestionTemplate.replace(/#scoreName/g, group);
 }
 
 function showApplication(applicationData) {
-  // Show the next application
-  console.log(applicationData);
-
   // Clear the applicatipon section
-  const container = $("#" + applicationContainerID);
+  const container = $('#' + applicationContainerID);
   container.empty();
 
   // Create the section to contain the application
   applicationData['reviewFields'].forEach((group) => {
     var questionString = makeGroupQuestionString(applicationData['application'], group);
     container.append(questionString);
-
-    var scoreString = makeGroupScoreString(group);
   });
 
   // Reset the rating form
+  $('#reviewForm div').not("input[type='submit']").remove();
+  const formContainer = $('#reviewForm');
+
+  // Add the application ID
+  var idString = applicationFormIDTemplate.replace(/#applicationID/g, applicationData['application'].id);
+  formContainer.append(idString);
+
+  // Add the score inputs to the form
+  var inputScoreGroups = [];
+  applicationData['reviewFields'].forEach((group) => {
+    if (group[0] === 'extra') return;
+    else if (group[0] == 'ungrouped') {
+      group[1].forEach((scoredQuestion) => {
+        var questionString = makeGroupScoreInputString(scoredQuestion);
+        inputScoreGroups.push(questionString);
+      });
+    } else {
+      var questionString = makeGroupScoreInputString(group[0]);
+      inputScoreGroups.push(questionString);
+    }
+  });
+
+  inputScoreGroups.reverse().forEach((input) => {
+    formContainer.prepend(input);
+  });
 }
 
 function getNextApplication() {
