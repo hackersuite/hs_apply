@@ -3,9 +3,8 @@ const applicationFormQuestionTemplate = `
 <div class="form-group">
   <label for="#scoreName">#scoreName:</label>
   <input class="form-control" type="number" name="#scoreName" min="1" max="5" value="0">
-</div>`
-const applicationFormIDTemplate = `<input class="input-hidden" type="text" name="id" value="#applicationID">`;
-const applicationContainerID = 'application-data-container';
+</div>`;
+const applicationContainerID = '#application-data-container';
 
 $(document).ready(function () {
   // Get the first application to review
@@ -64,7 +63,7 @@ function makeGroupScoreInputString(group) {
 
 function showApplication(applicationData) {
   // Clear the applicatipon section
-  const container = $('#' + applicationContainerID);
+  const container = $(applicationContainerID);
   container.empty();
 
   // Create the section to contain the application
@@ -78,8 +77,7 @@ function showApplication(applicationData) {
   const formContainer = $('#reviewForm');
 
   // Add the application ID
-  var idString = applicationFormIDTemplate.replace(/#applicationID/g, applicationData['application'].id);
-  formContainer.append(idString);
+  $('#applicationIDInput').prop('value', applicationData['application'].id);
 
   // Add the score inputs to the form
   var inputScoreGroups = [];
@@ -101,12 +99,25 @@ function showApplication(applicationData) {
   });
 }
 
+function showReviewComplete() {
+  // Hide the review form
+  $('#reviewCard').css('display', 'none');
+
+  // Show review complete message
+  $(applicationContainerID)[0].textContent = "You have no more applications to review (for now!)";
+}
+
 function getNextApplication() {
   $.ajax({
     type: 'GET',
     url: '/review/next'
   }).done(function (applicationData) {
+    console.log(applicationData);
+    if (applicationData['application'] == undefined) {
+      showReviewComplete();
+    } else {
       showApplication(applicationData);
+    }
   }).fail(function (error) {
     $.notify({
       message: error.responseJSON.message
