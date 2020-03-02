@@ -7,7 +7,7 @@
   </div>
   <div class="sidebar-wrapper">
     <ul class="nav">
-      <% if (locals._locals.authLevel == 3) { %>
+      <% if (locals._locals.authLevel == 4) { %>
       <li id="admin-overview" class="nav-item">
         <a class="nav-link" href="/admin/overview">
           <i class="material-icons">lock</i>
@@ -15,7 +15,7 @@
         </a>
       </li>
       <% } %>
-      <% if (locals._locals.authLevel >= 2) { %>
+      <% if (locals._locals.authLevel >= 3) { %>
       <li id="admin-manage" class="nav-item">
         <a class="nav-link" href="/admin/manage">
           <i class="material-icons">lock</i>
@@ -24,7 +24,7 @@
       </li>
       <% } %>
 
-      <% if (locals._locals.authLevel == 3) { %>
+      <% if (locals._locals.authLevel == 4) { %>
       <li id="review-overview" class="nav-item">
         <a class="nav-link" href="/review/overview">
           <i class="material-icons">gavel</i>
@@ -32,7 +32,7 @@
         </a>
       </li>
       <% } %>
-      <% if (locals._locals.authLevel >= 2) { %>
+      <% if (locals._locals.authLevel >= 3) { %>
       <li id="review-application" class="nav-item">
         <a class="nav-link" href="/review">
           <i class="material-icons">gavel</i>
