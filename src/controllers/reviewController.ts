@@ -54,15 +54,26 @@ export class ReviewController implements ReviewControllerInterface {
     const { applicationID, averageScore } = req.body;
 
     // Find the applicant by the provided ID
-    const application = await this._applicantService.findOne(applicationID);
+    let application: Applicant;
+    try {
+      application = await this._applicantService.findOne(applicationID);
+    } catch (err) {
+      res.status(HttpResponseCode.INTERNAL_ERROR).send({ message: "Failed to save application review" });
+      return;
+    }
 
     const newReview = new Review();
     newReview.createdByAuthID = (req.user as RequestUser).authId;
     newReview.applicant = application;
     newReview.averageScore = averageScore;
-    const savedReview = await this._reviewService.save(newReview);
-    console.log(savedReview);
 
-    res.send();
+    try {
+      await this._reviewService.save(newReview);
+    } catch (err) {
+      res.status(HttpResponseCode.INTERNAL_ERROR).send({ message: "Failed to save application review" });
+      return;
+    }
+
+    res.send({ message: "Saved review" });
   };
 }
