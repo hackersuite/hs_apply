@@ -123,7 +123,7 @@ test("Test 404 page provided when invalid URL", async t => {
   t.is(response.status, HttpResponseCode.OK);
 });
 
-test.only("Test applicant created with valid request", async t => {
+test("Test applicant created with valid request", async t => {
   // Perform the request along .../apply
   const response = await request(bApp)
     .post("/apply")
