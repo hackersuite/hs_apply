@@ -6,6 +6,8 @@ const applicationFormQuestionTemplate = `
 </div>`;
 const applicationContainerID = '#application-data-container';
 
+const reviewCountTemplate = 'Total reviews: #count';
+
 $(document).ready(function () {
   // Get the first application to review
   getNextApplication();
@@ -61,6 +63,10 @@ function makeGroupScoreInputString(group) {
   return applicationFormQuestionTemplate.replace(/#scoreName/g, group);
 }
 
+function makeReviewCountString(count) {
+  return reviewCountTemplate.replace(/#count/g, count);
+}
+
 function showApplication(applicationData) {
   // Clear the applicatipon section
   const container = $(applicationContainerID);
@@ -99,6 +105,14 @@ function showApplication(applicationData) {
   });
 }
 
+function showReviewCount(applicationData) {
+  const reviewCountContainer = $("#review-count-text");
+  reviewCountContainer.empty();
+  if (applicationData && applicationData['totalReviews']) {
+    reviewCountContainer.append(makeReviewCountString(applicationData['totalReviews']));
+  }
+}
+
 function showReviewComplete() {
   // Hide the review form
   $('#reviewCard').css('display', 'none');
@@ -112,12 +126,12 @@ function getNextApplication() {
     type: 'GET',
     url: '/review/next'
   }).done(function (applicationData) {
-    console.log(applicationData);
     if (applicationData['application'] == undefined) {
       showReviewComplete();
     } else {
       showApplication(applicationData);
     }
+    showReviewCount(applicationData);
   }).fail(function (error) {
     $.notify({
       message: error.responseJSON.message

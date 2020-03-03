@@ -6,3 +6,9 @@
 .input-hidden {
   display: none;
 }
+
+#review-count-text {
+  position: absolute;
+  left: 10px;
+  top: 5px;
+}

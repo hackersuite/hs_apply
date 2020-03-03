@@ -43,9 +43,18 @@ export class ReviewController implements ReviewControllerInterface {
       return;
     }
 
+    let totalReviewsByUser: number;
+    try {
+      totalReviewsByUser = await this._reviewService.getReviewCountByAuthID((req.user as RequestUser).authId);
+    } catch (err) {
+      res.status(HttpResponseCode.INTERNAL_ERROR).send({ message: "Failed to get another application" });
+      return;
+    }
+
     res.send({
       application: nextApplication,
-      reviewFields: Array.from(reviewApplicationMapping)
+      reviewFields: Array.from(reviewApplicationMapping),
+      totalReviews: totalReviewsByUser
     });
     return;
   };
