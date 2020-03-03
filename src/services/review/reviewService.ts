@@ -33,11 +33,12 @@ export class ReviewService implements ReviewServiceInterface {
     }
   };
 
-  public getNextApplication = async (reviewerID: string, chooseFromK = 10): Promise<Applicant> => {
+  public getNextApplication = async (reviewerAuthID: string, chooseFromK = 10): Promise<Applicant> => {
     // 1. Select next k applicants, ordered by the oldest applications first (with < 2 reviews)
     // 2. Choose a random application from k and return
 
-    const applications: Applicant[] = (await this._applicantService.getKRandomToReview(reviewerID, chooseFromK)) || [];
+    const applications: Applicant[] =
+      (await this._applicantService.getKRandomToReview(reviewerAuthID, chooseFromK)) || [];
 
     // Set chooseFromK to applications length if too few remaining
     // Also check for > 0 applications, prevents Array out of bounds
@@ -46,6 +47,21 @@ export class ReviewService implements ReviewServiceInterface {
 
     // Pick a random application from the top k
     return applications[(Math.random() * numberOfApplications) | 0];
+  };
+
+  public getReviewCountByAuthID = async (reviewerAuthID: string): Promise<number> => {
+    let reviewsCreatedCount: number;
+    try {
+      reviewsCreatedCount = await this._reviewRepository.count({
+        where: {
+          createdByAuthID: reviewerAuthID
+        }
+      });
+    } catch (err) {
+      throw new Error("Failed to get review count");
+    }
+
+    return reviewsCreatedCount;
   };
 
   public save = async (newReview: Review): Promise<Review> => {
