@@ -1,8 +1,8 @@
 const applicationQuestionTemplate = '<p><strong>#questionText</strong>: #questionAnswer</p><br>';
 const applicationFormQuestionTemplate = `
 <div class="form-group">
-  <label for="#scoreName">#scoreName:</label>
-  <input class="form-control" type="number" name="#scoreName" min="1" max="5" value="0">
+  <label for="#scoreInput">#scoreLabel:</label>
+  <input class="form-control" type="number" name="#scoreInput" min="1" max="5" value="0">
 </div>`;
 const applicationContainerID = '#application-data-container';
 
@@ -51,16 +51,20 @@ function makeGroupQuestionString(application, group) {
 
   var reviewGroup = '';
   group[1].forEach((property) => {
+    // console.log(property);
     var questionString = applicationQuestionTemplate
-      .replace(/#questionText/g, property)
-      .replace(/#questionAnswer/g, application[property] || 'Not Provided');
+      .replace(/#questionText/g, property.reviewText || property.propertyName)
+      .replace(/#questionAnswer/g, application[property.propertyName] || 'Not Provided');
     reviewGroup += (questionString);
   });
   return reviewGroup;
 }
 
 function makeGroupScoreInputString(group) {
-  return applicationFormQuestionTemplate.replace(/#scoreName/g, group);
+  console.log(group);
+  return applicationFormQuestionTemplate
+    .replace(/#scoreLabel/g, group.reviewText || group)
+    .replace(/#scoreInput/g, group.propertyName || group)
 }
 
 function makeReviewCountString(count) {
@@ -71,7 +75,7 @@ function showApplication(applicationData) {
   // Clear the applicatipon section
   const container = $(applicationContainerID);
   container.empty();
-
+  // console.log(applicationData);
   // Create the section to contain the application
   applicationData['reviewFields'].forEach((group) => {
     var questionString = makeGroupQuestionString(applicationData['application'], group);

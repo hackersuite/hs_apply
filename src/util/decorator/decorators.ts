@@ -36,10 +36,12 @@ export interface ReviewApplicationOptions {
    * Set to false to include as extra information for the review
    */
   isSeparateScore?: boolean;
+
+  reviewText?: string;
 }
 
 export const applicationMapping: Map<string, ApplicationMappingOptions> = new Map();
-export const reviewApplicationMapping: Map<string, string[]> = new Map();
+export const reviewApplicationMapping: Map<string, any> = new Map();
 /**
  * Maps the applicant property to the application in a post request
  *
@@ -54,9 +56,14 @@ export function ApplicationMapped(options?: ApplicationMappingOptions) {
 
       const currentGroupArray = reviewApplicationMapping.get(groupKey);
       if (currentGroupArray === undefined) {
-        reviewApplicationMapping.set(groupKey, [propertyName]);
+        reviewApplicationMapping.set(groupKey, [
+          {
+            propertyName: propertyName,
+            reviewText: options.reviewed.reviewText || propertyName
+          }
+        ]);
       } else {
-        currentGroupArray.push(propertyName);
+        currentGroupArray.push({ propertyName: propertyName, reviewText: options.reviewed.reviewText || propertyName });
         reviewApplicationMapping.set(groupKey, currentGroupArray);
       }
     }
