@@ -67,12 +67,12 @@ export class Applicant {
 
   @Column("varchar", { nullable: true })
   @IsOptional()
-  @ApplicationMapped({ isOptional: true })
+  @ApplicationMapped({ isOptional: true, reviewed: { group: "Enthusiasm" } })
   skillsTechnical: string;
 
   @Column("varchar", { nullable: true })
   @IsOptional()
-  @ApplicationMapped({ isOptional: true })
+  @ApplicationMapped({ isOptional: true, reviewed: { group: "Enthusiasm" } })
   skillsNonTechnical: string;
 
   @Column("integer", { nullable: true })
