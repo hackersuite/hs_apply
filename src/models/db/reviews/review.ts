@@ -12,7 +12,7 @@ export class Review {
   @Column()
   createdByAuthID: string;
 
-  @Column()
+  @Column("double")
   averageScore: number;
 
   @Column("datetime", { nullable: false, default: () => "CURRENT_TIMESTAMP" })

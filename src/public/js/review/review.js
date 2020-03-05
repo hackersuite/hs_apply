@@ -51,17 +51,19 @@ function makeGroupQuestionString(application, group) {
 
   var reviewGroup = '';
   group[1].forEach((property) => {
-    // console.log(property);
-    var questionString = applicationQuestionTemplate
-      .replace(/#questionText/g, property.reviewText || property.propertyName)
-      .replace(/#questionAnswer/g, application[property.propertyName] || 'Not Provided');
-    reviewGroup += (questionString);
+    var questionString = applicationQuestionTemplate.replace(/#questionText/g, property.reviewText || property.propertyName);
+    var questionAnswer = application[property.propertyName] || 'Not Provided';
+
+    if (property.propertyName == 'createdAt') {
+      questionAnswer = new Date(questionAnswer).toGMTString()
+    }
+    
+    reviewGroup += questionString.replace(/#questionAnswer/g, questionAnswer);
   });
   return reviewGroup;
 }
 
 function makeGroupScoreInputString(group) {
-  console.log(group);
   return applicationFormQuestionTemplate
     .replace(/#scoreLabel/g, group.reviewText || group)
     .replace(/#scoreInput/g, group.propertyName || group)
