@@ -527,33 +527,33 @@
           "questionName": "skillsTechnical",
           "questionText": "List down your top 3 technical skills",
           "answerType": "short",
-          "required": false
+          "required": true
         },
         {
           "questionName": "skillsNonTechnical",
           "questionText": "List down your top 3 non-technical skills",
           "answerType": "short",
-          "required": false
+          "required": true
         },
         {
           "questionName": "hackathonCount",
           "questionText": "How many hackathons have you participated in?",
           "answerType": "number",
-          "required": false
+          "required": true
         },
         {
           "questionName": "whyChooseHacker",
           "questionText": "Why do you want to come?",
           "answerType": "long",
           "maxLength": 800,
-          "required": false
+          "required": true
         },
         {
           "questionName": "pastProjects",
           "questionText": "Tell us about any projects you have worked on (they don’t need to be technical/CS related)",
           "answerType": "long",
           "maxLength": 800,
-          "required": false
+          "required": true
         },
         {
           "questionName": "hardwareRequests",

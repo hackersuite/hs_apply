@@ -66,35 +66,28 @@ export class Applicant {
   workArea: string;
 
   @Column("varchar", { nullable: true })
-  @IsOptional()
-  @ApplicationMapped({ isOptional: true, reviewed: { group: "Enthusiasm", reviewText: "Top 3 technical skills" } })
+  @ApplicationMapped({ reviewed: { group: "Enthusiasm", reviewText: "Top 3 technical skills" } })
   skillsTechnical: string;
 
   @Column("varchar", { nullable: true })
-  @IsOptional()
-  @ApplicationMapped({ isOptional: true, reviewed: { group: "Enthusiasm", reviewText: "Top 3 Non-technical skills" } })
+  @ApplicationMapped({ reviewed: { group: "Enthusiasm", reviewText: "Top 3 Non-technical skills" } })
   skillsNonTechnical: string;
 
   @Column("integer", { nullable: true })
   @IsInt()
   @Min(0, { message: "Minimum number of hackathons is zero" })
-  @IsOptional()
   @ApplicationMapped({
-    isOptional: true,
     isNumeric: true,
     reviewed: { group: "Enthusiasm", reviewText: "How many hackathons have you attended?" }
   })
   hackathonCount: number;
 
   @Column("text", { nullable: true })
-  @IsOptional()
-  @ApplicationMapped({ isOptional: true, reviewed: { isSeparateScore: true, reviewText: "Why do you want to come?" } })
+  @ApplicationMapped({ reviewed: { isSeparateScore: true, reviewText: "Why do you want to come?" } })
   whyChooseHacker: string;
 
   @Column("text", { nullable: true })
-  @IsOptional()
   @ApplicationMapped({
-    isOptional: true,
     reviewed: { isSeparateScore: true, reviewText: "Past projects you have worked on" }
   })
   pastProjects: string;
