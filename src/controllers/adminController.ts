@@ -213,6 +213,7 @@ export class AdminController implements AdminControllerInterface {
         });
       });
     });
+    
     allApplicants.forEach(application => {
       // UID, TID, WhyChoose?, Proj, Skills, Degree
       const team: string = authUsers[application.authId] ? authUsers[application.authId].team : "";

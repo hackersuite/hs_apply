@@ -53,17 +53,16 @@ export class ReviewService implements ReviewServiceInterface {
       reviews = await this._reviewRepository
         .createQueryBuilder()
         .select("applicantId")
-        .addSelect("AVG(averageScore)")
+        .addSelect("AVG(averageScore)", "averageScore")
         .groupBy("applicantId")
         .orderBy("AVG(averageScore)", "DESC")
-        .getMany();
+        .getRawMany();
     } catch(err) {
       console.log(err);
       return undefined;
     }
 
     console.log(reviews);
-    console.log(reviews);
-    return reviews;
+    return reviews as Partial<Review>[];
   }
 }

@@ -29,6 +29,8 @@ export class ReviewRouter implements RouterInterface {
 
     router.get("/", this._requestAuth.checkIsVolunteer, this._reviewController.reviewPage);
 
+    router.get("/overview", this._reviewController.overviewPage);
+
     router.get("/next", this._requestAuth.checkIsVolunteer, this._reviewController.nextReview);
 
     router.post(
@@ -38,10 +40,6 @@ export class ReviewRouter implements RouterInterface {
       this._reviewController.submit,
       this._reviewController.nextReview,
     );
-
-    router.get(
-      "/getListing", this._reviewController.getReviews
-    )
 
     return router;
   };
