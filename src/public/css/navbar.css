@@ -1,3 +1,13 @@
 .sidebar {
   z-index: 1030;
 }
+
+a[aria-expanded="true"] .caret,
+a[data-toggle="collapse"][aria-expanded="true"] .caret {
+  transform: rotate(180deg);
+}
+
+.sidebar .nav li.active > [data-toggle="collapse"] {
+  background-color: hsla(0, 0%, 78%, 0.2);
+  box-shadow: none;
+}
