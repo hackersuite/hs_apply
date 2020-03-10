@@ -131,6 +131,5 @@ export class Applicant {
   reviews: Review[];
 
   @Column("datetime", { nullable: false, default: () => "CURRENT_TIMESTAMP" })
-  @ApplicationMapped({ reviewed: { isSeparateScore: false, reviewText: "Application Created At" } })
   createdAt: Date;
 }
