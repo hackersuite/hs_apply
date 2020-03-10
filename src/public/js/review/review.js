@@ -1,8 +1,15 @@
 const applicationQuestionTemplate = '<p><strong>#questionText</strong>: #questionAnswer</p><br>';
+const applicationCreateTimeTemplate = `
+<div class="card-footer">
+  <div class="stats">
+    <i class="material-icons">access_time</i> #createDate
+  </div>
+</div>`;
+
 const applicationFormQuestionTemplate = `
 <div class="form-group">
   <label for="#scoreInput">#scoreLabel:</label>
-  <input class="form-control" type="number" name="#scoreInput" min="1" max="5" value="0">
+  <input class="form-control" type="number" name="#scoreInput" min="0" max="5" value="0" step="0.01">
 </div>`;
 const applicationContainerID = '#application-data-container';
 
@@ -53,11 +60,6 @@ function makeGroupQuestionString(application, group) {
   group[1].forEach((property) => {
     var questionString = applicationQuestionTemplate.replace(/#questionText/g, property.reviewText || property.propertyName);
     var questionAnswer = application[property.propertyName] || 'Not Provided';
-
-    if (property.propertyName == 'createdAt') {
-      questionAnswer = new Date(questionAnswer).toGMTString()
-    }
-    
     reviewGroup += questionString.replace(/#questionAnswer/g, questionAnswer);
   });
   return reviewGroup;
@@ -109,6 +111,10 @@ function showApplication(applicationData) {
   inputScoreGroups.reverse().forEach((input) => {
     formContainer.prepend(input);
   });
+
+  // Add the application create date to the card
+  const applicationCreateDate = new Date(applicationData['application'].createdAt).toGMTString();
+  container.after(applicationCreateTimeTemplate.replace(/#createDate/g, applicationCreateDate));
 }
 
 function showReviewCount(applicationData) {
