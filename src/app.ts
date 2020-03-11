@@ -152,7 +152,7 @@ export class App {
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
         entities: [__dirname + "/models/db/*{.js,.ts}"],
-        synchronize: true
+        charset: "utf8mb4_unicode_ci"
       }
     ];
   };
