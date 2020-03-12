@@ -24,6 +24,17 @@ export class ReviewService implements ReviewServiceInterface {
     this._reviewRepository = reviewRepository.getRepository();
   }
 
+  public getReviewCountByApplicantID = async (applicantID: string): Promise<number> => {
+    try {
+      return await this._reviewRepository
+        .createQueryBuilder()
+        .where("applicantId = :id", { id: applicantID })
+        .getCount();
+    } catch (err) {
+      throw new Error("Failed to get review count for application");
+    }
+  };
+
   public getAll = async (columns?: (keyof Review)[]): Promise<Review[]> => {
     try {
       const options: object = columns ? { select: columns } : undefined;
