@@ -9,7 +9,7 @@ const applicationCreateTimeTemplate = `
 const applicationFormQuestionTemplate = `
 <div class="form-group">
   <label for="#scoreInput">#scoreLabel:</label>
-  <input class="form-control" type="number" name="#scoreInput" min="0" max="5" value="0" step="0.01">
+  <input class="form-control" type="number" name="#scoreInput" min="0" max="5" value="0" step="0.5">
 </div>`;
 const applicationContainerID = '#application-data-container';
 
@@ -112,6 +112,7 @@ function showApplication(applicationData) {
 
   // Add the application create date to the card
   const applicationCreateDate = new Date(applicationData['application'].createdAt).toGMTString();
+  container.next().remove();
   container.after(applicationCreateTimeTemplate.replace(/#createDate/g, applicationCreateDate));
 }
 
@@ -129,6 +130,8 @@ function showReviewComplete() {
 
   // Show review complete message
   $(applicationContainerID)[0].textContent = "You have no more applications to review (for now!)";
+
+  $(applicationContainerID).next().remove();
 }
 
 function getNextApplication() {

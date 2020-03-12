@@ -12,3 +12,8 @@
   left: 10px;
   top: 5px;
 }
+
+.card .card-body + .card-footer,
+.card .card-footer {
+  border-top: 1px solid #eee;
+}

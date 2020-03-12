@@ -6,6 +6,7 @@ import { Applicant, Review } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
 import { RequestUser } from "@unicsmcr/hs_auth_client";
 import { reviewApplicationMapping } from "../util";
+import { ApplicantStatus } from "../services/applications/applicantStatus";
 
 export interface ReviewControllerInterface {
   submit: (req: Request, res: Response) => Promise<void>;
@@ -67,7 +68,9 @@ export class ReviewController implements ReviewControllerInterface {
     try {
       application = await this._applicantService.findOne(applicationID);
     } catch (err) {
-      res.status(HttpResponseCode.INTERNAL_ERROR).send({ message: "Failed to save application review" });
+      res.status(HttpResponseCode.INTERNAL_ERROR).send({
+        message: "Failed to save application review"
+      });
       return;
     }
 
@@ -76,10 +79,35 @@ export class ReviewController implements ReviewControllerInterface {
     newReview.applicant = application;
     newReview.averageScore = averageScore;
 
+    let reviewCountForApplicant;
+    try {
+      reviewCountForApplicant = await this._reviewService.getReviewCountByApplicantID(applicationID);
+    } catch (err) {
+      res.status(HttpResponseCode.INTERNAL_ERROR).send({
+        message: "Failed to get review count"
+      });
+      return;
+    }
+
+    // Only update the application state when they have had at least one review
+    if (reviewCountForApplicant >= 1) {
+      application.applicationStatus = ApplicantStatus.Reviewed;
+      try {
+        await this._applicantService.save(application);
+      } catch (err) {
+        res.status(HttpResponseCode.INTERNAL_ERROR).send({
+          message: "Failed to update applicant with reviewed state"
+        });
+        return;
+      }
+    }
+
     try {
       await this._reviewService.save(newReview);
     } catch (err) {
-      res.status(HttpResponseCode.INTERNAL_ERROR).send({ message: "Failed to save application review" });
+      res.status(HttpResponseCode.INTERNAL_ERROR).send({
+        message: "Failed to save application review"
+      });
       return;
     }
 

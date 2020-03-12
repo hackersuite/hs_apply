@@ -6,6 +6,7 @@ import { ObjectID, Repository, DeleteResult } from "typeorm";
 import { validateOrReject } from "class-validator";
 import * as request from "request-promise-native";
 import { Review } from "../../models/db";
+import { ApplicantStatus } from "./applicantStatus";
 
 type ApplicationID = string | number | Date | ObjectID;
 
@@ -131,6 +132,9 @@ export class ApplicantService implements ApplicantServiceInterface {
             .where("review.createdByAuthID = :authID", { authID: reviewerID })
             .getQuery();
           return "id NOT IN " + subQuery;
+        })
+        .andWhere("application.applicationStatus = :applicantState", {
+          applicantState: ApplicantStatus.Applied.toString()
         })
         .orderBy("application.createdAt", "ASC")
         .take(chooseFromK)
