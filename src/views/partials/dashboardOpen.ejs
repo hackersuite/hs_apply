@@ -2,14 +2,14 @@
   <div class="col-md-8">
     <div class="card time-remaining-card">
       <p class="time-remaining-text text-center">
-      Time until applications close:
-      <strong id="secondsLeftDeadline">
-      0 days, 0h 0m 0s
-      </strong>
-      <script>
-        var applicationsCloseDate = <%- new Date(locals.settings.applicationsClose).getTime() %>;
-        var timeUntilClose = Math.floor((applicationsCloseDate - new Date().getTime()) / 1000);
-      </script>
+        Time until applications close:
+        <strong id="secondsLeftDeadline">
+          0 days, 0h 0m 0s
+        </strong>
+        <script>
+          var applicationsCloseDate = <%- new Date(locals.settings.applicationsClose).getTime() %>;
+          var timeUntilClose = Math.floor((applicationsCloseDate - new Date().getTime()) / 1000);
+        </script>
       </p>
     </div>
   </div>
@@ -22,109 +22,109 @@
       </div>
       <div class="card-body">
         <% if (applicationStatus === 0) { %>
-          <h3 class="application-status incomplete-status">Incomplete</h3>
+        <h3 class="application-status incomplete-status">Unconfirmed</h3>
         <% } else if (applicationStatus === 1 || applicationStatus === 2) { %>
-          <h3 class="application-status underreview-status">Under review</h3>
+        <h3 class="application-status underreview-status">Under review</h3>
         <% } else if (applicationStatus === 3) { %>
-          <h3 class="application-status invited-status">Invited</h3>
+        <h3 class="application-status invited-status">Invited</h3>
         <% } else if (applicationStatus === 4) { %>
-          <h3 class="application-status confirmed-status">Confirmed</h3>
+        <h3 class="application-status confirmed-status">Confirmed</h3>
         <% } else if (applicationStatus === 6) { %>
-          <h3 class="application-status incomplete-status">Cancelled</h3>
+        <h3 class="application-status incomplete-status">Cancelled</h3>
         <% } else if (applicationStatus === 7) { %>
-          <h3 class="application-status incomplete-status">Rejected</h3>
+        <h3 class="application-status incomplete-status">Rejected</h3>
         <% } %>
         <div class="status-footer">
           <% if (applicationStatus === 0) { %>
-            <div class="row">
-              <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
-            </div>
-            <div class="row">
-              <p>Click the button below to fill out your application.</p>
-            </div>
-            <div class="row justify-content-center">
-              <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
-              <a href="/apply" class="btn btn-success text-center">Create your application</a>
-            </div>
+          <div class="row">
+            <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
+          </div>
+          <div class="row">
+            <p>Click the button below to confirm your place in the hackathon.</p>
+          </div>
+          <div class="row justify-content-center">
+            <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
+            <a href="#" class="btn btn-success text-center" onclick="confirmPlace()">Confirm place</a>
+          </div>
           <% } else if (applicationStatus === 1) { %>
-            <div class="row">
-              <h4 class="font-weight-bold">Thank you for applying!</h4>
-            </div>
-            <div class="row">
-              <p>We will be in touch soon with any updates</p>
-            </div>
+          <div class="row">
+            <h4 class="font-weight-bold">Thank you for applying!</h4>
+          </div>
+          <div class="row">
+            <p>We will be in touch soon with any updates</p>
+          </div>
 
-            <div class="row justify-content-center">
-              <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
-              <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModel">Cancel your application</button>
-            </div>
-            
-            <div class="modal fade" id="cancelApplicationModel" tabindex="-1" role="dialog" aria-labelledby="cancelApplicationModelLabel" aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="cancelApplicationModelLabel">Cancel Application</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    Are you sure you want to cancel your application?
-                  </div>
-                  <div class="modal-footer">
-                    <a href="/apply/cancel" class="btn btn-danger">Yes, cancel my application</a>
-                    <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
-                  </div>
+          <div class="row justify-content-center">
+            <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
+            <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModel">Cancel your application</button>
+          </div>
+
+          <div class="modal fade" id="cancelApplicationModel" tabindex="-1" role="dialog" aria-labelledby="cancelApplicationModelLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="cancelApplicationModelLabel">Cancel Application</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  Are you sure you want to cancel your application?
+                </div>
+                <div class="modal-footer">
+                  <a href="/apply/cancel" class="btn btn-danger">Yes, cancel my application</a>
+                  <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
                 </div>
               </div>
             </div>
+          </div>
           <% } else if (applicationStatus === 2) { %>
-            <div class="row">
-              <h4 class="font-weight-bold">Thank you for applying!</h4>
-            </div>
-            <div class="row">
-              <p>We will be in touch soon with any updates.</p>
-            </div>
-            <div class="row justify-content-center">
-              <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
-              <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModelStrong">Cancel your application</button>
-            </div>
+          <div class="row">
+            <h4 class="font-weight-bold">Thank you for applying!</h4>
+          </div>
+          <div class="row">
+            <p>We will be in touch soon with any updates.</p>
+          </div>
+          <div class="row justify-content-center">
+            <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
+            <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModelStrong">Cancel your application</button>
+          </div>
           <% } else if (applicationStatus === 3) { %>
-            <div class="row">
-              <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
-            </div>
-            <div class="row">
-              <p>Congratulations! You've been accepted, please check your email for the invite, and confirm your attendance</p>
-            </div>
-            <div class="row justify-content-center">
-              <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
-              <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModelStrong">Cancel your application</button>
-            </div>
+          <div class="row">
+            <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
+          </div>
+          <div class="row">
+            <p>Congratulations! You've been accepted, please check your email for the invite, and confirm your attendance</p>
+          </div>
+          <div class="row justify-content-center">
+            <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
+            <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModelStrong">Cancel your application</button>
+          </div>
           <% } else if (applicationStatus === 4) { %>
-            <div class="row">
-              <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
-            </div>
-            <div class="row">
-              <p>Thank you for confirming! We are excited to see you at the hackathon!</p>
-            </div>
-            <div class="row justify-content-center">
-              <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
-              <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModelStrong">Cancel your application</button>
-            </div>
+          <div class="row">
+            <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
+          </div>
+          <div class="row">
+            <p>Thank you for confirming! We are excited to see you at the hackathon!</p>
+          </div>
+          <div class="row justify-content-center">
+            <a id="createJoinTeamBtn" class="btn btn-success" href="<%- process.env.AUTH_URL %>" role="button">Create/join a team</a>
+            <button id="cancelApplicationBtn" class="btn btn-danger" data-toggle="modal" data-target="#cancelApplicationModelStrong">Cancel your application</button>
+          </div>
           <% } else if (applicationStatus === 6) { %>
-            <div class="row">
-              <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
-            </div>
-            <div class="row">
-              <p>We're sorry you couldn't make it this time, we hope you will apply next time!</p>
-            </div>
+          <div class="row">
+            <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
+          </div>
+          <div class="row">
+            <p>We're sorry you couldn't make it this time, we hope you will apply next time!</p>
+          </div>
           <% } else if (applicationStatus === 7) { %>
-            <div class="row">
-              <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
-            </div>
-            <div class="row">
-              <p>We're sorry, you haven't been accepted. We wish we could accept everyone but we have limited space at the Hackathon. Please try applying again next time!</p>
-            </div>
+          <div class="row">
+            <h4 class="font-weight-bold">Welcome <%= applicantName %>!</h4>
+          </div>
+          <div class="row">
+            <p>We're sorry, you haven't been accepted. We wish we could accept everyone but we have limited space at the Hackathon. Please try applying again next time!</p>
+          </div>
           <% } %>
         </div>
       </div>

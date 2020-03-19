@@ -14,6 +14,7 @@ export interface ApplicationControllerInterface {
   apply: (req: Request, res: Response, next: NextFunction) => void;
   submitApplication: (req: Request, res: Response, next: NextFunction) => void;
   cancel: (req: Request, res: Response, next: NextFunction) => void;
+  confirmPlace: (req: Request, res: Response, next: NextFunction) => void;
 }
 
 /**
@@ -160,6 +161,40 @@ export class ApplicationController implements ApplicationControllerInterface {
 
     res.send({
       message: "Hacker checked in!"
+    });
+  };
+
+  public confirmPlace = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const user = req.user as RequestUser;
+
+    try {
+      let applicant = await this._applicantService.findOne(user.authId, "authId");
+      if (!applicant) {
+        applicant = new Applicant();
+        applicant.authId = user.authId;
+        applicant.age = 2020;
+        applicant.gender = "N/A";
+        applicant.country = "N/A";
+        applicant.city = "N/A";
+        applicant.university = "N/A";
+        applicant.degree = "N/A";
+        applicant.yearOfStudy = "N/A";
+        applicant.dietaryRequirements = "N/A";
+        applicant.tShirtSize = "N/A";
+        applicant.hearAbout = "N/A";
+      }
+      applicant.applicationStatus = ApplicantStatus.Confirmed;
+      await this._applicantService.save(applicant);
+    } catch (err) {
+      console.log(err);
+      res.status(HttpResponseCode.BAD_REQUEST).send({
+        error: true,
+        message: "Could not confirm your place!"
+      });
+      return;
+    }
+    res.send({
+      message: "Your place has been confirmed!"
     });
   };
 }
