@@ -173,6 +173,7 @@ export class ApplicationController implements ApplicationControllerInterface {
         applicant = new Applicant();
         applicant.authId = user.authId;
         applicant.age = 2020;
+        applicant.hackathonCount = 2020;
         applicant.gender = "N/A";
         applicant.country = "N/A";
         applicant.city = "N/A";
@@ -182,6 +183,8 @@ export class ApplicationController implements ApplicationControllerInterface {
         applicant.dietaryRequirements = "N/A";
         applicant.tShirtSize = "N/A";
         applicant.hearAbout = "N/A";
+        applicant.skillsTechnical = "N/A";
+        applicant.skillsNonTechnical = "N/A";
       }
       applicant.applicationStatus = ApplicantStatus.Confirmed;
       await this._applicantService.save(applicant);
