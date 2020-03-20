@@ -100,6 +100,8 @@ export class ApplicationRouter implements RouterInterface {
 
     router.put("/:id([a-f0-9-]+)/checkin", this._requestAuth.checkIsVolunteer, this._applicationController.checkin);
 
+    router.put("/confirm_place", this._applicationController.confirmPlace);
+
     return router;
   };
 }
