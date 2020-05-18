@@ -56,6 +56,7 @@
     "@types/reflect-metadata": "^0.1.0",
     "@types/request-promise-native": "^1.0.16",
     "@unicsmcr/hs_auth_client": "^1.2.0",
+    "axios": "^0.19.2",
     "class-validator": "^0.10.0",
     "cookie-parser": "^1.4.4",
     "dotenv": "^8.1.0",
@@ -70,8 +71,6 @@
     "passport": "^0.4.0",
     "passport-cookie": "^1.0.6",
     "reflect-metadata": "^0.1.13",
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.7",
     "typeorm": "^0.2.18",
     "typescript": "^3.5.2"
   },
