@@ -3,6 +3,7 @@ import * as express from "express";
 import * as dotenv from "dotenv";
 import * as path from "path";
 import * as cookieParser from "cookie-parser";
+import * as helmet from "helmet";
 import { Express, Request, Response, NextFunction } from "express";
 import { ConnectionOptions, createConnections, Connection } from "typeorm";
 import { RouterInterface } from "./routes";
@@ -109,6 +110,9 @@ export class App {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
+
+    // Sets and removes some standard HTTP headers that prevent some common attacks
+    app.use(helmet());
   };
 
   /**
