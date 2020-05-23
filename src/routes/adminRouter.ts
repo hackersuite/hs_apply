@@ -33,6 +33,12 @@ export class AdminRouter implements RouterInterface {
 
     router.get("/manage/downloadCSV", this._requestAuth.checkIsOrganiser, this._adminController.downloadCSV);
 
+    router.get(
+      "/manage/download-cvs",
+      this._requestAuth.checkIsOrganiser,
+      this._adminController.downloadAllCVsFromDropbox
+    );
+
     router.get("/manage/[a-z0-9-]+", this._requestAuth.checkIsOrganiser, this._adminController.manageApplication);
 
     return router;

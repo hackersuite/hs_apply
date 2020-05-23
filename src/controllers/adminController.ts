@@ -1,13 +1,16 @@
-import * as request from "request-promise-native";
+import * as fs from "fs";
+
 import { Request, Response, NextFunction } from "express";
 import { Cache } from "../util/cache";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
-import * as fs from "fs";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
-import { getAllUsers, RequestUser } from "@unicsmcr/hs_auth_client"
+import { getAllUsers, RequestUser } from "@unicsmcr/hs_auth_client";
+import { CloudStorageService } from "../services/cloudStorage/cloudStorageService";
+import { createWriteableStream, WriteableStreamCallback, CleanupCallback, logger } from "../util";
+import { HttpResponseCode } from "../util/errorHandling";
 
 export interface AdminControllerInterface {
   overview: (req: Request, res: Response, next: NextFunction) => void;
@@ -20,14 +23,17 @@ export interface AdminControllerInterface {
 @injectable()
 export class AdminController implements AdminControllerInterface {
   private _applicantService: ApplicantService;
+  private _cloudStorageService: CloudStorageService;
   private _cache: Cache;
 
   public constructor(
     @inject(TYPES.ApplicantService) applicantService: ApplicantService,
+    @inject(TYPES.CloudStorageService) cloudStorageService: CloudStorageService,
     @inject(TYPES.Cache) cache: Cache
   ) {
     this._cache = cache;
     this._applicantService = applicantService;
+    this._cloudStorageService = cloudStorageService;
   }
 
   public overview = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -115,12 +121,11 @@ export class AdminController implements AdminControllerInterface {
   };
 
   public manage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-
     let authUsersResult: RequestUser[];
     try {
-      authUsersResult = await getAllUsers(req.cookies["Authorization"])
+      authUsersResult = await getAllUsers(req.cookies["Authorization"]);
     } catch (err) {
-      next(err)
+      next(err);
     }
 
     const columnsToSelect: (keyof Applicant)[] = [
@@ -177,7 +182,7 @@ export class AdminController implements AdminControllerInterface {
 
     let authUsersResult: RequestUser[];
     try {
-      authUsersResult = await getAllUsers(req.cookies["Authorization"])
+      authUsersResult = await getAllUsers(req.cookies["Authorization"]);
     } catch (err) {
       res.send("Failed to get the users authentication info!");
     }
@@ -188,18 +193,17 @@ export class AdminController implements AdminControllerInterface {
       authUsers[a.authId] = { ...a };
     });
 
-
     const stream = fs.createWriteStream("voting.csv");
     stream.on("finish", () => {
       // Once the stream is closed, send the file in the response
       res.download("voting.csv", err => {
         if (err) {
-          console.log("File transfer failed!");
+          logger.error("File transfer failed!");
         }
         // Remove the voting.csv file once the download has either completed or failed
         fs.unlink("voting.csv", err => {
           if (err) {
-            console.log(`Failed to remove the voting.csv file! ${err}`);
+            logger.error(`Failed to remove the voting.csv file! ${err}`);
           }
         });
       });
@@ -219,5 +223,30 @@ export class AdminController implements AdminControllerInterface {
 
   private escapeForCSV = (input: string): string => {
     return input ? input.replace(/"/g, "") : "";
+  };
+
+  public downloadAllCVsFromDropbox = async (req: Request, res: Response): Promise<void> => {
+    const downloadFileName = "dropbox-cv.zip";
+
+    // Create the callback function that is executed once the stream is closed
+    const onStreamComplete: WriteableStreamCallback = (cleanup: CleanupCallback): void => {
+      res.download(downloadFileName, err => {
+        // Call the provided cleanup function, err is undefined if nothing broke
+        cleanup(err);
+      });
+    };
+
+    // Create a new writeable stream, we provide a filename and the callback function above
+    const stream: fs.WriteStream = createWriteableStream(downloadFileName, onStreamComplete);
+
+    // Make the request to the Dropbox API for the byte stream
+    // The stream is closed automatically when the API call is completed
+    try {
+      await this._cloudStorageService.downloadAll(stream);
+    } catch (err) {
+      // If an error occured, make sure to clean up the stream
+      stream.destroy(new Error(err.message));
+      res.status(HttpResponseCode.INTERNAL_ERROR).send(err.message);
+    }
   };
 }
