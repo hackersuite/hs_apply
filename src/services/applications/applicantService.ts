@@ -4,9 +4,10 @@ import { ApplicantRepository } from "../../repositories";
 import { TYPES } from "../../types";
 import { ObjectID, Repository, DeleteResult } from "typeorm";
 import { validateOrReject } from "class-validator";
-import * as request from "request-promise-native";
 import { Review } from "../../models/db";
 import { ApplicantStatus } from "./applicantStatus";
+import { logger } from "../../util";
+import { CloudStorageService } from "../cloudStorage";
 
 type ApplicationID = string | number | Date | ObjectID;
 
@@ -24,9 +25,14 @@ export interface ApplicantServiceInterface {
 @injectable()
 export class ApplicantService implements ApplicantServiceInterface {
   private _applicantRepository: Repository<Applicant>;
+  private _cloudStorageService: CloudStorageService;
 
-  public constructor(@inject(TYPES.ApplicantRepository) applicantRepository: ApplicantRepository) {
+  public constructor(
+    @inject(TYPES.ApplicantRepository) applicantRepository: ApplicantRepository,
+    @inject(TYPES.CloudStorageService) cloudStorageService: CloudStorageService
+  ) {
     this._applicantRepository = applicantRepository.getRepository();
+    this._cloudStorageService = cloudStorageService;
   }
 
   public getAll = async (columns?: (keyof Applicant)[]): Promise<Applicant[]> => {
@@ -75,14 +81,14 @@ export class ApplicantService implements ApplicantServiceInterface {
         validationError: { target: false }
       });
     } catch (errors) {
-      console.log(errors);
+      logger.error(errors);
       throw new Error("Failed to validate applicant");
     }
 
     if (file) {
       // Save the CV to dropbox if the CV is provided
       try {
-        await this.saveToDropbox(newApplicant.cv, file);
+        await this._cloudStorageService.upload(newApplicant.cv, file);
       } catch (err) {
         throw new Error("Failed to save applicant CV");
       }
@@ -140,29 +146,11 @@ export class ApplicantService implements ApplicantServiceInterface {
         .take(chooseFromK)
         .getMany();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
       return undefined;
     }
 
     return applications;
-  };
-
-  private saveToDropbox = async (fileName: string, file: Buffer): Promise<string> => {
-    if (!process.env.DROPBOX_API_TOKEN) {
-      throw new Error("Failed to upload CV to Dropbox, set dropbox envs correctly");
-    }
-    if (!process.env.DROPBOX_API_TOKEN) throw new Error("Failed to upload CV to Dropbox, set dropbox envs correctly");
-
-    const result = await request.post("https://content.dropboxapi.com/2/files/upload", {
-      headers: {
-        "Content-Type": "application/octet-stream",
-        Authorization: "Bearer " + process.env.DROPBOX_API_TOKEN,
-        "Dropbox-API-Arg": `{"path": "/hackathon-cv/${fileName}", "mode": "add", "autorename": true, "mute": false}`
-      },
-      body: file
-    });
-
-    return result;
   };
 
   // public getCVLink = async (fileName: string): Promise<string> => {

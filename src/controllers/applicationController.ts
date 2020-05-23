@@ -9,6 +9,7 @@ import { HttpResponseCode } from "../util/errorHandling";
 import { RequestUser } from "@unicsmcr/hs_auth_client";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 import { applicationMapping } from "../util/decorator";
+import { logger } from "../util";
 
 export interface ApplicationControllerInterface {
   apply: (req: Request, res: Response, next: NextFunction) => void;
@@ -84,7 +85,7 @@ export class ApplicationController implements ApplicationControllerInterface {
     try {
       await this._applicantService.save(newApplication, cvFile);
     } catch (errors) {
-      console.log(errors);
+      logger.error(errors);
       res.status(HttpResponseCode.BAD_REQUEST).send({
         error: true,
         message: "Could not create application!"
