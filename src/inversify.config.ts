@@ -21,6 +21,9 @@ import { ReviewRepository } from "./repositories";
 import { EmailServiceInterface, EmailService } from "./services";
 import { InviteControllerInterface, InviteController } from "./controllers";
 
+// Cloud Storage
+import { CloudStorageServiceInterface, CloudStorageService } from "./services";
+
 // Routers
 import { RouterInterface, ApplicationRouter, DashboardRouter, InviteRouter, AdminRouter, ReviewRouter } from "./routes";
 import { CacheInterface, Cache } from "./util/cache";
@@ -57,6 +60,9 @@ container.bind<EmailServiceInterface>(TYPES.EmailService).to(EmailService);
 container.bind<ReviewController>(TYPES.ReviewController).to(ReviewController);
 container.bind<ReviewService>(TYPES.ReviewService).to(ReviewService);
 container.bind<ReviewRepository>(TYPES.ReviewRepository).to(ReviewRepository);
+
+// Cloud Storage Service
+container.bind<CloudStorageServiceInterface>(TYPES.CloudStorageService).to(CloudStorageService);
 
 // Request Authentication
 container.bind<RequestAuthenticationInterface>(TYPES.RequestAuthentication).to(RequestAuthentication);
