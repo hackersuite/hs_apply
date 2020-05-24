@@ -101,14 +101,27 @@ export class ApplicantService implements ApplicantServiceInterface {
     }
   };
 
-  public delete = async (id: ApplicationID, findBy?: keyof Applicant): Promise<DeleteResult> => {
-    if (id === undefined) {
-      throw new Error("Applicant ID must be provided");
+  public delete = async (id: ApplicationID): Promise<DeleteResult> => {
+    if (id === undefined) throw new Error("Applicant ID must be provided");
+
+    // Find the applicant via the provided ID
+    let applicant: Applicant;
+    try {
+      applicant = await this._applicantRepository.findOne(id);
+    } catch (err) {
+      throw new Error("Failed to find applicant using the provided ID");
     }
 
-    const findColumn: keyof Applicant = findBy || "id";
     try {
-      return await this._applicantRepository.delete({ [findColumn]: id });
+      if (applicant.cv) {
+        await this._cloudStorageService.delete(applicant.cv);
+      }
+    } catch (err) {
+      logger.error(err, "Failed to remove the applicants CV");
+    }
+
+    try {
+      return await this._applicantRepository.delete(id);
     } catch (err) {
       throw new Error(`Failed to remove an applicant:\n${err}`);
     }

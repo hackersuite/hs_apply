@@ -19,7 +19,7 @@ interface DropboxAPIRequest {
   requestURL: string;
   contentType?: ContentTypeOptions;
   extraHeaders?: any;
-  body?: Buffer;
+  body?: Buffer | any;
   responseType?: ResponseType;
 }
 
@@ -44,18 +44,24 @@ export class CloudStorageService {
       throw new Error("Cannot make request to dropbox, Dropbox API token not defined");
 
     // Format the provided headers to be HTTP safe JSON
-    for (const [key, value] of Object.entries(params?.extraHeaders)) {
-      params.extraHeaders[key] = this.httpHeaderSafeJson(value);
+    if (params.extraHeaders) {
+      for (const [key, value] of Object.entries(params.extraHeaders)) {
+        params.extraHeaders[key] = this.httpHeaderSafeJson(value);
+      }
     }
 
     // Setup the config, headers and other options
     const config = {
       headers: {
         Authorization: `Bearer ${this.DROPBOX_API_TOKEN}`,
-        ...(params?.contentType && { "Content-Type": params?.contentType }),
+        ...(params?.contentType && {
+          "Content-Type": params?.contentType
+        }),
         ...params?.extraHeaders
       },
-      ...(params?.responseType && { responseType: params?.responseType }),
+      ...(params?.responseType && {
+        responseType: params?.responseType
+      }),
       maxContentLength: 20 * 1024 * 1024 * 1024 // Max 20GB file
     };
 
@@ -87,15 +93,13 @@ export class CloudStorageService {
 
   public delete = async (fileName: string): Promise<string> => {
     if (!fileName || fileName.length === 0) throw new Error("File name is not valid to delete");
-    const customHeaders = {
-      data: { path: `/${this.DROPBOX_BASE_PATH}/${fileName}` }
-    };
+    const requestBody = { path: `/${this.DROPBOX_BASE_PATH}/${fileName}` };
 
     return (
       await this.apiRequest({
         requestURL: dropboxAPIFactory(DropboxMethods.Delete),
         contentType: ContentTypeOptions.Request,
-        extraHeaders: customHeaders
+        body: requestBody
       })
     ).data;
   };
