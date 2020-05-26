@@ -5,6 +5,8 @@ import { TYPES } from "../../types";
 import { ObjectID, Repository, DeleteResult } from "typeorm";
 import { validateOrReject } from "class-validator";
 import * as request from "request-promise-native";
+import { Review } from "../../models/db";
+import { ApplicantStatus } from "./applicantStatus";
 
 type ApplicationID = string | number | Date | ObjectID;
 
@@ -104,6 +106,45 @@ export class ApplicantService implements ApplicantServiceInterface {
     } catch (err) {
       throw new Error(`Failed to remove an applicant:\n${err}`);
     }
+  };
+
+  public getKRandomToReview = async (reviewerID: string, chooseFromK = 5): Promise<Applicant[]> => {
+    // TODO: Refactor query below to make it more readable, there must be a better way...
+    let applications;
+    try {
+      applications = await this._applicantRepository
+        .createQueryBuilder("application")
+        .where(qb => {
+          const subQuery = qb
+            .subQuery()
+            .select("review.applicantId")
+            .from(Review, "review")
+            .groupBy("review.applicantId")
+            .having("COUNT(review.applicantId) >= 2")
+            .getQuery();
+          return "id NOT IN " + subQuery;
+        })
+        .andWhere(qb => {
+          const subQuery = qb
+            .subQuery()
+            .select("review.applicantId")
+            .from(Review, "review")
+            .where("review.createdByAuthID = :authID", { authID: reviewerID })
+            .getQuery();
+          return "id NOT IN " + subQuery;
+        })
+        .andWhere("application.applicationStatus = :applicantState", {
+          applicantState: ApplicantStatus.Applied.toString()
+        })
+        .orderBy("application.createdAt", "ASC")
+        .take(chooseFromK)
+        .getMany();
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+
+    return applications;
   };
 
   private saveToDropbox = async (fileName: string, file: Buffer): Promise<string> => {
