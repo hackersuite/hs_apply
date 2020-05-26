@@ -132,6 +132,12 @@ export class ApplicationController implements ApplicationControllerInterface {
       return next(err);
     }
 
+    try {
+      await this._applicantService.deleteCV(application.cv);
+    } catch (err) {
+      return next(err);
+    }
+
     if (application.applicationStatus <= ApplicantStatus.Applied && res.locals.applicationsOpen) {
       // Delete the application so they can re-apply
       try {

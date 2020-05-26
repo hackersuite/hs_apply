@@ -5,6 +5,7 @@ import { TYPES } from "../../types";
 import { ObjectID, Repository } from "typeorm";
 import { validateOrReject } from "class-validator";
 import * as request from "request-promise-native";
+import { BroadcasterResult } from "typeorm/subscriber/BroadcasterResult";
 
 type ApplicationID = string | number | Date | ObjectID;
 
@@ -122,6 +123,22 @@ export class ApplicantService implements ApplicantServiceInterface {
 
     return result;
   };
+
+  public deleteCV = async (fileName: string): Promise<string> => {
+    if (!process.env.DROPBOX_API_TOKEN) {
+      throw new Error("Failed to delete CV from Dropbox, set dropbox envs correctly");
+    }
+    if (!process.env.DROPBOX_API_TOKEN) throw new Error("Failed to delete CV from Dropbox, set dropbox envs correctly");
+
+    const result = await request.post("https://api.dropboxapi.com/2/files/delete_v2", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + process.env.DROPBOX_API_TOKEN,
+        "Dropbox-API-Arg": `{"path": "/hackathon-cv/${fileName}"}`
+      },
+    });
+    return result;
+  }
 
   // public getCVLink = async (fileName: string): Promise<string> => {
   //   if (!process.env.DROPBOX_API_TOKEN)
