@@ -135,7 +135,7 @@ export class ApplicantService implements ApplicantServiceInterface {
         "Content-Type": "application/json",
         Authorization: "Bearer " + process.env.DROPBOX_API_TOKEN,
         "Dropbox-API-Arg": `{"path": "/hackathon-cv/${fileName}"}`
-      },
+      }
     });
     return result;
   }
