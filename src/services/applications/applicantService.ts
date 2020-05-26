@@ -110,7 +110,6 @@ export class ApplicantService implements ApplicantServiceInterface {
     if (!process.env.DROPBOX_API_TOKEN) {
       throw new Error("Failed to upload CV to Dropbox, set dropbox envs correctly");
     }
-    if (!process.env.DROPBOX_API_TOKEN) throw new Error("Failed to upload CV to Dropbox, set dropbox envs correctly");
 
     const result = await request.post("https://content.dropboxapi.com/2/files/upload", {
       headers: {
@@ -128,7 +127,6 @@ export class ApplicantService implements ApplicantServiceInterface {
     if (!process.env.DROPBOX_API_TOKEN) {
       throw new Error("Failed to delete CV from Dropbox, set dropbox envs correctly");
     }
-    if (!process.env.DROPBOX_API_TOKEN) throw new Error("Failed to delete CV from Dropbox, set dropbox envs correctly");
 
     const result = await request.post("https://api.dropboxapi.com/2/files/delete_v2", {
       headers: {
