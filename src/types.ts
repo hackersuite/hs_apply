@@ -16,6 +16,8 @@ export const TYPES = {
   ReviewRepository: Symbol.for("ReviewRepository"),
   ReviewerRepository: Symbol.for("ReviewerRepository"),
 
+  CloudStorageService: Symbol.for("CloudStorageService"),
+
   RequestAuthentication: Symbol.for("RequestAuthentication"),
 
   SettingLoader: Symbol.for("SettingLoader"),

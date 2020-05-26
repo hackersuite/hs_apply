@@ -4,9 +4,10 @@ import { ApplicantRepository } from "../../repositories";
 import { TYPES } from "../../types";
 import { ObjectID, Repository, DeleteResult } from "typeorm";
 import { validateOrReject } from "class-validator";
-import * as request from "request-promise-native";
 import { Review } from "../../models/db";
 import { ApplicantStatus } from "./applicantStatus";
+import { logger } from "../../util";
+import { CloudStorageService } from "../cloudStorage";
 
 type ApplicationID = string | number | Date | ObjectID;
 
@@ -24,9 +25,14 @@ export interface ApplicantServiceInterface {
 @injectable()
 export class ApplicantService implements ApplicantServiceInterface {
   private _applicantRepository: Repository<Applicant>;
+  private _cloudStorageService: CloudStorageService;
 
-  public constructor(@inject(TYPES.ApplicantRepository) applicantRepository: ApplicantRepository) {
+  public constructor(
+    @inject(TYPES.ApplicantRepository) applicantRepository: ApplicantRepository,
+    @inject(TYPES.CloudStorageService) cloudStorageService: CloudStorageService
+  ) {
     this._applicantRepository = applicantRepository.getRepository();
+    this._cloudStorageService = cloudStorageService;
   }
 
   public getAll = async (columns?: (keyof Applicant)[]): Promise<Applicant[]> => {
@@ -75,14 +81,14 @@ export class ApplicantService implements ApplicantServiceInterface {
         validationError: { target: false }
       });
     } catch (errors) {
-      console.log(errors);
+      logger.error(errors);
       throw new Error("Failed to validate applicant");
     }
 
     if (file) {
       // Save the CV to dropbox if the CV is provided
       try {
-        await this.saveToDropbox(newApplicant.cv, file);
+        await this._cloudStorageService.upload(newApplicant.cv, file);
       } catch (err) {
         throw new Error("Failed to save applicant CV");
       }
@@ -95,14 +101,27 @@ export class ApplicantService implements ApplicantServiceInterface {
     }
   };
 
-  public delete = async (id: ApplicationID, findBy?: keyof Applicant): Promise<DeleteResult> => {
-    if (id === undefined) {
-      throw new Error("Applicant ID must be provided");
+  public delete = async (id: ApplicationID): Promise<DeleteResult> => {
+    if (id === undefined) throw new Error("Applicant ID must be provided");
+
+    // Find the applicant via the provided ID
+    let applicant: Applicant;
+    try {
+      applicant = await this._applicantRepository.findOne(id);
+    } catch (err) {
+      throw new Error("Failed to find applicant using the provided ID");
     }
 
-    const findColumn: keyof Applicant = findBy || "id";
     try {
-      return await this._applicantRepository.delete({ [findColumn]: id });
+      if (applicant.cv) {
+        await this._cloudStorageService.delete(applicant.cv);
+      }
+    } catch (err) {
+      logger.error(err, "Failed to remove the applicants CV");
+    }
+
+    try {
+      return await this._applicantRepository.delete(id);
     } catch (err) {
       throw new Error(`Failed to remove an applicant:\n${err}`);
     }
@@ -140,29 +159,11 @@ export class ApplicantService implements ApplicantServiceInterface {
         .take(chooseFromK)
         .getMany();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
       return undefined;
     }
 
     return applications;
-  };
-
-  private saveToDropbox = async (fileName: string, file: Buffer): Promise<string> => {
-    if (!process.env.DROPBOX_API_TOKEN) {
-      throw new Error("Failed to upload CV to Dropbox, set dropbox envs correctly");
-    }
-    if (!process.env.DROPBOX_API_TOKEN) throw new Error("Failed to upload CV to Dropbox, set dropbox envs correctly");
-
-    const result = await request.post("https://content.dropboxapi.com/2/files/upload", {
-      headers: {
-        "Content-Type": "application/octet-stream",
-        Authorization: "Bearer " + process.env.DROPBOX_API_TOKEN,
-        "Dropbox-API-Arg": `{"path": "/hackathon-cv/${fileName}", "mode": "add", "autorename": true, "mute": false}`
-      },
-      body: file
-    });
-
-    return result;
   };
 
   // public getCVLink = async (fileName: string): Promise<string> => {

@@ -2,7 +2,6 @@ import "reflect-metadata";
 import * as express from "express";
 import * as dotenv from "dotenv";
 import * as path from "path";
-import * as morgan from "morgan";
 import * as cookieParser from "cookie-parser";
 import { Express, Request, Response, NextFunction } from "express";
 import { ConnectionOptions, createConnections, Connection } from "typeorm";
@@ -12,6 +11,7 @@ import container from "./inversify.config";
 import { error404Handler, errorHandler } from "./util/errorHandling";
 import { RequestAuthentication } from "./util/auth";
 import { SettingLoader } from "./util/fs/loader";
+import { reqLogger, logger } from "./util";
 
 // Load environment variables from .env file
 dotenv.config({ path: ".env" });
@@ -35,7 +35,7 @@ export class App {
     try {
       await settingLoader.loadApplicationSettings(app);
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     }
 
     // Connecting to database
@@ -45,10 +45,10 @@ export class App {
     try {
       connections = await createConnections(databaseConnectionSettings);
       connections.forEach(element => {
-        console.log("  Connection to database (" + element.name + ") established.");
+        logger.info(`Connection to database (${element.name}) established.`);
       });
     } catch (err) {
-      console.log(err);
+      logger.error(err);
       return callback(app, err);
     }
 
@@ -109,7 +109,6 @@ export class App {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
-    // app.use(expressSession(this.getSessionOptions(app)));
   };
 
   /**
@@ -118,7 +117,8 @@ export class App {
    */
   private devMiddlewareSetup = (app: Express): void => {
     // Request logging
-    app.use(morgan("dev"));
+    app.use(reqLogger);
+
     // Disable browser caching
     app.use((req: Request, res: Response, next: NextFunction) => {
       res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
@@ -126,19 +126,6 @@ export class App {
       res.header("Pragma", "no-cache");
       next();
     });
-  };
-
-  private getSessionOptions = (app: Express): any => {
-    return {
-      saveUninitialized: true, // Saved new sessions
-      resave: false, // Do not automatically write to the session store
-      secret: process.env.SESSION_SECRET,
-      cookie: {
-        // Configure when sessions expires
-        secure: app.get("env") === "dev" ? false : true,
-        maxAge: 2419200000
-      }
-    };
   };
 
   private createDatabaseSettings = (): ConnectionOptions[] => {
@@ -152,7 +139,7 @@ export class App {
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
         entities: [__dirname + "/models/db/*{.js,.ts}"],
-        synchronize: true
+        synchronize: true // Note: Unsafe in productionn, use migrations instead
       }
     ];
   };

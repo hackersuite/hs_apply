@@ -6,6 +6,7 @@ import { TYPES } from "../../types";
 import { Cache } from "../cache";
 import { promisify } from "util";
 import { injectable, inject } from "inversify";
+import { logger } from "../logger";
 
 export interface SettingLoaderInterface {
   loadApplicationSettings: (app: Express) => Promise<void>;
@@ -33,24 +34,24 @@ export class SettingLoader implements SettingLoaderInterface {
    *
    * If you update the hackathon settings, you need to restart the application
    */
+  // TODO: Improve this function by not awaiting both loads seperately
   public async loadApplicationSettings(app: Express): Promise<void> {
-    console.log("Loading hackathon application questions...");
+    logger.info("Loading hackathon application questions...");
     const sections: Array<ApplicationSectionInterface> = await this.loadSettingsFile("questions.json", "sections");
     if (sections) {
       const applicationSections: Sections = new Sections(sections);
       this.cache.set(Sections.name, applicationSections);
-      console.log("\tLoaded application questions");
+      logger.info("Loaded application questions");
     }
 
-    console.log("Loading hackathon application settings...");
+    logger.info("Loading hackathon application settings...");
     const settings: HackathonSettingsInterface = await this.loadSettingsFile("hackathon.json");
     if (settings) {
       // Add the hackathon settings to the cache and add them to app locals
       const hackathonSettings: HackathonSettings = new HackathonSettings(settings);
       this.cache.set(HackathonSettings.name, hackathonSettings);
       app.locals.settings = hackathonSettings.settings;
-      console.log("\tLoaded hackathon settings");
-      console.log(JSON.stringify(hackathonSettings.settings, undefined, 2));
+      logger.info(hackathonSettings.settings, "Loaded hackathon settings");
     } else {
       // We couldn't load the hackathon settings so set some defaults
       app.locals.settings = {
@@ -74,7 +75,7 @@ export class SettingLoader implements SettingLoaderInterface {
         throw "Failed to parse JSON";
       }
     } catch (err) {
-      console.error("  Failed to load settings!");
+      logger.warn("Failed to load settings!");
       return undefined;
     }
     return settings;

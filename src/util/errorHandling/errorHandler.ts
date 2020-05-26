@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ApiError } from "./apiError";
 import { HttpResponseCode } from "./httpResponseCode";
+import { logger } from "../logger";
 
 // const toEmails: string[] = ["admin@unicsmcr.com"];
 
@@ -18,7 +19,7 @@ export const errorHandler = (err: ApiError | Error, req: Request, res: Response)
       //   );
     }
 
-    console.error(err.stack);
+    logger.error(err.stack);
     res.status(HttpResponseCode.INTERNAL_ERROR).send("An error occured.");
   } else {
     res.status(err.statusCode).send(err);
