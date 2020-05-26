@@ -59,9 +59,11 @@ test.serial.cb("App should start in production environment", t => {
  */
 test.serial.cb("App should throw error with invalid settings", t => {
   process.env.DB_HOST = "invalidhost";
-  new App().buildApp(async (builtApp: Express, err: Error): Promise<void> => {
-    t.truthy(err);
-    t.falsy(getConnection("applications").isConnected);
-    t.end();
-  });
+  new App().buildApp(
+    async (builtApp: Express, err: Error): Promise<void> => {
+      t.truthy(err);
+      t.falsy(getConnection("applications").isConnected);
+      t.end();
+    }
+  );
 });

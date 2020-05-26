@@ -13,8 +13,8 @@
 
 ## Dependencies
 
- - Node.js (v8.3.0 or later)
- - MySQL database (v5.7 or later)
+ - Node.js (v10.0.0 or later)
+ - Docker CE
 
 ## Getting started
 ### Project set up
@@ -47,14 +47,14 @@ The first command will create two containers:
 * MySQL database
 
 It also creates two Docker networks:
-* `internal`
+* `internal_hackathon`
 * `hacker_suite`
 
 The first time you run the command, it will take a while since it will install the required services. Next time you run the command, it will be much faster since dependencies are cached.
 
-The NodeJS app will be available at `localhost:8010` or as `hs_application` on the `hacker_suite` network. The MySQL database will be available at `localhost:8011`
+The NodeJS app will be available at `localhost:8010` or as `hs_application` on the `hacker_suite` network. The MySQL database will be available at `localhost:8011`, you can connect using the MySQL GUI tool of your choice 
 
-`internal` is a network used by hs_application containers internally to communicate with each other, while `hacker_suite` is used to connect all consumer-facing Hacker Suite services.
+`internal_hackathon` is a network used by hs_application containers internally to communicate with each other, while `hacker_suite` is used to connect all consumer-facing Hacker Suite services.
 
 ### Logging
 The output from the apps can be attached to the terminal with one of the following commands:
@@ -72,9 +72,8 @@ $ make down
 
 ## Running the tests
 Assuming you have completed the intial set up, you can run the test suite using the either of the following command:
-```python
-$ npm test
-# NOTE: You need to have ran `npm i` locally before running the tests otherwise they will fail
+```
+$ make tests
 ```
 
  ## License

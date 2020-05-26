@@ -3,7 +3,7 @@ import { Cache, Cacheable } from "../../../../src/util/cache";
 
 class MockCacheableA implements Cacheable {
   id: number;
-  expiresIn: number = 100;
+  expiresIn = 100;
   syncedAt: number;
   testA: string;
 
@@ -16,7 +16,7 @@ class MockCacheableA implements Cacheable {
 
 class MockCacheableB implements Cacheable {
   id: number;
-  expiresIn: number = 100;
+  expiresIn = 100;
   syncedAt: number;
   testB: number;
 
@@ -31,8 +31,7 @@ let itemsClassA: MockCacheableA[];
 let itemsClassB: MockCacheableB[];
 let sampleItemsCollection: Map<string, Map<number, Cacheable>>;
 
-
-test.beforeEach(t => {
+test.beforeEach(() => {
   sampleItemsCollection = new Map<string, Map<number, Cacheable>>();
   sampleItemsCollection.set(MockCacheableA.name, new Map<number, Cacheable>());
   sampleItemsCollection.set(MockCacheableB.name, new Map<number, Cacheable>());
@@ -40,21 +39,15 @@ test.beforeEach(t => {
   const collectionA: Map<number, Cacheable> = sampleItemsCollection.get(MockCacheableA.name);
   const collectionB: Map<number, Cacheable> = sampleItemsCollection.get(MockCacheableB.name);
 
-  itemsClassA = [
-      new MockCacheableA(0, "obj 1 class A"),
-      new MockCacheableA(1, "obj 2 class A")
-  ];
+  itemsClassA = [new MockCacheableA(0, "obj 1 class A"), new MockCacheableA(1, "obj 2 class A")];
 
-  itemsClassB = [
-      new MockCacheableB(0, 1),
-      new MockCacheableB(1, 100)
-  ];
+  itemsClassB = [new MockCacheableB(0, 1), new MockCacheableB(1, 100)];
 
   itemsClassA.forEach((obj: MockCacheableA) => {
-      collectionA.set(obj.id, obj);
+    collectionA.set(obj.id, obj);
   });
   itemsClassB.forEach((obj: MockCacheableB) => {
-      collectionB.set(obj.id, obj);
+    collectionB.set(obj.id, obj);
   });
 });
 
@@ -92,7 +85,10 @@ test("set should add the given item to the cache", t => {
   itemsClassA.push(new MockCacheableA(2, "test"));
   cache.set(MockCacheableA.name, itemsClassA[itemsClassA.length - 1]);
 
-  t.deepEqual(cache.get(MockCacheableA.name, itemsClassA[itemsClassA.length - 1].id), itemsClassA[itemsClassA.length - 1]);
+  t.deepEqual(
+    cache.get(MockCacheableA.name, itemsClassA[itemsClassA.length - 1].id),
+    itemsClassA[itemsClassA.length - 1]
+  );
 });
 
 // Serial tests since we are modifying the global itemsClassA

@@ -7,22 +7,57 @@
   </div>
   <div class="sidebar-wrapper">
     <ul class="nav">
-      <% if (locals._locals.authLevel == 3) { %>
-      <li id="admin-overview" class="nav-item">
-        <a class="nav-link" href="/admin/overview">
-          <i class="material-icons">lock</i>
-          <p>Admin | Overview</p>
-        </a>
-      </li>
+      <% if (locals._locals.authLevel >= 4) { %>
+        <li class="nav-item" data-nav="group">
+          <a class="nav-link" data-toggle="collapse" href="#adminCollapse" aria-expanded="false" aria-controls="#adminCollapse">
+            <i class="material-icons">lock</i>
+            <p>Admin<b class="caret"></b></p>
+          </a>
+          <div class="collapse" id="adminCollapse">
+            <ul class="nav">
+              <% if (locals._locals.authLevel == 4) { %>
+              <li id="admin-overview" class="nav-item">
+                <a class="nav-link" href="/admin/overview">
+                  <p> Overview </p>
+                </a>
+              </li>
+              <% } %>
+              <li id="admin-manage" class="nav-item">
+                <a class="nav-link" href="/admin/manage">
+                  <p>Manage</p>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
       <% } %>
-      <% if (locals._locals.authLevel >= 2) { %>
-      <li id="admin-manage" class="nav-item">
-        <a class="nav-link" href="/admin/manage">
-          <i class="material-icons">lock</i>
-          <p>Admin | Manage</p>
-        </a>
-      </li>
+
+      <% if (locals._locals.authLevel >= 3) { %>
+        <li class="nav-item" data-nav="group">
+          <a class="nav-link" data-toggle="collapse" href="#reviewCollapse" aria-expanded="false" aria-controls="#reviewCollapse">
+            <i class="material-icons">gavel</i>
+            <p>Review<b class="caret"></b></p>
+          </a>
+          <div class="collapse" id="reviewCollapse">
+            <ul class="nav">
+              <% if (locals._locals.authLevel == 4) { %>
+              <li id="review-overview" class="nav-item">
+                <a class="nav-link" href="/review/overview">
+                  <p>Overview</p>
+                </a>
+              </li>
+              <% } %>
+
+              <li id="review-application" class="nav-item">
+                <a class="nav-link" href="/review">
+                  <p>Application</p>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
       <% } %>
+
       <li id="dashboard" class="nav-item">
         <a class="nav-link" href="/">
           <i class="material-icons">dashboard</i>
@@ -42,8 +77,13 @@
 </div>
 <script>
   var currentPage = "<%- locals.currentPage || null %>";
-  if (document.getElementById(currentPage) !== null) {
-    document.getElementById(currentPage).classList.add("active");
+  var element = document.getElementById(currentPage)
+  if (element != null) {
+    element.classList.add("active");
+
+    // Attempt to add the active class if the element is in a dropdown group
+    var elementGroup = element.closest('li[data-nav="group"]');
+    if (elementGroup != null) elementGroup.classList.add("active");
   }
 </script>
 <!-- Navbar -->

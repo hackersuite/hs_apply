@@ -4,7 +4,7 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { Applicant } from "../models/db";
 import { ApplicantService } from "../services";
-import { RequestUser } from "../util/auth";
+import { RequestUser } from "@unicsmcr/hs_auth_client";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 
 export interface DashboardControllerInterface {

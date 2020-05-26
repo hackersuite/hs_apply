@@ -33,12 +33,17 @@ text.ct-label {
   fill: black !important;
 }
 
-span.ct-label.ct-horizontal,span.ct-vertical {
+span.ct-label.ct-horizontal,
+span.ct-vertical {
   color: white !important;
 }
 
 .search-input {
   left: 15px;
+}
+
+.page-select-row {
+  justify-content: space-around;
 }
 
 @media only screen and (max-width: 768px) {

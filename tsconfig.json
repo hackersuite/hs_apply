@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es2018",
-    "lib": ["es2018"],
+    "target": "es2017",
+    "moduleResolution": "node",
+    "lib": ["dom"],
     "noImplicitAny": false,
     "outDir": "dist",
     "types": ["reflect-metadata"],
