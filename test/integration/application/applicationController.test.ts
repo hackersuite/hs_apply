@@ -62,7 +62,7 @@ const requestUser = {
   authLevel: AuthLevels.Organiser
 };
 
-const getUniqueApplicant = (options?: { needsID: boolean }): { applicantRequest: any; applicant: Applicant } => {
+const getUniqueApplicant = (options?: { needsID: boolean }): [any, Applicant] => {
   // Create a unique applicant using current time
   const applicantIdentifier = new Date().getTime().toString();
   const applicant: Applicant = { ...testApplicant, city: applicantIdentifier };
@@ -72,9 +72,9 @@ const getUniqueApplicant = (options?: { needsID: boolean }): { applicantRequest:
   applicant.authId = requestUser.authId;
   applicant.applicationStatus = ApplicantStatus.Applied;
 
-  if (options && options.needsID) applicant.id = "11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000";
+  applicant.id = options?.needsID ? "11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000" : undefined;
 
-  return { applicantRequest, applicant };
+  return [applicantRequest, applicant];
 };
 
 test.before.cb(t => {
@@ -161,7 +161,7 @@ test.serial("Test application page redirects, applications open, application sub
 });
 
 test.serial("Test applicant deleted when application open", async t => {
-  const { applicantRequest, applicant } = getUniqueApplicant();
+  const [, applicant] = getUniqueApplicant();
   when(mockApplicantService.findOne(requestUser.authId, "authId")).thenResolve(applicant);
   when(mockApplicantService.delete(applicant.id)).thenResolve();
 
@@ -176,7 +176,7 @@ test.serial("Test applicant deleted when application open", async t => {
 });
 
 test("Test applicant created with valid request, applications open", async t => {
-  const { applicantRequest, applicant } = getUniqueApplicant();
+  const [applicantRequest, applicant] = getUniqueApplicant();
   when(mockApplicantService.save(objectContaining(applicant), undefined)).thenResolve(applicant);
 
   // Perform the request along .../apply
@@ -190,7 +190,7 @@ test("Test applicant created with valid request, applications open", async t => 
 
 test("Test applicant created with valid request (using Other input options)", async t => {
   const workArea = "Testtt";
-  const { applicantRequest, applicant } = getUniqueApplicant();
+  const [applicantRequest, applicant] = getUniqueApplicant();
   applicant.workArea = workArea;
 
   when(mockApplicantService.save(objectContaining(applicant), undefined)).thenResolve(applicant);
@@ -209,7 +209,7 @@ test("Test applicant created with valid request (using Other input options)", as
 });
 
 test("Test applicant created with valid request (with no Other input provided)", async t => {
-  const { applicantRequest, applicant } = getUniqueApplicant();
+  const [applicantRequest, applicant] = getUniqueApplicant();
   applicant.gender = "Other";
   when(mockApplicantService.save(objectContaining(applicant), undefined)).thenResolve(applicant);
 
@@ -228,7 +228,7 @@ test("Test applicant created with valid request (with no Other input provided)",
 });
 
 test("Test applicant not created with invalid input", async t => {
-  const { applicantRequest, applicant } = getUniqueApplicant();
+  const [applicantRequest, applicant] = getUniqueApplicant();
   // Mock out the application save call in the service
   when(mockApplicantService.save(objectContaining(applicant), undefined)).thenReject(new Error(""));
 
@@ -270,7 +270,7 @@ test("Test applicant not created with unsupported cv format", async t => {
 
 test("Test applicant created with doc cv", async t => {
   const cvFile: Buffer = Buffer.from("");
-  const { applicantRequest, applicant } = getUniqueApplicant();
+  const [applicantRequest, applicant] = getUniqueApplicant();
   when(mockApplicantService.save(objectContaining(applicant), anyOfClass(Buffer))).thenResolve(applicant);
 
   // Perform the request along /apply
@@ -285,7 +285,7 @@ test("Test applicant created with doc cv", async t => {
 
 test("Test applicant created with pdf cv", async t => {
   const cvFile: Buffer = Buffer.from("");
-  const { applicantRequest, applicant } = getUniqueApplicant();
+  const [applicantRequest, applicant] = getUniqueApplicant();
   when(mockApplicantService.save(objectContaining(applicant), anyOfClass(Buffer))).thenResolve(applicant);
 
   // Perform the request along .../apply
@@ -300,7 +300,7 @@ test("Test applicant created with pdf cv", async t => {
 
 test("Test applicant created with docx cv", async t => {
   const cvFile: Buffer = Buffer.from("");
-  const { applicantRequest, applicant } = getUniqueApplicant();
+  const [applicantRequest, applicant] = getUniqueApplicant();
   when(mockApplicantService.save(objectContaining(applicant), anyOfClass(Buffer))).thenResolve(applicant);
 
   // Perform the request along .../apply
@@ -315,7 +315,7 @@ test("Test applicant created with docx cv", async t => {
 
 // Checkin Tests
 test.serial("Test checkin performed by organiser on confirmed applicant", async t => {
-  const { applicantRequest, applicant } = getUniqueApplicant({ needsID: true });
+  const [, applicant] = getUniqueApplicant({ needsID: true });
   const testApplicant: Applicant = { ...applicant, applicationStatus: ApplicantStatus.Confirmed };
   when(mockApplicantService.findOne(applicant.id)).thenResolve(testApplicant);
 
@@ -328,7 +328,7 @@ test.serial("Test checkin performed by organiser on confirmed applicant", async 
 });
 
 test.serial("Test checkin not allowed on rejected applicant", async t => {
-  const { applicantRequest, applicant } = getUniqueApplicant({ needsID: true });
+  const [, applicant] = getUniqueApplicant({ needsID: true });
   when(mockApplicantService.findOne(applicant.id)).thenResolve({
     ...applicant,
     applicationStatus: ApplicantStatus.Rejected
@@ -342,7 +342,7 @@ test.serial("Test checkin not allowed on rejected applicant", async t => {
 });
 
 test.serial("Test checkin not allowed on invited applicant", async t => {
-  const { applicantRequest, applicant } = getUniqueApplicant({ needsID: true });
+  const [, applicant] = getUniqueApplicant({ needsID: true });
   when(mockApplicantService.findOne(applicant.id)).thenResolve({
     ...applicant,
     applicationStatus: ApplicantStatus.Invited
