@@ -39,4 +39,6 @@ export function initEnv(): void {
   process.env.DIGEST = "sha256";
   process.env.SESSION_SECRET = "cat";
   process.env.ENVIRONMENT = "dev";
+  process.env.AUTH_URL = "localhost:auth";
+  process.env.APPLICATION_URL = "localhost:applications";
 }
