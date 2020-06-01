@@ -3,7 +3,6 @@ import * as querystring from "querystring";
 import { Express, Request, Response, Application, NextFunction, CookieOptions } from "express";
 import * as CookieStrategy from "passport-cookie";
 import { injectable, inject } from "inversify";
-import { ApplicantService } from "../../services";
 import { TYPES } from "../../types";
 import { Cache } from "../cache";
 import { getCurrentUser, RequestUser, AuthLevels } from "@unicsmcr/hs_auth_client";
@@ -14,18 +13,9 @@ export interface RequestAuthenticationInterface {
 
 @injectable()
 export class RequestAuthentication {
-  // We inject the applicant service since in the future we may want to
-  // get check if a partial application has been added to the database
-  // and attach it to req.user
-  private _applicantService: ApplicantService;
-
   private _cache: Cache;
 
-  public constructor(
-    @inject(TYPES.Cache) cache: Cache,
-    @inject(TYPES.ApplicantService) applicantService: ApplicantService
-  ) {
-    this._applicantService = applicantService;
+  public constructor(@inject(TYPES.Cache) cache: Cache) {
     this._cache = cache;
   }
 
@@ -71,28 +61,22 @@ export class RequestAuthentication {
   };
 
   public checkLoggedIn = (req: Request, res: Response, next: NextFunction): void => {
-    passport.authenticate(
-      "cookie",
-      {
-        session: false
-      },
-      (err, user, info) => {
-        if (err) {
-          return next(err);
-        }
-
-        // There is not authenticated user, so redirect to logins
-        if (!user) {
-          const queryParam: string = querystring.encode({
-            returnto: `${process.env.APPLICATION_URL}${req.originalUrl}`
-          });
-          res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
-          return;
-        }
-        res.locals.authLevel = user.authLevel;
-        return next();
+    passport.authenticate("cookie", { session: false }, (err, user, info) => {
+      if (err) {
+        return next(err);
       }
-    )(req, res, next);
+
+      // There is not authenticated user, so redirect to logins
+      if (!user) {
+        const queryParam: string = querystring.encode({
+          returnto: `${process.env.APPLICATION_URL}${req.originalUrl}`
+        });
+        res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
+        return next("User not authenticated");
+      }
+      res.locals.authLevel = user.authLevel;
+      return next();
+    })(req, res, next);
   };
 
   public checkAuthLevel = (req: Request, res: Response, user: RequestUser, requiredAuth: AuthLevels): boolean => {
