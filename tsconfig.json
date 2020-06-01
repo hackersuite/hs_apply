@@ -6,12 +6,13 @@
     "lib": ["dom"],
     "noImplicitAny": false,
     "outDir": "dist",
-    "types": ["reflect-metadata"],
+    "types": ["reflect-metadata", "jest"],
+    "typeRoots": ["./types", "./node_modules/@types"],
     "inlineSourceMap": true,
     "inlineSources": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },
   "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"],
-  "include": ["src/**/*.ts"]
+  "include": ["./src/**/*.ts"]
 }
