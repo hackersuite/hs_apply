@@ -1,4 +1,3 @@
-import test from "ava";
 import { Cache, Cacheable } from "../../../../src/util/cache";
 
 class MockCacheableA implements Cacheable {
@@ -31,7 +30,7 @@ let itemsClassA: MockCacheableA[];
 let itemsClassB: MockCacheableB[];
 let sampleItemsCollection: Map<string, Map<number, Cacheable>>;
 
-test.beforeEach(() => {
+beforeEach(() => {
   sampleItemsCollection = new Map<string, Map<number, Cacheable>>();
   sampleItemsCollection.set(MockCacheableA.name, new Map<number, Cacheable>());
   sampleItemsCollection.set(MockCacheableB.name, new Map<number, Cacheable>());
@@ -51,66 +50,63 @@ test.beforeEach(() => {
   });
 });
 
-test("get should return the expected item", t => {
+test("get should return the expected item", () => {
   const cache: Cache = new Cache(sampleItemsCollection);
 
   itemsClassA.forEach((obj: MockCacheableA) => {
-    t.deepEqual(cache.get(MockCacheableA.name, obj.id), obj);
+    expect(cache.get(MockCacheableA.name, obj.id)).toEqual(obj);
   });
 
   itemsClassB.forEach((obj: MockCacheableB) => {
-    t.deepEqual(cache.get(MockCacheableB.name, obj.id), obj);
+    expect(cache.get(MockCacheableB.name, obj.id)).toEqual(obj);
   });
 });
 
-test("get should return undefined when the cache is empty", t => {
+test("get should return undefined when the cache is empty", () => {
   const cache: Cache = new Cache();
 
-  t.is(cache.get(MockCacheableA.name, itemsClassA[0].id), undefined);
+  expect(cache.get(MockCacheableA.name, itemsClassA[0].id)).toBe(undefined);
 });
 
-test("getAll should return the expected items", t => {
+test("getAll should return the expected items", () => {
   const cache: Cache = new Cache(sampleItemsCollection);
 
   const returnedACollection: MockCacheableA[] = cache.getAll(MockCacheableA.name);
-  t.deepEqual(returnedACollection, itemsClassA);
+  expect(returnedACollection).toEqual(itemsClassA);
 
   const returnedBCollection: MockCacheableB[] = cache.getAll(MockCacheableB.name);
-  t.deepEqual(returnedBCollection, itemsClassB);
+  expect(returnedBCollection).toEqual(itemsClassB);
 });
 
-test("set should add the given item to the cache", t => {
+test("set should add the given item to the cache", () => {
   const cache: Cache = new Cache(sampleItemsCollection);
 
   itemsClassA.push(new MockCacheableA(2, "test"));
   cache.set(MockCacheableA.name, itemsClassA[itemsClassA.length - 1]);
 
-  t.deepEqual(
-    cache.get(MockCacheableA.name, itemsClassA[itemsClassA.length - 1].id),
-    itemsClassA[itemsClassA.length - 1]
-  );
+  expect(cache.get(MockCacheableA.name, itemsClassA[itemsClassA.length - 1].id)).toEqual(itemsClassA[itemsClassA.length - 1]);
 });
 
 // Serial tests since we are modifying the global itemsClassA
-test.serial("set should not affect other collections", t => {
+test("set should not affect other collections", () => {
   const cache: Cache = new Cache(sampleItemsCollection);
 
   itemsClassA.push(new MockCacheableA(2, "test"));
   cache.set(MockCacheableA.name, itemsClassA[itemsClassA.length - 1]);
 
-  t.deepEqual(cache.getAll(MockCacheableB.name), itemsClassB);
+  expect(cache.getAll(MockCacheableB.name)).toEqual(itemsClassB);
 });
 
-test.serial("set should create new collection in empty cache", t => {
+test("set should create new collection in empty cache", () => {
   const cache: Cache = new Cache();
 
   itemsClassA.push(new MockCacheableA(2, "test"));
   cache.set(MockCacheableA.name, itemsClassA[0]);
 
-  t.deepEqual(cache.get(MockCacheableA.name, itemsClassA[0].id), itemsClassA[0]);
+  expect(cache.get(MockCacheableA.name, itemsClassA[0].id)).toEqual(itemsClassA[0]);
 });
 
-test.serial("setAll should add all elements in an array to the cache", t => {
+test("setAll should add all elements in an array to the cache", () => {
   const cache: Cache = new Cache(sampleItemsCollection);
 
   itemsClassA.push(new MockCacheableA(2, "test"));
@@ -118,37 +114,37 @@ test.serial("setAll should add all elements in an array to the cache", t => {
 
   cache.setAll(MockCacheableA.name, itemsClassA);
 
-  t.deepEqual(cache.getAll(MockCacheableA.name), itemsClassA);
+  expect(cache.getAll(MockCacheableA.name)).toEqual(itemsClassA);
 });
 
-test.serial("getAll should only return elements that are not expired", t => {
+test("getAll should only return elements that are not expired", () => {
   itemsClassA[0].expiresIn = 0;
   const cache: Cache = new Cache(sampleItemsCollection);
 
   itemsClassA = itemsClassA.splice(1);
 
-  t.deepEqual(cache.getAll(MockCacheableA.name), itemsClassA);
+  expect(cache.getAll(MockCacheableA.name)).toEqual(itemsClassA);
 });
 // End of serial tests, all other run concurrently
 
-test("setAll should create a new collection in an empty cache", t => {
+test("setAll should create a new collection in an empty cache", () => {
   const cache: Cache = new Cache();
 
   cache.setAll(MockCacheableA.name, itemsClassA);
 
-  t.deepEqual(cache.getAll(MockCacheableA.name), itemsClassA);
+  expect(cache.getAll(MockCacheableA.name)).toEqual(itemsClassA);
 });
 
-test("setAll should not affect other collections in the cache", t => {
+test("setAll should not affect other collections in the cache", () => {
   sampleItemsCollection.delete(MockCacheableA.name);
   const cache: Cache = new Cache(sampleItemsCollection);
 
   cache.setAll(MockCacheableA.name, itemsClassA);
 
-  t.deepEqual(cache.getAll(MockCacheableB.name), itemsClassB);
+  expect(cache.getAll(MockCacheableB.name)).toEqual(itemsClassB);
 });
 
-test("delete should delete the required item from the cache", t => {
+test("delete should delete the required item from the cache", () => {
   const cache: Cache = new Cache(sampleItemsCollection);
 
   cache.delete(MockCacheableA.name, itemsClassA[0].id);
@@ -156,48 +152,48 @@ test("delete should delete the required item from the cache", t => {
   // Removing the first element in the array
   itemsClassA = itemsClassA.slice(1);
 
-  t.deepEqual(cache.getAll(MockCacheableA.name), itemsClassA);
-  t.deepEqual(cache.getAll(MockCacheableB.name), itemsClassB);
+  expect(cache.getAll(MockCacheableA.name)).toEqual(itemsClassA);
+  expect(cache.getAll(MockCacheableB.name)).toEqual(itemsClassB);
 });
 
-test("delete should not throw error when trying to delete an item in a non-existant collection", t => {
+test("delete should not throw error when trying to delete an item in a non-existant collection", () => {
   const cache: Cache = new Cache();
 
-  t.is(cache.delete(MockCacheableA.name, itemsClassA[0].id), undefined);
+  expect(cache.delete(MockCacheableA.name, itemsClassA[0].id)).toBe(undefined);
 });
 
-test("deleteAll should delete all items in a collection", t => {
+test("deleteAll should delete all items in a collection", () => {
   const cache: Cache = new Cache(sampleItemsCollection);
 
   cache.deleteAll(MockCacheableA.name);
 
-  t.deepEqual(cache.getAll(MockCacheableA.name), []);
+  expect(cache.getAll(MockCacheableA.name)).toEqual([]);
 });
 
-test("deleteAll should only affect one collection", t => {
+test("deleteAll should only affect one collection", () => {
   const cache: Cache = new Cache(sampleItemsCollection);
 
   cache.deleteAll(MockCacheableA.name);
 
-  t.deepEqual(cache.getAll(MockCacheableB.name), itemsClassB);
+  expect(cache.getAll(MockCacheableB.name)).toEqual(itemsClassB);
 });
 
-test("get should not return expired element", t => {
+test("get should not return expired element", () => {
   const cache: Cache = new Cache();
   const expiredElement: MockCacheableA = new MockCacheableA(0, "test");
 
   expiredElement.expiresIn = 0;
   cache.set(MockCacheableA.name, expiredElement);
 
-  t.is(cache.get(MockCacheableA.name, expiredElement.id), undefined);
+  expect(cache.get(MockCacheableA.name, expiredElement.id)).toBe(undefined);
 });
 
-test("element with negative expiresIn should not expire", t => {
+test("element with negative expiresIn should not expire", () => {
   const cache: Cache = new Cache();
   const element: MockCacheableA = new MockCacheableA(0, "test");
 
   element.expiresIn = -1;
   cache.set(MockCacheableA.name, element);
 
-  t.deepEqual(cache.get(MockCacheableA.name, element.id), element);
+  expect(cache.get(MockCacheableA.name, element.id)).toEqual(element);
 });

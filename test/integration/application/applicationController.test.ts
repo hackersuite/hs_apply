@@ -1,4 +1,3 @@
-import test from "ava";
 import * as request from "supertest";
 import { App } from "../../../src/app";
 import { Express, NextFunction } from "express";
@@ -77,7 +76,7 @@ const getUniqueApplicant = (options?: { needsID: boolean }): [any, Applicant] =>
   return [applicantRequest, applicant];
 };
 
-test.before.cb(t => {
+beforeAll(done => {
   initEnv();
   mockCache = mock(Cache);
   mockApplicantService = mock(ApplicantService);
@@ -114,20 +113,20 @@ test.before.cb(t => {
 
   new App().buildApp((builtApp: Express, err: Error): void => {
     if (err) {
-      t.end(err.message + "\n" + err.stack);
+      done(err.message + "\n" + err.stack);
     } else {
       bApp = builtApp;
-      t.end();
+      done();
     }
   }, getTestDatabaseOptions());
 });
 
-test.beforeEach(() => {
+beforeEach(() => {
   // Create a snapshot so each unit test can modify it without breaking other unit tests
   container.snapshot();
 });
 
-test.afterEach(() => {
+afterEach(() => {
   // Reset the mocks
   reset(mockCache);
   reset(mockApplicantService);
@@ -136,7 +135,7 @@ test.afterEach(() => {
   container.restore();
 });
 
-test.serial("Test application page loads, applications open, no application submitted", async t => {
+test("Test application page loads, applications open, no application submitted", async () => {
   // Mock out the cache and question loader
   when(mockCache.getAll(Sections.name)).thenReturn([new Sections([])]);
   when(mockApplicantService.findOne(anything(), anything())).thenResolve(undefined);
@@ -145,10 +144,10 @@ test.serial("Test application page loads, applications open, no application subm
   const response = await request(bApp).get("/apply");
 
   // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
+  expect(response.status).toBe(HttpResponseCode.OK);
 });
 
-test.serial("Test application page redirects, applications open, application submitted", async t => {
+test("Test application page redirects, applications open, application submitted", async () => {
   // Mock out the cache and question loader
   when(mockCache.getAll(Sections.name)).thenReturn([new Sections([])]);
   when(mockApplicantService.findOne(anything(), anything())).thenResolve(new Applicant());
@@ -157,10 +156,10 @@ test.serial("Test application page redirects, applications open, application sub
   const response = await request(bApp).get("/apply");
 
   // Check that we get a REDIRECT (302) response code
-  t.is(response.status, HttpResponseCode.REDIRECT);
+  expect(response.status).toBe(HttpResponseCode.REDIRECT);
 });
 
-test.serial("Test applicant deleted when application open", async t => {
+test("Test applicant deleted when application open", async () => {
   const [, applicant] = getUniqueApplicant();
   when(mockApplicantService.findOne(requestUser.authId, "authId")).thenResolve(applicant);
   when(mockApplicantService.delete(applicant.id)).thenResolve();
@@ -172,10 +171,10 @@ test.serial("Test applicant deleted when application open", async t => {
   verify(mockApplicantService.findOne(requestUser.authId, "authId")).once();
   verify(mockApplicantService.save(objectContaining(applicant))).never();
   verify(mockApplicantService.delete(applicant.id)).once();
-  t.is(response.status, HttpResponseCode.REDIRECT);
+  expect(response.status).toBe(HttpResponseCode.REDIRECT);
 });
 
-test("Test applicant created with valid request, applications open", async t => {
+test("Test applicant created with valid request, applications open", async () => {
   const [applicantRequest, applicant] = getUniqueApplicant();
   when(mockApplicantService.save(objectContaining(applicant), undefined)).thenResolve(applicant);
 
@@ -185,10 +184,10 @@ test("Test applicant created with valid request, applications open", async t => 
     .send({ applicantRequest });
 
   // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
+  expect(response.status).toBe(HttpResponseCode.OK);
 });
 
-test("Test applicant created with valid request (using Other input options)", async t => {
+test("Test applicant created with valid request (using Other input options)", async () => {
   const workArea = "Testtt";
   const [applicantRequest, applicant] = getUniqueApplicant();
   applicant.workArea = workArea;
@@ -205,10 +204,10 @@ test("Test applicant created with valid request (using Other input options)", as
     });
 
   // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
+  expect(response.status).toBe(HttpResponseCode.OK);
 });
 
-test("Test applicant created with valid request (with no Other input provided)", async t => {
+test("Test applicant created with valid request (with no Other input provided)", async () => {
   const [applicantRequest, applicant] = getUniqueApplicant();
   applicant.gender = "Other";
   when(mockApplicantService.save(objectContaining(applicant), undefined)).thenResolve(applicant);
@@ -224,13 +223,13 @@ test("Test applicant created with valid request (with no Other input provided)",
     });
 
   // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
+  expect(response.status).toBe(HttpResponseCode.OK);
 });
 
-test("Test applicant not created with invalid input", async t => {
-  const [applicantRequest, applicant] = getUniqueApplicant();
+test("Test applicant not created with invalid input", async () => {
+  const [applicantRequest] = getUniqueApplicant();
   // Mock out the application save call in the service
-  when(mockApplicantService.save(objectContaining(applicant), undefined)).thenReject(new Error(""));
+  when(mockApplicantService.save(anything(), undefined)).thenReject(new Error(""));
 
   // Perform the post request along /apply
   const response = await request(bApp)
@@ -238,11 +237,11 @@ test("Test applicant not created with invalid input", async t => {
     .send(applicantRequest);
 
   // Check that we get a BAD_REQUEST (400) response code
-  t.is(response.status, HttpResponseCode.BAD_REQUEST);
-  t.is(response.body.error, true);
+  expect(response.status).toBe(HttpResponseCode.BAD_REQUEST);
+  expect(response.body.error).toBe(true);
 });
 
-test("Test applicant not created with cv too large", async t => {
+test("Test applicant not created with cv too large", async () => {
   // Perform the request along /apply
   const response = await request(bApp)
     .post("/apply")
@@ -250,12 +249,12 @@ test("Test applicant not created with cv too large", async t => {
     .field(newApplicantRequest);
 
   // Check that we get a BAD_REQUEST (400) response code
-  t.is(response.status, HttpResponseCode.BAD_REQUEST);
-  t.is(response.body.error, true);
-  t.is(response.body.message, "File too large");
+  expect(response.status).toBe(HttpResponseCode.BAD_REQUEST);
+  expect(response.body.error).toBe(true);
+  expect(response.body.message).toBe("File too large");
 });
 
-test("Test applicant not created with unsupported cv format", async t => {
+test("Test applicant not created with unsupported cv format", async () => {
   // Perform the request along .../apply
   const response = await request(bApp)
     .post("/apply")
@@ -263,12 +262,12 @@ test("Test applicant not created with unsupported cv format", async t => {
     .field(newApplicantRequest);
 
   // Check that we get a BAD_REQUEST (400) response code
-  t.is(response.status, HttpResponseCode.BAD_REQUEST);
-  t.is(response.body.error, true);
-  t.is(response.body.message, "Unsupported file format");
+  expect(response.status).toBe(HttpResponseCode.BAD_REQUEST);
+  expect(response.body.error).toBe(true);
+  expect(response.body.message).toBe("Unsupported file format");
 });
 
-test("Test applicant created with doc cv", async t => {
+test("Test applicant created with doc cv", async () => {
   const cvFile: Buffer = Buffer.from("");
   const [applicantRequest, applicant] = getUniqueApplicant();
   when(mockApplicantService.save(objectContaining(applicant), anyOfClass(Buffer))).thenResolve(applicant);
@@ -280,10 +279,10 @@ test("Test applicant created with doc cv", async t => {
     .field(applicantRequest);
 
   // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
+  expect(response.status).toBe(HttpResponseCode.OK);
 });
 
-test("Test applicant created with pdf cv", async t => {
+test("Test applicant created with pdf cv", async () => {
   const cvFile: Buffer = Buffer.from("");
   const [applicantRequest, applicant] = getUniqueApplicant();
   when(mockApplicantService.save(objectContaining(applicant), anyOfClass(Buffer))).thenResolve(applicant);
@@ -295,10 +294,10 @@ test("Test applicant created with pdf cv", async t => {
     .field(applicantRequest);
 
   // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
+  expect(response.status).toBe(HttpResponseCode.OK);
 });
 
-test("Test applicant created with docx cv", async t => {
+test("Test applicant created with docx cv", async () => {
   const cvFile: Buffer = Buffer.from("");
   const [applicantRequest, applicant] = getUniqueApplicant();
   when(mockApplicantService.save(objectContaining(applicant), anyOfClass(Buffer))).thenResolve(applicant);
@@ -310,11 +309,11 @@ test("Test applicant created with docx cv", async t => {
     .field(applicantRequest);
 
   // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
+  expect(response.status).toBe(HttpResponseCode.OK);
 });
 
 // Checkin Tests
-test.serial("Test checkin performed by organiser on confirmed applicant", async t => {
+test("Test checkin performed by organiser on confirmed applicant", async () => {
   const [, applicant] = getUniqueApplicant({ needsID: true });
   const testApplicant: Applicant = { ...applicant, applicationStatus: ApplicantStatus.Confirmed };
   when(mockApplicantService.findOne(applicant.id)).thenResolve(testApplicant);
@@ -323,11 +322,11 @@ test.serial("Test checkin performed by organiser on confirmed applicant", async 
   const response = await request(bApp).put(`/apply/${applicant.id}/checkin`);
 
   // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
-  t.is(testApplicant.applicationStatus, ApplicantStatus.Admitted);
+  expect(response.status).toBe(HttpResponseCode.OK);
+  expect(testApplicant.applicationStatus).toBe(ApplicantStatus.Admitted);
 });
 
-test.serial("Test checkin not allowed on rejected applicant", async t => {
+test("Test checkin not allowed on rejected applicant", async () => {
   const [, applicant] = getUniqueApplicant({ needsID: true });
   when(mockApplicantService.findOne(applicant.id)).thenResolve({
     ...applicant,
@@ -338,10 +337,10 @@ test.serial("Test checkin not allowed on rejected applicant", async t => {
   const response = await request(bApp).put(`/apply/${applicant.id}/checkin`);
 
   // Check that we get a BAD_REQUEST (400) response code
-  t.is(response.status, HttpResponseCode.BAD_REQUEST);
+  expect(response.status).toBe(HttpResponseCode.BAD_REQUEST);
 });
 
-test.serial("Test checkin not allowed on invited applicant", async t => {
+test("Test checkin not allowed on invited applicant", async () => {
   const [, applicant] = getUniqueApplicant({ needsID: true });
   when(mockApplicantService.findOne(applicant.id)).thenResolve({
     ...applicant,
@@ -352,5 +351,5 @@ test.serial("Test checkin not allowed on invited applicant", async t => {
   const response = await request(bApp).put(`/apply/${applicant.id}/checkin`);
 
   // Check that we get a BAD_REQUEST (400) response code
-  t.is(response.status, HttpResponseCode.BAD_REQUEST);
+  expect(response.status).toBe(HttpResponseCode.BAD_REQUEST);
 });

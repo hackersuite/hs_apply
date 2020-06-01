@@ -1,4 +1,3 @@
-import test from "ava";
 import * as request from "supertest";
 import { App } from "../../src/app";
 import { Express, NextFunction } from "express";
@@ -60,7 +59,7 @@ const requestUser = {
   authLevel: AuthLevels.Organiser
 };
 
-test.before.cb(t => {
+beforeAll(done => {
   initEnv();
 
   mockRequestAuth = mock(RequestAuthentication);
@@ -94,47 +93,47 @@ test.before.cb(t => {
 
   new App().buildApp((builtApp: Express, err: Error): void => {
     if (err) {
-      t.end(err.message + "\n" + err.stack);
+      done(err.message + "\n" + err.stack);
     } else {
       bApp = builtApp;
 
       // After the application has been built and db connection established -- get the applicant repository
       applicantRepository = container.get<ApplicantRepository>(TYPES.ApplicantRepository).getRepository();
-      t.end();
+      done();
     }
   }, getTestDatabaseOptions());
 });
 
-test.beforeEach(() => {
+beforeEach(() => {
   // Create a snapshot so each unit test can modify it without breaking other unit tests
   container.snapshot();
 });
 
-test.afterEach(() => {
+afterEach(() => {
   // Restore to last snapshot so each unit test takes a clean copy of the application container
   container.restore();
 });
 
-test("Test 404 page provided when invalid URL", async t => {
+test("Test 404 page provided when invalid URL", async () => {
   // Perform the request along .../apply
   const response = await request(bApp).get("/invalidpage-url-123");
 
   // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
+  expect(response.status).toBe(HttpResponseCode.OK);
 });
 
-test("Test applicant created with valid request", async t => {
+test("Test applicant created with valid request", async () => {
   // Perform the request along .../apply
   const response = await request(bApp)
     .post("/apply")
     .send(newApplicantRequest);
   // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
+  expect(response.status).toBe(HttpResponseCode.OK);
 
   // Check that the application has been added to the database
   const createdApplicant: Applicant = await applicantRepository.findOne({ authId: requestUser.authId });
-  t.is(createdApplicant.authId, requestUser.authId);
-  t.is(createdApplicant.age, newApplicantRequest.age);
-  t.is(createdApplicant.city, newApplicantRequest.city);
-  t.is(createdApplicant.degree, newApplicantRequest.degree);
+  expect(createdApplicant.authId).toBe(requestUser.authId);
+  expect(createdApplicant.age).toBe(newApplicantRequest.age);
+  expect(createdApplicant.city).toBe(newApplicantRequest.city);
+  expect(createdApplicant.degree).toBe(newApplicantRequest.degree);
 });

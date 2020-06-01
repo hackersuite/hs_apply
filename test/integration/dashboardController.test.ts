@@ -1,4 +1,3 @@
-import test from "ava";
 import * as request from "supertest";
 import { App } from "../../src/app";
 import { Express, NextFunction } from "express";
@@ -23,7 +22,7 @@ const requestUser = {
   authLevel: AuthLevels.Organiser
 };
 
-test.before.cb(t => {
+beforeAll(done => {
   initEnv();
   mockCache = mock(Cache);
   mockRequestAuth = mock(RequestAuthentication);
@@ -58,20 +57,20 @@ test.before.cb(t => {
 
   new App().buildApp((builtApp: Express, err: Error): void => {
     if (err) {
-      t.end(err.message + "\n" + err.stack);
+      done(err.message + "\n" + err.stack);
     } else {
       bApp = builtApp;
-      t.end();
+      done();
     }
   }, getTestDatabaseOptions());
 });
 
-test.beforeEach(() => {
+beforeEach(() => {
   // Create a snapshot so each unit test can modify it without breaking other unit tests
   container.snapshot();
 });
 
-test.afterEach(() => {
+afterEach(() => {
   // Reset the mocks
   reset(mockCache);
 
@@ -79,10 +78,10 @@ test.afterEach(() => {
   container.restore();
 });
 
-test("Test the dashboard page loads", async t => {
+test("Test the dashboard page loads", async () => {
   // Perform the request along .../
   const response = await request(bApp).get("/");
 
   // Check that we get a OK (200) response code
-  t.is(response.status, HttpResponseCode.OK);
+  expect(response.status).toBe(HttpResponseCode.OK);
 });
