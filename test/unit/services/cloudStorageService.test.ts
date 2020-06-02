@@ -5,9 +5,11 @@ import { CloudStorageService } from "../../../src/services";
 import axios from "axios";
 import { createWriteStream as writeStreamFunc } from "fs";
 import { PassThrough } from "stream";
-import { logger } from "../../../src/util";
 
 let storageService: CloudStorageService;
+
+const failResponseAPIErr = new Error("Failed to make Dropbox API Request");
+const failResponseServiceErr = new Error("File name is not valid to delete");
 
 beforeAll(() => {
   initEnv();
@@ -61,5 +63,32 @@ describe("API request to dropbox", () => {
 
     expect(axiosMock.post).toBeCalledTimes(1);
     expect(result).toBe(successResponse);
+  });
+});
+
+describe("Invalid API requests to dropbox", () => {
+  const axiosMock = axios as jest.Mocked<typeof axios>;
+  const failResponse = { data: "Failed" };
+  beforeAll(() => {
+    axiosMock.post.mockRejectedValue(failResponse);
+  });
+
+  afterEach(() => {
+    axiosMock.post.mockClear();
+  });
+
+  test("Test upload should fail when upload API request fails", async () => {
+    const promiseResult = storageService.upload("testfile.pdf", Buffer.from(""));
+    await expect(promiseResult).rejects.toThrow(failResponseAPIErr);
+  });
+
+  test("Test delete should fail when upload API request fails", async () => {
+    const promiseResult = storageService.delete("testfile.pdf");
+    await expect(promiseResult).rejects.toThrow(failResponseAPIErr);
+  });
+
+  test("Test delete should fail when invalid filename provided", async () => {
+    const promiseResult = storageService.delete("");
+    await expect(promiseResult).rejects.toThrow(failResponseServiceErr);
   });
 });
