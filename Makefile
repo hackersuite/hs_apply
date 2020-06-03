@@ -53,7 +53,7 @@ up-dev: setup-network
 ci:
 	docker-compose -f $(test_docker_compose_file) up -d
 	while ! docker exec mysql_db_test mysql --user=root -e "SELECT 1" >/dev/null 2>&1; do \
-    sleep 5; \
+    sleep 10; \
 	done
 	docker exec mysql_db_test mysql --user=root -e "CREATE DATABASE IF NOT EXISTS hs_applications;"
 	-npm run test:coverage
