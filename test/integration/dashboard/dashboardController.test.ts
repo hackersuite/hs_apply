@@ -1,13 +1,13 @@
 import * as request from "supertest";
-import { App } from "../../src/app";
+import { App } from "../../../src/app";
 import { Express, NextFunction } from "express";
-import { initEnv, getTestDatabaseOptions } from "../util/testUtils";
-import { HttpResponseCode } from "../../src/util/errorHandling";
+import { initEnv, getTestDatabaseOptions } from "../../util/testUtils";
+import { HttpResponseCode } from "../../../src/util/errorHandling";
 import { instance, mock, reset, when, anything } from "ts-mockito";
-import container from "../../src/inversify.config";
-import { TYPES } from "../../src/types";
-import { Cache } from "../../src/util/cache";
-import { RequestAuthentication, SettingLoader } from "../../src/util";
+import container from "../../../src/inversify.config";
+import { TYPES } from "../../../src/types";
+import { Cache } from "../../../src/util/cache";
+import { RequestAuthentication, SettingLoader } from "../../../src/util";
 import { AuthLevels } from "@unicsmcr/hs_auth_client";
 
 let bApp: Express;
