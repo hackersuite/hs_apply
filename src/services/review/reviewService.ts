@@ -9,6 +9,8 @@ export interface ReviewServiceInterface {
   getAll: () => Promise<Review[]>;
   getNextApplication: (reviewerID: string, chooseFromK: number) => Promise<Applicant>;
   save: (newReview: Review) => Promise<Review>;
+  getReviewCountByApplicantID: (applicantID: string) => Promise<number>;
+  getReviewCountByAuthID: (reviewerAuthID: string) => Promise<number>;
 }
 
 @injectable()
@@ -23,17 +25,6 @@ export class ReviewService implements ReviewServiceInterface {
     this._applicantService = applicantService;
     this._reviewRepository = reviewRepository.getRepository();
   }
-
-  public getReviewCountByApplicantID = async (applicantID: string): Promise<number> => {
-    try {
-      return await this._reviewRepository
-        .createQueryBuilder()
-        .where("applicantId = :id", { id: applicantID })
-        .getCount();
-    } catch (err) {
-      throw new Error("Failed to get review count for application");
-    }
-  };
 
   public getAll = async (columns?: (keyof Review)[]): Promise<Review[]> => {
     try {
@@ -58,6 +49,17 @@ export class ReviewService implements ReviewServiceInterface {
 
     // Pick a random application from the top k
     return applications[(Math.random() * numberOfApplications) | 0];
+  };
+
+  public getReviewCountByApplicantID = async (applicantID: string): Promise<number> => {
+    try {
+      return await this._reviewRepository.count({
+        select: ["applicant"],
+        where: { applicant: applicantID }
+      });
+    } catch (err) {
+      throw new Error("Failed to get review count for application");
+    }
   };
 
   public getReviewCountByAuthID = async (reviewerAuthID: string): Promise<number> => {
