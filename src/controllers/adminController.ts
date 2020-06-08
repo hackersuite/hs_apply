@@ -203,11 +203,11 @@ export class AdminController implements AdminControllerInterface {
       application.skills = this.escapeForCSV(application.skills);
       csvContents += `${application.createdAt},${application.id},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree}"\n`;
     });
-    const readStream = new PassThrough();
-    readStream.end(Buffer.from(csvContents));
+    const csvStream = new PassThrough();
+    csvStream.end(Buffer.from(csvContents));
     res.set("Content-Disposition", "attachment; filename=voting.csv");
-    res.set("Content-Type", "text/plain");
-    readStream.pipe(res).on("error", err => {
+    res.set("Content-Type", "text/csv");
+    csvStream.pipe(res).on("error", err => {
       logger.error(`File transfer failed! ${err.message}`);
     });
   };
