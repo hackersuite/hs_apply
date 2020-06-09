@@ -171,24 +171,18 @@ jest.mock("@unicsmcr/hs_auth_client");
 describe("Check logged in tests", () => {
   const mockGetCurrentUserRequest = authUserReq as jest.Mock;
 
-  test("User logged in and auth level verfied with valid request", done => {
+  test("User logged in and auth level verfied with valid request", async () => {
+    // Test setup cookies and mock passport and hs_auth API
     mockGetCurrentUserRequest.mockImplementation(() => Promise.resolve(requestUser));
-
-    function callback(): void {
-      try {
-        expect(reqMock.user).toBe(requestUser);
-        expect(mockGetCurrentUserRequest).toHaveBeenCalledTimes(1);
-        done();
-      } catch (error) {
-        done(error);
-      }
-    }
     reqMock.cookies["Authorization"] = "test_cookie";
     requestAuth.passportSetup(mock<Express>());
-    requestAuth.checkLoggedIn(reqMock, resMock, callback);
+
+    await requestAuth.checkLoggedIn(reqMock, resMock, nextFunctionMock);
+    expect(reqMock.user).toBe(requestUser);
+    expect(mockGetCurrentUserRequest).toHaveBeenCalledTimes(1);
   });
 
-  test("User redirected when user is not authenticated", done => {
+  test("User redirected when user is not authenticated", async () => {
     // Test setup for creating mock implementation of getCurrentUser API request
     const getCurrentUserRejectError = new Error("MockFuncError");
     mockGetCurrentUserRequest.mockRejectedValue(getCurrentUserRejectError);
@@ -196,23 +190,14 @@ describe("Check logged in tests", () => {
     // Test setup for creating a mock of the redirect function we can spy on
     resMock.redirect = jest.fn();
 
-    function callback(): void {
-      try {
-        // Verify that the auth request failed and we are redirected to login
-        expect(mockGetCurrentUserRequest).rejects.toBe(getCurrentUserRejectError);
-        expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
-        expect(resMock.locals.authLevel).toBeFalsy();
-
-        // End the test successfully
-        done();
-      } catch (error) {
-        done(error);
-      }
-    }
-
     // Perform the test
     requestAuth.passportSetup(mock<Express>());
-    requestAuth.checkLoggedIn(reqMock, resMock, callback);
+    await requestAuth.checkLoggedIn(reqMock, resMock, nextFunctionMock);
+
+    // Verify that the auth request failed and we are redirected to login
+    expect(mockGetCurrentUserRequest).rejects.toBe(getCurrentUserRejectError);
+    expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
+    expect(resMock.locals.authLevel).toBeFalsy();
   });
 
   afterAll(() => {

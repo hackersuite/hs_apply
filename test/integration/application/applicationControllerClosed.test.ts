@@ -87,7 +87,7 @@ beforeAll(done => {
   container.rebind(TYPES.SettingLoader).toConstantValue(instance(mockSettingLoader));
 
   when(mockRequestAuth.passportSetup).thenReturn(() => null);
-  when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
+  when(mockRequestAuth.checkLoggedIn).thenReturn(async (req, res, next: NextFunction) => {
     req.user = requestUser;
     next();
   });

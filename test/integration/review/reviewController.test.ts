@@ -54,7 +54,7 @@ beforeAll(done => {
   container.rebind(TYPES.ReviewService).toConstantValue(instance(mockReviewService));
 
   when(mockRequestAuth.passportSetup).thenReturn(() => null);
-  when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
+  when(mockRequestAuth.checkLoggedIn).thenReturn(async (req, res, next: NextFunction) => {
     req.user = requestUser;
     next();
   });
@@ -112,7 +112,7 @@ describe("Review page tests", () => {
   // TODO: Add auth tests
   test.skip("Test review page inaccessible to attendees", async () => {
     // Setup test authentication as Attendee
-    when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
+    when(mockRequestAuth.checkLoggedIn).thenReturn(async (req, res, next: NextFunction) => {
       req.user = { ...requestUser, authLevel: AuthLevels.Attendee };
       logger.info(req.user);
       next();
