@@ -60,23 +60,31 @@ export class RequestAuthentication {
     );
   };
 
-  public checkLoggedIn = (req: Request, res: Response, next: NextFunction): void => {
-    passport.authenticate("cookie", { session: false }, (err, user, info) => {
-      if (err) {
-        return next(err);
-      }
+  public authenticate = (req: Request, res: Response): Promise<RequestUser> => {
+    return new Promise((resolve, reject) => {
+      passport.authenticate("cookie", { session: false }, (err: any, user: RequestUser) => {
+        if (err) reject(new Error(err));
+        else if (!user) reject(new Error("Not authenticated"));
+        resolve(user);
+      })(req, res);
+    });
+  };
 
-      // There is not authenticated user, so redirect to logins
-      if (!user) {
-        const queryParam: string = querystring.encode({
-          returnto: `${process.env.APPLICATION_URL}${req.originalUrl}`
-        });
-        res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
-        return next("User not authenticated");
-      }
-      res.locals.authLevel = user.authLevel;
-      return next();
-    })(req, res, next);
+  public checkLoggedIn = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    let user: RequestUser;
+    try {
+      user = await this.authenticate(req, res);
+    } catch (err) {
+      // Either user was not authenticated, or an error occured during authentication
+      // In both cases we redirect them to the login
+      const queryParam: string = querystring.encode({
+        returnto: `${process.env.APPLICATION_URL}${req.originalUrl}`
+      });
+      res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
+      return;
+    }
+    res.locals.authLevel = user.authLevel;
+    return next();
   };
 
   public checkAuthLevel = (req: Request, res: Response, user: RequestUser, requiredAuth: AuthLevels): boolean => {
