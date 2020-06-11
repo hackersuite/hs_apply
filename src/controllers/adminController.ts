@@ -11,6 +11,7 @@ import { getAllUsers, RequestUser } from "@unicsmcr/hs_auth_client";
 import { CloudStorageService } from "../services/cloudStorage/cloudStorageService";
 import { createWriteableStream, WriteableStreamCallback, CleanupCallback, logger } from "../util";
 import { HttpResponseCode } from "../util/errorHandling";
+import { PassThrough } from "stream";
 
 export interface AdminControllerInterface {
   overview: (req: Request, res: Response, next: NextFunction) => void;
@@ -193,32 +194,22 @@ export class AdminController implements AdminControllerInterface {
       authUsers[a.authId] = { ...a };
     });
 
-    const stream = fs.createWriteStream("voting.csv");
-    stream.on("finish", () => {
-      // Once the stream is closed, send the file in the response
-      res.download("voting.csv", err => {
-        if (err) {
-          logger.error("File transfer failed!");
-        }
-        // Remove the voting.csv file once the download has either completed or failed
-        fs.unlink("voting.csv", err => {
-          if (err) {
-            logger.error(`Failed to remove the voting.csv file! ${err}`);
-          }
-        });
-      });
-    });
+    let csvContents = "";
     allApplicants.forEach(application => {
       // UID, TID, WhyChoose?, Proj, Skills, Degree
       const team: string = authUsers[application.authId] ? authUsers[application.authId].team : "";
       application.whyChooseHacker = this.escapeForCSV(application.whyChooseHacker);
       application.pastProjects = this.escapeForCSV(application.pastProjects);
       application.skills = this.escapeForCSV(application.skills);
-      stream.write(
-        `${application.createdAt},${application.id},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree}"\n`
-      );
+      csvContents += `${application.createdAt},${application.id},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree}"\n`;
     });
-    stream.end();
+    const csvStream = new PassThrough();
+    csvStream.end(Buffer.from(csvContents));
+    res.set("Content-Disposition", "attachment; filename=voting.csv");
+    res.set("Content-Type", "text/csv");
+    csvStream.pipe(res).on("error", err => {
+      logger.error(`File transfer failed! ${err.message}`);
+    });
   };
 
   private escapeForCSV = (input: string): string => {
