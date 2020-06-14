@@ -1,0 +1,8 @@
+<div class="form-group">
+  <label class="bmd-label-floating apply-label" for="<%= currentID %>">
+  <%= question.questionText %>
+  <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+  </label>
+  
+  <input autocomplete="off" type="text" class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
+</div>

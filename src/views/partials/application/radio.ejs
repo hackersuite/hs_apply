@@ -1,0 +1,35 @@
+<div class="form-group bmd-form-group">
+  <label class="apply-form-radio-label apply-label">
+  <%= question.questionText %>
+  <%- question.required ? "<span class='label-req'> *</span>" : "" %>
+  </label>
+<% if (question.hasOwnProperty('answerOptions')) { %>
+  <% question.answerOptions.forEach((multiradio, index) => { %>
+    <div class="form-check form-check-radio">
+      <label class="form-check-label">
+          <input class="form-check-input" type="radio" name="<%= question.questionName %>" value="<%= multiradio %>" <%= question.required ? "required" : "" %>>
+          <%= multiradio %>
+          <span class="circle">
+            <span class="check"></span>
+          </span>
+      </label>
+    </div>
+  <% }) %>
+  <div class="form-check form-check-radio">
+    <div class="form-row">
+      <div class="col-auto">
+        <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="<%= question.questionName %>" value="Other" id="<%= `${currentID}` %>-radio-other" <%= question.required ? "required" : "" %>>
+            Other
+            <span class="circle">
+                <span class="check"></span>
+            </span>
+        </label>
+      </div>
+      <div class="col-auto apply-form-radio-input-other">
+        <input class="form-control" type="text" name="<%= question.questionName %>Other" placeholder="Please specify"/>
+      </div>
+    </div>
+  </div>
+<% } %>
+</div>
