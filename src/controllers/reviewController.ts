@@ -5,7 +5,7 @@ import { ReviewService, ApplicantService } from "../services";
 import { Applicant, Review } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
 import { RequestUser } from "@unicsmcr/hs_auth_client";
-import { reviewApplicationMapping } from "../util";
+import { reviewApplicationMapping, logger } from "../util";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 
 export interface ReviewControllerInterface {

@@ -1,4 +1,3 @@
-import test from "ava";
 import { Express } from "express";
 import { App } from "../../src/app";
 import { getConnection } from "typeorm";
@@ -7,63 +6,63 @@ import { getTestDatabaseOptions, initEnv } from "../util/testUtils";
 /**
  * Setup the env variables for the tests
  */
-test.before((): void => {
+beforeAll(() => {
   initEnv();
 });
 
 /**
  * Building app with default settings
  */
-test.serial.cb("App should build without errors", t => {
+test("App should build without errors", done => {
   new App().buildApp(async (builtApp: Express, err: Error): Promise<void> => {
-    t.is(err, undefined);
-    t.is(builtApp.get("port"), process.env.PORT || 3000);
-    t.is(builtApp.get("env"), process.env.ENVIRONMENT || "production");
-    t.truthy(getConnection("applications").isConnected);
+    expect(err).toBe(undefined);
+    expect(builtApp.get("port")).toBe(process.env.PORT || 3000);
+    expect(builtApp.get("env")).toBe(process.env.ENVIRONMENT || "production");
+    expect(getConnection("applications").isConnected).toBeTruthy();
     await getConnection("applications").close();
-    t.end();
+    done();
   }, getTestDatabaseOptions());
 });
 
 /**
  * Testing dev environment
  */
-test.serial.cb("App should start in dev environment", t => {
+test("App should start in dev environment", done => {
   process.env.ENVIRONMENT = "dev";
   new App().buildApp(async (builtApp: Express, err: Error): Promise<void> => {
-    t.is(builtApp.get("env"), "dev");
-    t.is(err, undefined);
-    t.truthy(getConnection("applications").isConnected);
+    expect(builtApp.get("env")).toBe("dev");
+    expect(err).toBe(undefined);
+    expect(getConnection("applications").isConnected).toBeTruthy();
     await getConnection("applications").close();
-    t.end();
+    done();
   }, getTestDatabaseOptions());
 });
 
 /**
  * Testing production environment
  */
-test.serial.cb("App should start in production environment", t => {
+test("App should start in production environment", done => {
   process.env.ENVIRONMENT = "production";
   new App().buildApp(async (builtApp: Express, err: Error): Promise<void> => {
-    t.is(builtApp.get("env"), "production");
-    t.is(builtApp.get("trust proxy"), 1);
-    t.is(err, undefined);
-    t.truthy(getConnection("applications").isConnected);
+    expect(builtApp.get("env")).toBe("production");
+    expect(builtApp.get("trust proxy")).toBe(1);
+    expect(err).toBe(undefined);
+    expect(getConnection("applications").isConnected).toBeTruthy();
     await getConnection("applications").close();
-    t.end();
+    done();
   }, getTestDatabaseOptions());
 });
 
 /**
  * Testing error handling with incorrect settings
  */
-test.serial.cb("App should throw error with invalid settings", t => {
+test("App should throw error with invalid settings", done => {
   process.env.DB_HOST = "invalidhost";
   new App().buildApp(
     async (builtApp: Express, err: Error): Promise<void> => {
-      t.truthy(err);
-      t.falsy(getConnection("applications").isConnected);
-      t.end();
+      expect(err).toBeTruthy();
+      expect(getConnection("applications").isConnected).toBeFalsy();
+      done();
     }
   );
 });

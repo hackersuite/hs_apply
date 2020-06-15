@@ -1,4 +1,3 @@
-import test from "ava";
 import { when, mock, instance, reset, resetCalls, objectContaining } from "ts-mockito";
 import container from "../../../src/inversify.config";
 import { TYPES } from "../../../src/types";
@@ -40,7 +39,7 @@ let reviewService: ReviewService;
 let mockReviewRepository: Repository<Review>;
 class StubReviewRepository extends Repository<Review> {}
 
-test.before(() => {
+beforeAll(() => {
   const stubReviewRepository: ReviewRepository = mock(ReviewRepository);
   mockReviewRepository = mock(StubReviewRepository);
   when(stubReviewRepository.getRepository()).thenReturn(instance(mockReviewRepository));
@@ -50,74 +49,79 @@ test.before(() => {
   container.rebind(TYPES.ApplicantService).toConstantValue(instance(mockApplicantService));
 });
 
-test.beforeEach(() => {
+beforeEach(() => {
   // Create a snapshot so each unit test can modify it without breaking other unit tests
   container.snapshot();
   reviewService = container.get(TYPES.ReviewService);
 });
 
-test.afterEach(() => {
+afterEach(() => {
   // Restore to last snapshot so each unit test takes a clean copy of the container
   container.restore();
   resetCalls(mockReviewRepository);
   reset(mockReviewRepository);
 });
 
-/**
- * getAll Tests
- */
-test("Test all reviews can be found", async t => {
-  // Set up the stubbed method in the mock
-  when(mockReviewRepository.find(undefined)).thenResolve([testReview]);
+describe("getAll review tests", () => {
+  test("Test all reviews can be found", async () => {
+    // Set up the stubbed method in the mock
+    when(mockReviewRepository.find(undefined)).thenResolve([testReview]);
 
-  // Perform the test by calling the method in the service
-  const result: Review[] = await reviewService.getAll();
+    // Perform the test by calling the method in the service
+    const result: Review[] = await reviewService.getAll();
 
-  // Check the result is expected
-  t.deepEqual(result[0], testReview);
+    // Check the result is expected
+    expect(result[0]).toEqual(testReview);
+  });
+
+  test("Test only selected columns returned in getAll", async () => {
+    const testReviewOnlyAvgScore: Review = new Review();
+    testReviewOnlyAvgScore.averageScore = 10.0;
+    // Set up the stubbed method in the mock
+    when(mockReviewRepository.find(objectContaining({ select: ["averageScore"] }))).thenResolve([
+      testReviewOnlyAvgScore
+    ]);
+
+    // Perform the test by calling the method in the service
+    const result: Review[] = await reviewService.getAll(["averageScore"]);
+
+    // Check the result is expected
+    expect(result[0]).toEqual(testReviewOnlyAvgScore);
+  });
+
+  test("Test error thrown when getAll fails", async () => {
+    // Set up the stubbed method in the mock
+    when(mockReviewRepository.find(objectContaining({ select: ["createdAt"] }))).thenThrow(new Error());
+
+    await expect(reviewService.getAll(["createdAt"])).rejects.toThrow();
+  });
 });
 
-test("Test only selected columns returned in getAll", async t => {
-  const testReviewOnlyAvgScore: Review = new Review();
-  testReviewOnlyAvgScore.averageScore = 10.0;
-  // Set up the stubbed method in the mock
-  when(mockReviewRepository.find(objectContaining({ select: ["averageScore"] }))).thenResolve([testReviewOnlyAvgScore]);
+describe("getNextApplication to review tests", () => {
+  beforeAll(() => {
+    jest.spyOn(global.Math, "random").mockReturnValue(0.4);
+  });
 
-  // Perform the test by calling the method in the service
-  const result: Review[] = await reviewService.getAll(["averageScore"]);
+  afterAll(() => {
+    (global.Math.random as jest.Mock).mockRestore();
+  });
 
-  // Check the result is expected
-  t.deepEqual(result[0], testReviewOnlyAvgScore);
-});
+  test("Test that an application returned with less than 2 reviews", async () => {
+    const testReviewerID = "101001";
+    when(mockApplicantService.getKRandomToReview).thenReturn(() => Promise.resolve([testApplicant]));
 
-test("Test error thrown when getAll fails", async t => {
-  // Set up the stubbed method in the mock
-  when(mockReviewRepository.find(objectContaining({ select: ["createdAt"] }))).thenThrow(new Error());
+    // Although the getNextApplication has a random component, it is deterministic if we only pick from 1 application
+    const application: Applicant = await reviewService.getNextApplication(testReviewerID, 1);
 
-  const error: Error = await t.throwsAsync(reviewService.getAll(["createdAt"]));
+    expect(application).toEqual(testApplicant);
+  });
 
-  t.truthy(error);
-});
+  test("Test that undefined is returned when no application are for review", async () => {
+    const testReviewerID = "10100101";
+    when(mockApplicantService.getKRandomToReview).thenReturn(() => Promise.resolve([]));
 
-/**
- * getNextApplication Tests
- */
-test("Test that an application returned with less than 2 reviews", async t => {
-  const testReviewerID = "101001";
-  when(mockApplicantService.getKRandomToReview).thenReturn(() => Promise.resolve([testApplicant]));
+    const application: Applicant = await reviewService.getNextApplication(testReviewerID, 1);
 
-  // Although the getNextApplication has a random component, it is deterministic if we only pick from 1 application
-  // TODO: Switch to using SinonJS for testing so we can stub the Math.random function
-  const application: Applicant = await reviewService.getNextApplication(testReviewerID, 1);
-
-  t.deepEqual(application, testApplicant);
-});
-
-test("Test that undefined is returned when no application are for review", async t => {
-  const testReviewerID = "10100101";
-  when(mockApplicantService.getKRandomToReview).thenReturn(() => Promise.resolve([]));
-
-  const application: Applicant = await reviewService.getNextApplication(testReviewerID, 1);
-
-  t.is(application, undefined);
+    expect(application).toBe(undefined);
+  });
 });

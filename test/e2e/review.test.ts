@@ -4,37 +4,23 @@ import { Express, NextFunction } from "express";
 import { initEnv, getTestDatabaseOptions } from "../util/testUtils";
 import { HttpResponseCode } from "../../src/util/errorHandling";
 import container from "../../src/inversify.config";
-import { Applicant } from "../../src/models/db";
+import { Applicant, Review } from "../../src/models/db";
 import { RequestAuthentication } from "../../src/util/auth";
 import { SettingLoader } from "../../src/util/fs";
 import { AuthLevels } from "@unicsmcr/hs_auth_client";
 import { mock, instance, when, anything } from "ts-mockito";
 import { TYPES } from "../../src/types";
 import { Repository } from "typeorm";
-import { ApplicantRepository } from "../../src/repositories";
+import { ReviewRepository } from "../../src/repositories";
 
 let bApp: Express;
-let applicantRepository: Repository<Applicant>;
+let reviewRepository: Repository<Review>;
 let mockRequestAuth: RequestAuthentication;
 let mockSettingLoader: SettingLoader;
 
-const newApplicantRequest: any = {
-  age: 20,
-  gender: "Other",
-  genderOther: "Test",
-  nationality: "UK",
-  country: "UK",
-  city: "Manchester",
-  university: "UoM",
-  degree: "CS",
-  yearOfStudy: "Foundation",
-  workArea: "Other",
-  workAreaOther: "This",
-  hackathonCount: 0,
-  dietaryRequirements: "Other",
-  dietaryRequirementsOther: "Test",
-  tShirtSize: "M",
-  hearAbout: "IDK"
+const newReviewRequest: any = {
+  applicationID: "",
+  averageScore: 2.0
 };
 
 const testApplicant: Applicant = new Applicant();
@@ -98,7 +84,7 @@ beforeAll(done => {
       bApp = builtApp;
 
       // After the application has been built and db connection established -- get the applicant repository
-      applicantRepository = container.get<ApplicantRepository>(TYPES.ApplicantRepository).getRepository();
+      reviewRepository = container.get<ReviewRepository>(TYPES.ReviewRepository).getRepository();
       done();
     }
   }, getTestDatabaseOptions());
@@ -114,26 +100,19 @@ afterEach(() => {
   container.restore();
 });
 
-test("Test 404 page provided when invalid URL", async () => {
-  // Perform the request along .../apply
-  const response = await request(bApp).get("/invalidpage-url-123");
-
-  // Check that we get a OK (200) response code
-  expect(response.status).toBe(HttpResponseCode.OK);
-});
-
-test("Test applicant created with valid request", async () => {
-  // Perform the request along .../apply
+test("Test review created with valid request", async () => {
+  // Perform the request along .../review/submit
   const response = await request(bApp)
-    .post("/apply")
-    .send(newApplicantRequest);
+    .post("/review/submit")
+    .send(newReviewRequest);
   // Check that we get a OK (200) response code
   expect(response.status).toBe(HttpResponseCode.OK);
 
   // Check that the application has been added to the database
-  const createdApplicant: Applicant = await applicantRepository.findOne({ authId: requestUser.authId });
-  expect(createdApplicant.authId).toBe(requestUser.authId);
-  expect(createdApplicant.age).toBe(newApplicantRequest.age);
-  expect(createdApplicant.city).toBe(newApplicantRequest.city);
-  expect(createdApplicant.degree).toBe(newApplicantRequest.degree);
+  const createdReview: Review = await reviewRepository.findOne({ createdByAuthID: requestUser.authId });
+
+  expect(createdReview.averageScore).toBe(newReviewRequest.averageScore);
+  expect(createdReview.createdByAuthID).toBe(requestUser.authId);
+  expect(createdReview.id).toBeDefined();
+  expect(createdReview.createdAt).toBeInstanceOf(Date);
 });
