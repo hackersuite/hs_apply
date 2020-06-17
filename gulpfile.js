@@ -83,7 +83,7 @@ function views() {
      * 3. Positive lookahead for the file extension being .js or .css with no other characters after
      * Replaces the match with .min.js or .min.css
      */
-    .pipe(replace(/(?<=(src|href)=['"])[\/a-zA-z-_]+(?=\.(js|css)[^a-z])/gm, '$&.min'))
+    .pipe(replace(/(?<=(src|href)=['"])[/a-zA-z-_]+(?=\.(js|css)[^a-z])/gm, '$&.min'))
     .pipe(gulp.dest(paths.views.dest));
 }
 

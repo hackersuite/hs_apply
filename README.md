@@ -1,7 +1,7 @@
 # Hacker Suite Applications
 
 <p align="center">
-  <a href="https://travis-ci.org/unicsmcr/hs_hub" alt="Build Status">
+  <a href="https://travis-ci.org/unicsmcr/hs_application" alt="Build Status">
     <img src="https://travis-ci.org/unicsmcr/hs_application.svg?branch=master" />
   </a>
   <a href="https://codecov.io/gh/unicsmcr/hs_application" alt="License">
