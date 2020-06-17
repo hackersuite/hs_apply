@@ -36,7 +36,7 @@
 
 #applyForm .action-button-previous {
   width: 100px;
-  background: #C5C5F1;
+  background: #c5c5f1;
   font-weight: bold;
   color: white;
   border: 0 none;
@@ -48,14 +48,14 @@
 
 #applyForm .action-button-previous:hover,
 #applyForm .action-button-previous:focus {
-  box-shadow: 0 0 0 2px white, 0 0 0 3px #C5C5F1;
+  box-shadow: 0 0 0 2px white, 0 0 0 3px #c5c5f1;
 }
 
 /*headings*/
 .fs-title {
   font-size: 18px;
   text-transform: uppercase;
-  color: #2C3E50;
+  color: #2c3e50;
   margin-bottom: 10px;
   letter-spacing: 2px;
   font-weight: bold;
@@ -104,7 +104,7 @@
 
 /*progressbar connectors*/
 #progressbar li:after {
-  content: '';
+  content: "";
   width: 100%;
   height: 2px;
   background: white;
@@ -129,7 +129,7 @@
 }
 
 /* Override the default colour styling for bootstrap dropdown - on show we make the text white*/
-.show>.btn.dropdown-toggle {
+.show > .btn.dropdown-toggle {
   color: white !important;
 }
 
@@ -165,12 +165,12 @@ div.custom-file {
   left: 0;
   z-index: 1;
   height: calc(2.25rem + 2px);
-  padding: .375rem .75rem;
+  padding: 0.375rem 0.75rem;
   line-height: 1.5;
   color: #495057;
   background-color: #fff;
   border: 1px solid #ced4da;
-  border-radius: .25rem;
+  border-radius: 0.25rem;
 }
 
 .custom-file-label:after {
@@ -180,26 +180,34 @@ div.custom-file {
   bottom: 0;
   z-index: 3;
   display: block;
-  height: calc(calc(2.25rem + 2px) - 1px * 2);
-  padding: .375rem .75rem;
+  height: calc(2.25rem);
+  padding: 0.375rem 0.75rem;
   line-height: 1.5;
   color: #495057;
   content: "Browse";
   background-color: #e9ecef;
   border-left: 1px solid #ced4da;
-  border-radius: 0 .25rem .25rem 0;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+
+#attach-file-btn {
+  padding: 0 12px 0 0;
+}
+
+.btn-file-upload {
+  padding: 10px 15px;
 }
 
 span.twitter-typeahead {
-  width: 100%
+  width: 100%;
 }
 
 .list-group {
-  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   width: 100%;
 }
 
 .tt-menu {
-  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   width: 100%;
 }
