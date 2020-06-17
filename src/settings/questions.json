@@ -503,7 +503,7 @@
         },
         {
           "questionName": "cv",
-          "questionText": "Attach your CV (Maximum 5 MB file)",
+          "questionText": "Attach your CV",
           "answerType": "file",
           "required": false
         }
