@@ -1,0 +1,15 @@
+<div class="form-group">
+  <label
+  class="bmd-label-floating apply-label"
+  for="<%= currentID %>" >
+  <%= question.questionText %>
+  </label>
+
+  <textarea
+  class="form-control"
+  id="<%= currentID %>"
+  name="<%= question.questionName %>"
+  maxlength="<%= question.maxLength || "" %>"
+  rows="3"
+  <%= question.required ? "required" : "" %>></textarea>
+</div>

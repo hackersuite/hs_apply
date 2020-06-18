@@ -1,0 +1,29 @@
+<div class="form-group form-file-upload form-file-simple bmd-form-group">
+  <label class="apply-form-radio-label apply-label">
+  <%= question.questionText %>
+  </label>
+  
+  <input
+  id="customFile"
+  type="file"
+  class="inputFileHidden"
+  accept=".pdf,.doc,.docx"
+  name="<%= question.questionName %>"
+  <%= question.required ? "required" : "" %> >
+
+  <div class="input-group">
+    <span class="input-group-btn" id="attach-file-btn">
+      <button type="button" class="btn btn-success btn-file-upload">
+        Browse
+      </button>
+    </span>
+
+    <span class="input-group-btn" id="delete-file-btn" style="display: none;">
+      <button type="button" class="btn btn-fab btn-round btn-danger">
+        <i class="material-icons">delete</i>
+      </button>
+    </span>
+
+    <input id="shownCVFileInput" type="text" class="form-control inputFileVisible" placeholder="Choose file (Maximum 5 MB)" aria-label="Choose CV to upload" readonly>
+  </div>
+</div>

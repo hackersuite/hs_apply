@@ -187,28 +187,43 @@ $(document).ready(function() {
     });
   });
   
-  $('.form-file-simple .inputFileVisible, .form-file-simple .input-group-btn').click(function() {
+  const attachFileButton = $('#attach-file-btn');
+  const removeFileButton = $('#delete-file-btn');
+  const shownFileInput = $('#shownCVFileInput');
+  const trueFileInput = $('.form-file-simple .inputFileHidden');
+
+  attachFileButton.click(function() {
     $(this).parent().parent().find('.inputFileHidden').trigger('click');
     $(this).parent().parent().addClass('is-focused');
   });
-  
-  $('.form-file-simple .inputFileHidden').change(function() {
-    var shownFileInput = $(this).siblings('.input-group').find('.inputFileVisible');
+
+  removeFileButton.click(function() {
+    // Remove the file from the form, clear the input and show the 'browse' button
+    $(this).hide();
+    trueFileInput.val('');
+    shownFileInput.val('');
+    attachFileButton.show();
+  });
+
+  trueFileInput.change(function() {
     if (this.files[0].size > 5 * (1 << 20)) {
+      // Maximum of 5MB file
       // Notify the user the file chosen is invalid
-      $.notify({
-        message: 'Maximum file size is 5 MB'
-      }, {
-        type: 'danger'
-      });
-  
+      $.notify(
+        { message: 'Maximum file size is 5 MB' },
+        { type: 'danger' }
+      );
+
       // Remove the file from the input
       $(this).val('');
     } else {
+      // Set the file input box to display the file name
       var name = $(this).get(0).files.item(0).name;
-      $(shownFileInput).val(name);
+      shownFileInput.val(name);
+
+      attachFileButton.hide();
+      removeFileButton.show();
     }
-    $(shownFileInput).attr('value', '');
   });
   
   $('.form-file-simple .btn').on('focus', function() {
