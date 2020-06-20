@@ -7,7 +7,7 @@ import container from "../../src/inversify.config";
 import { Applicant, Review } from "../../src/models/db";
 import { RequestAuthentication } from "../../src/util/auth";
 import { SettingLoader } from "../../src/util/fs";
-import { AuthLevels } from "@unicsmcr/hs_auth_client";
+import { AuthLevel } from "@unicsmcr/hs_auth_client";
 import { mock, instance, when, anything } from "ts-mockito";
 import { TYPES } from "../../src/types";
 import { Repository } from "typeorm";
@@ -42,7 +42,7 @@ const requestUser = {
   name: "Test",
   email: "test@test.com",
   authId: "010101",
-  authLevel: AuthLevels.Organiser
+  authLevel: AuthLevel.Organiser
 };
 
 beforeAll(done => {

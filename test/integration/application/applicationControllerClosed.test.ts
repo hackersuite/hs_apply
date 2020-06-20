@@ -12,7 +12,7 @@ import { Sections } from "../../../src/models/sections";
 import { Applicant } from "../../../src/models/db";
 import { RequestAuthentication } from "../../../src/util/auth";
 import { SettingLoader } from "../../../src/util/fs/loader";
-import { AuthLevels } from "@unicsmcr/hs_auth_client";
+import { AuthLevel } from "@unicsmcr/hs_auth_client";
 import { ApplicantStatus } from "../../../src/services/applications/applicantStatus";
 
 let bApp: Express;
@@ -58,7 +58,7 @@ const requestUser = {
   name: "Test",
   email: "test@test.com",
   authId: "01010111",
-  authLevel: AuthLevels.Organiser
+  authLevel: AuthLevel.Organiser
 };
 
 const getUniqueApplicant = (): [any, Applicant] => {
