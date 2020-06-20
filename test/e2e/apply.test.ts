@@ -131,8 +131,8 @@ test("Test applicant created with valid request", async () => {
   expect(response.status).toBe(HttpResponseCode.OK);
 
   // Check that the application has been added to the database
-  const createdApplicant: Applicant = await applicantRepository.findOne({ authId: requestUser.authId });
-  expect(createdApplicant.authId).toBe(requestUser.authId);
+  const createdApplicant: Applicant = await applicantRepository.findOne({ authId: requestUser.id });
+  expect(createdApplicant.authId).toBe(requestUser.id);
   expect(createdApplicant.age).toBe(newApplicantRequest.age);
   expect(createdApplicant.city).toBe(newApplicantRequest.city);
   expect(createdApplicant.degree).toBe(newApplicantRequest.degree);

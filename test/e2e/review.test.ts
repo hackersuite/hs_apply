@@ -109,10 +109,10 @@ test("Test review created with valid request", async () => {
   expect(response.status).toBe(HttpResponseCode.OK);
 
   // Check that the application has been added to the database
-  const createdReview: Review = await reviewRepository.findOne({ createdByAuthID: requestUser.authId });
+  const createdReview: Review = await reviewRepository.findOne({ createdByAuthID: requestUser.id });
 
   expect(createdReview.averageScore).toBe(newReviewRequest.averageScore);
-  expect(createdReview.createdByAuthID).toBe(requestUser.authId);
+  expect(createdReview.createdByAuthID).toBe(requestUser.id);
   expect(createdReview.id).toBeDefined();
   expect(createdReview.createdAt).toBeInstanceOf(Date);
 });
