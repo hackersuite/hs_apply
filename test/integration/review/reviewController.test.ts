@@ -34,7 +34,7 @@ testApplicant1.hearAbout = "Other";
 const requestUser = {
   name: "Test",
   email: "test@test.com",
-  authId: "010eee101",
+  id: "010eee101",
   authLevel: AuthLevel.Organiser
 };
 
