@@ -5,8 +5,7 @@ import { EmailService, ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 import { HttpResponseCode } from "../util/errorHandling";
-import { getAllUsers, RequestUser } from "@unicsmcr/hs_auth_client";
-
+import { getUsers, User } from "@unicsmcr/hs_auth_client";
 
 export interface InviteControllerInterface {
   send: (req: Request, res: Response, next: NextFunction) => void;
@@ -189,18 +188,13 @@ export class InviteController implements InviteControllerInterface {
       });
       return;
     }
-    
-    let authUsersResult: RequestUser[];
-    try {
-      authUsersResult = await getAllUsers(req.cookies["Authorization"])
-    } catch (err) {
-      throw(err);
-    }
+
+    const authUsersResult = await getUsers(req.cookies["Authorization"]);
 
     // Mapping like in the admin overvire page for ease of use
     const authUsers = {};
     authUsersResult.forEach(a => {
-      authUsers[a.authId] = { ...a };
+      authUsers[a.id] = { ...a };
     });
 
     // Send the emails to all the users in the list
@@ -231,7 +225,7 @@ export class InviteController implements InviteControllerInterface {
   };
 
   public send = async (req: Request, res: Response): Promise<void> => {
-    const reqUser: RequestUser = req.user as RequestUser;
+    const reqUser = req.user as User;
 
     let applicant: Applicant;
     try {
@@ -258,7 +252,7 @@ export class InviteController implements InviteControllerInterface {
   };
 
   public confirm = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const reqUser: RequestUser = req.user as RequestUser;
+    const reqUser = req.user as User;
     let applicant: Applicant;
     try {
       applicant = await this._applicantService.findOne(req.params.id, "id");
@@ -274,7 +268,7 @@ export class InviteController implements InviteControllerInterface {
       // Check that the invite deadline has not expired
       notifyMessage = "This invite has expired, we're sorry you have missed the deadline.";
       applicant.applicationStatus = ApplicantStatus.Rejected;
-    } else if (reqUser.authId === applicant.authId && applicant.applicationStatus === ApplicantStatus.Invited) {
+    } else if (reqUser.id === applicant.authId && applicant.applicationStatus === ApplicantStatus.Invited) {
       // Check that the logged in user can be invited
       notifyMessage = "Thank you! Your attendence has been confirmed!";
       applicant.applicationStatus = ApplicantStatus.Confirmed;

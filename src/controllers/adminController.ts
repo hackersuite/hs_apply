@@ -7,7 +7,7 @@ import { TYPES } from "../types";
 import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
-import { getAllUsers, RequestUser } from "@unicsmcr/hs_auth_client";
+import { getUsers, User } from "@unicsmcr/hs_auth_client";
 import { CloudStorageService } from "../services/cloudStorage/cloudStorageService";
 import { createWriteableStream, WriteableStreamCallback, CleanupCallback, logger } from "../util";
 import { HttpResponseCode } from "../util/errorHandling";
@@ -122,9 +122,9 @@ export class AdminController implements AdminControllerInterface {
   };
 
   public manage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    let authUsersResult: RequestUser[];
+    let authUsersResult: User[];
     try {
-      authUsersResult = await getAllUsers(req.cookies["Authorization"]);
+      authUsersResult = await getUsers(req.cookies["Authorization"]);
     } catch (err) {
       next(err);
     }
@@ -142,7 +142,7 @@ export class AdminController implements AdminControllerInterface {
 
     const authUsers = {};
     authUsersResult.forEach(a => {
-      authUsers[a.authId] = { ...a };
+      authUsers[a.id] = { ...a };
     });
 
     const combinedApplications: any = [];
@@ -181,9 +181,9 @@ export class AdminController implements AdminControllerInterface {
       return;
     }
 
-    let authUsersResult: RequestUser[];
+    let authUsersResult: User[];
     try {
-      authUsersResult = await getAllUsers(req.cookies["Authorization"]);
+      authUsersResult = await getUsers(req.cookies["Authorization"]);
     } catch (err) {
       res.send("Failed to get the users authentication info!");
     }
@@ -191,7 +191,7 @@ export class AdminController implements AdminControllerInterface {
     const authUsers = {};
     // Expand the auth user to use the auth id as the key for each object
     authUsersResult.forEach(a => {
-      authUsers[a.authId] = { ...a };
+      authUsers[a.id] = { ...a };
     });
 
     let csvContents = "";

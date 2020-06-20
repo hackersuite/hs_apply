@@ -6,7 +6,7 @@ import { TYPES } from "../types";
 import { ApplicantService } from "../services";
 import { Applicant } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
-import { RequestUser } from "@unicsmcr/hs_auth_client";
+import { User } from "@unicsmcr/hs_auth_client";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 import { applicationMapping } from "../util/decorator";
 import { logger } from "../util";
@@ -37,7 +37,7 @@ export class ApplicationController implements ApplicationControllerInterface {
     // Check if the user has already made an application using req.user.authId
     let application: Applicant;
     try {
-      application = await this._applicantService.findOne((req.user as RequestUser).authId, "authId");
+      application = await this._applicantService.findOne((req.user as User).id, "authId");
     } catch (err) {
       return next(err);
     }
@@ -53,7 +53,7 @@ export class ApplicationController implements ApplicationControllerInterface {
   };
 
   public submitApplication = async (req: Request, res: Response): Promise<void> => {
-    const reqUser: RequestUser = req.user as RequestUser;
+    const reqUser: User = req.user as User;
 
     const applicationFields: any = req.body;
     const newApplication: Applicant = new Applicant();
@@ -68,7 +68,7 @@ export class ApplicationController implements ApplicationControllerInterface {
         newApplication[name] = applicationFields[name];
       }
     }
-    newApplication.authId = (req.user as RequestUser).authId;
+    newApplication.authId = (req.user as User).id;
     newApplication.applicationStatus = ApplicantStatus.Applied;
 
     // Handling the CV file
@@ -100,7 +100,7 @@ export class ApplicationController implements ApplicationControllerInterface {
   public cancel = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let application: Applicant;
     try {
-      application = await this._applicantService.findOne((req.user as RequestUser).authId, "authId");
+      application = await this._applicantService.findOne((req.user as User).id, "authId");
     } catch (err) {
       return next(err);
     }

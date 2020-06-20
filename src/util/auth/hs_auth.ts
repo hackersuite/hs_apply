@@ -5,7 +5,7 @@ import * as CookieStrategy from "passport-cookie";
 import { injectable, inject } from "inversify";
 import { TYPES } from "../../types";
 import { Cache } from "../cache";
-import { getCurrentUser, RequestUser, AuthLevels } from "@unicsmcr/hs_auth_client";
+import { getCurrentUser, User, AuthLevel } from "@unicsmcr/hs_auth_client";
 
 export interface RequestAuthenticationInterface {
   passportSetup: (app: Application) => void;
@@ -49,7 +49,7 @@ export class RequestAuthentication {
         // Defines the callback function which is executed after the cookie strategy is completed
         // We call the API endpoint on hs_auth to return the user based on the token
         async (req: Request, token: string, done: (error: string, user?: any) => void): Promise<void> => {
-          let apiResult: RequestUser;
+          let apiResult: User;
           try {
             apiResult = await getCurrentUser(token, req.originalUrl);
           } catch (err) {
@@ -70,9 +70,9 @@ export class RequestAuthentication {
    * @param req Request object from express
    * @param res Response object from express
    */
-  public authenticate = (req: Request, res: Response): Promise<RequestUser> => {
+  public authenticate = (req: Request, res: Response): Promise<User> => {
     return new Promise((resolve, reject) => {
-      passport.authenticate("cookie", { session: false }, (err: any, user: RequestUser) => {
+      passport.authenticate("cookie", { session: false }, (err: any, user: User) => {
         if (err) reject(new Error(err));
         else if (!user) reject(new Error("Not authenticated"));
         resolve(user);
@@ -88,7 +88,7 @@ export class RequestAuthentication {
    * @param next Next Callback function used to move to the next middleware
    */
   public checkLoggedIn = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    let user: RequestUser;
+    let user: User;
     try {
       user = await this.authenticate(req, res);
     } catch (err) {
@@ -104,7 +104,7 @@ export class RequestAuthentication {
     return next();
   };
 
-  public checkAuthLevel = (req: Request, res: Response, user: RequestUser, requiredAuth: AuthLevels): boolean => {
+  public checkAuthLevel = (req: Request, res: Response, user: User, requiredAuth: AuthLevel): boolean => {
     if (!user || user.authLevel < requiredAuth) {
       const queryParam: string = querystring.encode({ returnto: `${process.env.APPLICATION_URL}${req.originalUrl}` });
       res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
@@ -114,21 +114,21 @@ export class RequestAuthentication {
   };
 
   public checkIsAttendee = (req: Request, res: Response, next: NextFunction): void => {
-    if (this.checkAuthLevel(req, res, req.user as RequestUser, AuthLevels.Attendee)) {
+    if (this.checkAuthLevel(req, res, req.user as User, AuthLevel.Attendee)) {
       res.locals.isAttendee = true;
       return next();
     }
   };
 
   public checkIsVolunteer = (req: Request, res: Response, next: NextFunction): void => {
-    if (this.checkAuthLevel(req, res, req.user as RequestUser, AuthLevels.Volunteer)) {
+    if (this.checkAuthLevel(req, res, req.user as User, AuthLevel.Volunteer)) {
       res.locals.isVolunteer = true;
       return next();
     }
   };
 
   public checkIsOrganiser = (req: Request, res: Response, next: NextFunction): void => {
-    if (this.checkAuthLevel(req, res, req.user as RequestUser, AuthLevels.Organiser)) {
+    if (this.checkAuthLevel(req, res, req.user as User, AuthLevel.Organiser)) {
       res.locals.isOrganiser = true;
       res.locals.isVolunteer = true;
       return next();
