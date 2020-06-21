@@ -4,7 +4,7 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { Applicant } from "../models/db";
 import { ApplicantService } from "../services";
-import { RequestUser } from "@unicsmcr/hs_auth_client";
+import { User } from "@unicsmcr/hs_auth_client";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 
 export interface DashboardControllerInterface {
@@ -30,7 +30,7 @@ export class DashboardController implements DashboardControllerInterface {
   public dashboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let applicant: Applicant;
     try {
-      applicant = await this._applicantService.findOne((req.user as RequestUser).authId, "authId");
+      applicant = await this._applicantService.findOne((req.user as User).id, "authId");
     } catch (err) {
       return next(err);
     }
@@ -47,7 +47,7 @@ export class DashboardController implements DashboardControllerInterface {
 
     res.render("pages/dashboard", {
       applicationStatus: applicationStatus,
-      applicantName: (req.user as RequestUser).name,
+      applicantName: (req.user as User).name,
       applicationsOpen: applicationsOpen
     });
   };

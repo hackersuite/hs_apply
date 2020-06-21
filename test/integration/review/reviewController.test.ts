@@ -7,7 +7,7 @@ import { instance, mock, when, anything, reset, verify } from "ts-mockito";
 import container from "../../../src/inversify.config";
 import { TYPES } from "../../../src/types";
 import { RequestAuthentication, SettingLoader, logger } from "../../../src/util";
-import { AuthLevels } from "@unicsmcr/hs_auth_client";
+import { AuthLevel } from "@unicsmcr/hs_auth_client";
 import { ApplicantService, ReviewService } from "../../../src/services";
 import { Applicant } from "../../../src/models/db";
 
@@ -34,8 +34,8 @@ testApplicant1.hearAbout = "Other";
 const requestUser = {
   name: "Test",
   email: "test@test.com",
-  authId: "010eee101",
-  authLevel: AuthLevels.Organiser
+  id: "010eee101",
+  authLevel: AuthLevel.Organiser
 };
 
 beforeAll(done => {
@@ -113,12 +113,12 @@ describe("Review page tests", () => {
   test.skip("Test review page inaccessible to attendees", async () => {
     // Setup test authentication as Attendee
     when(mockRequestAuth.checkLoggedIn).thenReturn(async (req, res, next: NextFunction) => {
-      req.user = { ...requestUser, authLevel: AuthLevels.Attendee };
+      req.user = { ...requestUser, authLevel: AuthLevel.Attendee };
       logger.info(req.user);
       next();
     });
     when(mockRequestAuth.checkIsVolunteer).thenReturn((req, res, next: NextFunction) => {
-      if (req.user["authLevel"] < AuthLevels.Volunteer) {
+      if (req.user["authLevel"] < AuthLevel.Volunteer) {
         res.redirect("/test");
         return;
       }

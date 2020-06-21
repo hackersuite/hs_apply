@@ -4,7 +4,7 @@ import { TYPES } from "../types";
 import { ReviewService, ApplicantService } from "../services";
 import { Applicant, Review } from "../models/db";
 import { HttpResponseCode } from "../util/errorHandling";
-import { RequestUser } from "@unicsmcr/hs_auth_client";
+import { User } from "@unicsmcr/hs_auth_client";
 import { reviewApplicationMapping, logger } from "../util";
 import { ApplicantStatus } from "../services/applications/applicantStatus";
 
@@ -38,7 +38,7 @@ export class ReviewController implements ReviewControllerInterface {
   public nextReview = async (req: Request, res: Response): Promise<void> => {
     let nextApplication: Applicant;
     try {
-      nextApplication = await this._reviewService.getNextApplication((req.user as RequestUser).authId);
+      nextApplication = await this._reviewService.getNextApplication((req.user as User).id);
     } catch (err) {
       res.status(HttpResponseCode.INTERNAL_ERROR).send({ message: "Failed to get another application" });
       return;
@@ -46,7 +46,7 @@ export class ReviewController implements ReviewControllerInterface {
 
     let totalReviewsByUser: number;
     try {
-      totalReviewsByUser = await this._reviewService.getReviewCountByAuthID((req.user as RequestUser).authId);
+      totalReviewsByUser = await this._reviewService.getReviewCountByAuthID((req.user as User).id);
     } catch (err) {
       res.status(HttpResponseCode.INTERNAL_ERROR).send({ message: "Failed to get another application" });
       return;
@@ -75,7 +75,7 @@ export class ReviewController implements ReviewControllerInterface {
     }
 
     const newReview = new Review();
-    newReview.createdByAuthID = (req.user as RequestUser).authId;
+    newReview.createdByAuthID = (req.user as User).id;
     newReview.applicant = application;
     newReview.averageScore = averageScore;
 

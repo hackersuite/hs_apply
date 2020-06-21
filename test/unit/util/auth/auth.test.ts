@@ -2,7 +2,7 @@ import { when, mock, instance, anything } from "ts-mockito";
 import { Express, NextFunction, Request, Response } from "express";
 import { initEnv } from "../../../util";
 import { SettingLoader, RequestAuthenticationInterface } from "../../../../src/util";
-import { AuthLevels } from "@unicsmcr/hs_auth_client";
+import { AuthLevel } from "@unicsmcr/hs_auth_client";
 import container from "../../../../src/inversify.config";
 import { TYPES } from "../../../../src/types";
 import { RequestAuthentication } from "../../../../src/util";
@@ -19,7 +19,7 @@ const requestUser = {
   name: "Test",
   email: "test@test.com",
   authId: "010101",
-  authLevel: AuthLevels.Organiser
+  authLevel: AuthLevel.Organiser
 };
 
 beforeAll(() => {
@@ -66,7 +66,7 @@ describe("Check Auth Level tests", () => {
   describe("Auth level valid", () => {
     test("Test organiser is authenticated as such, not redirected", async () => {
       // Setup the user in the request
-      reqMock.user = { ...requestUser, authLevel: AuthLevels.Organiser };
+      reqMock.user = { ...requestUser, authLevel: AuthLevel.Organiser };
 
       // Make the function call to check the users authentication level
       requestAuth.checkIsOrganiser(reqMock, resMock, nextFunctionMock);
@@ -78,7 +78,7 @@ describe("Check Auth Level tests", () => {
 
     test("Test volunteer is authenticated as such, not redirected", async () => {
       // Setup the user in the request
-      reqMock.user = { ...requestUser, authLevel: AuthLevels.Volunteer };
+      reqMock.user = { ...requestUser, authLevel: AuthLevel.Volunteer };
 
       // Make the function call to check the users authentication level
       requestAuth.checkIsVolunteer(reqMock, resMock, nextFunctionMock);
@@ -90,7 +90,7 @@ describe("Check Auth Level tests", () => {
 
     test("Test attendee is authenticated as such, not redirected", async () => {
       // Setup the user in the request
-      reqMock.user = { ...requestUser, authLevel: AuthLevels.Attendee };
+      reqMock.user = { ...requestUser, authLevel: AuthLevel.Attendee };
 
       // Make the function call to check the users authentication level
       requestAuth.checkIsAttendee(reqMock, resMock, nextFunctionMock);
@@ -105,7 +105,7 @@ describe("Check Auth Level tests", () => {
   describe("Auth level invalid", () => {
     test("Test request as attendee fails when lower auth level", async () => {
       // Setup the user in the request
-      reqMock.user = { ...requestUser, authLevel: AuthLevels.Unverified };
+      reqMock.user = { ...requestUser, authLevel: AuthLevel.Unverified };
       resMock.redirect = jest.fn();
 
       // Make the function call to check the users authentication level
@@ -120,7 +120,7 @@ describe("Check Auth Level tests", () => {
 
     test("Test request as volunteer fails when lower auth level", async () => {
       // Setup the user in the request
-      reqMock.user = { ...requestUser, authLevel: AuthLevels.Attendee };
+      reqMock.user = { ...requestUser, authLevel: AuthLevel.Attendee };
       resMock.redirect = jest.fn();
 
       // Make the function call to check the users authentication level
@@ -135,7 +135,7 @@ describe("Check Auth Level tests", () => {
 
     test("Test request as organiser fails when lower auth level", async () => {
       // Setup the user in the request
-      reqMock.user = { ...requestUser, authLevel: AuthLevels.Volunteer };
+      reqMock.user = { ...requestUser, authLevel: AuthLevel.Volunteer };
       resMock.redirect = jest.fn();
 
       // Make the function call to check the users authentication level

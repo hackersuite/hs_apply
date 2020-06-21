@@ -12,7 +12,7 @@ import { Sections } from "../../../src/models/sections";
 import { Applicant } from "../../../src/models/db";
 import { RequestAuthentication } from "../../../src/util/auth";
 import { SettingLoader } from "../../../src/util/fs/loader";
-import { AuthLevels } from "@unicsmcr/hs_auth_client";
+import { AuthLevel } from "@unicsmcr/hs_auth_client";
 import { ApplicantStatus } from "../../../src/services/applications/applicantStatus";
 
 let bApp: Express;
@@ -57,8 +57,8 @@ testApplicant.hearAbout = "Other";
 const requestUser = {
   name: "Test",
   email: "test@test.com",
-  authId: "010101",
-  authLevel: AuthLevels.Organiser
+  id: "010101",
+  authLevel: AuthLevel.Organiser
 };
 
 const getUniqueApplicant = (options?: { needsID: boolean }): [any, Applicant] => {
@@ -68,7 +68,7 @@ const getUniqueApplicant = (options?: { needsID: boolean }): [any, Applicant] =>
   const applicantRequest = { ...newApplicantRequest, city: applicantIdentifier };
 
   // Add fields that are added in the controller
-  applicant.authId = requestUser.authId;
+  applicant.authId = requestUser.id;
   applicant.applicationStatus = ApplicantStatus.Applied;
 
   applicant.id = options?.needsID ? "11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000" : undefined;
@@ -161,14 +161,14 @@ test("Test application page redirects, applications open, application submitted"
 
 test("Test applicant deleted when application open", async () => {
   const [, applicant] = getUniqueApplicant();
-  when(mockApplicantService.findOne(requestUser.authId, "authId")).thenResolve(applicant);
+  when(mockApplicantService.findOne(requestUser.id, "authId")).thenResolve(applicant);
   when(mockApplicantService.delete(applicant.id)).thenResolve();
 
   // Perform the request along /apply/cancel
   const response = await request(bApp).get("/apply/cancel");
 
   // Check that we get a REDIRECT (302) response code
-  verify(mockApplicantService.findOne(requestUser.authId, "authId")).once();
+  verify(mockApplicantService.findOne(requestUser.id, "authId")).once();
   verify(mockApplicantService.save(objectContaining(applicant))).never();
   verify(mockApplicantService.delete(applicant.id)).once();
   expect(response.status).toBe(HttpResponseCode.REDIRECT);

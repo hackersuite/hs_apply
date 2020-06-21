@@ -7,7 +7,7 @@ import container from "../../src/inversify.config";
 import { Applicant, Review } from "../../src/models/db";
 import { RequestAuthentication } from "../../src/util/auth";
 import { SettingLoader } from "../../src/util/fs";
-import { AuthLevels } from "@unicsmcr/hs_auth_client";
+import { AuthLevel } from "@unicsmcr/hs_auth_client";
 import { mock, instance, when, anything } from "ts-mockito";
 import { TYPES } from "../../src/types";
 import { Repository } from "typeorm";
@@ -41,8 +41,8 @@ testApplicant.hearAbout = "IDK";
 const requestUser = {
   name: "Test",
   email: "test@test.com",
-  authId: "010101",
-  authLevel: AuthLevels.Organiser
+  id: "010101",
+  authLevel: AuthLevel.Organiser
 };
 
 beforeAll(done => {
@@ -109,10 +109,10 @@ test("Test review created with valid request", async () => {
   expect(response.status).toBe(HttpResponseCode.OK);
 
   // Check that the application has been added to the database
-  const createdReview: Review = await reviewRepository.findOne({ createdByAuthID: requestUser.authId });
+  const createdReview: Review = await reviewRepository.findOne({ createdByAuthID: requestUser.id });
 
   expect(createdReview.averageScore).toBe(newReviewRequest.averageScore);
-  expect(createdReview.createdByAuthID).toBe(requestUser.authId);
+  expect(createdReview.createdByAuthID).toBe(requestUser.id);
   expect(createdReview.id).toBeDefined();
   expect(createdReview.createdAt).toBeInstanceOf(Date);
 });

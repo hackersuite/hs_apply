@@ -8,7 +8,7 @@ import container from "../../../src/inversify.config";
 import { TYPES } from "../../../src/types";
 import { Cache } from "../../../src/util/cache";
 import { RequestAuthentication, SettingLoader } from "../../../src/util";
-import { AuthLevels } from "@unicsmcr/hs_auth_client";
+import { AuthLevel } from "@unicsmcr/hs_auth_client";
 
 let bApp: Express;
 let mockCache: Cache;
@@ -18,8 +18,8 @@ let mockSettingLoader: SettingLoader;
 const requestUser = {
   name: "Test",
   email: "test@test.com",
-  authId: "010101",
-  authLevel: AuthLevels.Organiser
+  id: "010101",
+  authLevel: AuthLevel.Organiser
 };
 
 beforeAll(done => {

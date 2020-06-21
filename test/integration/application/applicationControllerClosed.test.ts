@@ -12,7 +12,7 @@ import { Sections } from "../../../src/models/sections";
 import { Applicant } from "../../../src/models/db";
 import { RequestAuthentication } from "../../../src/util/auth";
 import { SettingLoader } from "../../../src/util/fs/loader";
-import { AuthLevels } from "@unicsmcr/hs_auth_client";
+import { AuthLevel } from "@unicsmcr/hs_auth_client";
 import { ApplicantStatus } from "../../../src/services/applications/applicantStatus";
 
 let bApp: Express;
@@ -57,8 +57,8 @@ testApplicant.hearAbout = "Other";
 const requestUser = {
   name: "Test",
   email: "test@test.com",
-  authId: "01010111",
-  authLevel: AuthLevels.Organiser
+  id: "01010111",
+  authLevel: AuthLevel.Organiser
 };
 
 const getUniqueApplicant = (): [any, Applicant] => {
@@ -68,7 +68,7 @@ const getUniqueApplicant = (): [any, Applicant] => {
   const applicantRequest = { ...newApplicantRequest, city: applicantIdentifier };
 
   // Add fields that are added in the controller
-  applicant.authId = requestUser.authId;
+  applicant.authId = requestUser.id;
   applicant.applicationStatus = ApplicantStatus.Applied;
 
   return [applicantRequest, applicant];
@@ -141,7 +141,7 @@ test("Test application page redirects when applications closed", async () => {
   const response = await request(bApp).get("/apply");
 
   // Check that we get a REDIRECT (302) response code
-  verify(mockApplicantService.findOne(requestUser.authId, "authId")).never();
+  verify(mockApplicantService.findOne(requestUser.id, "authId")).never();
   expect(response.status).toBe(HttpResponseCode.REDIRECT);
 });
 
@@ -161,14 +161,14 @@ test("Test applicant not created with valid request, applications closed", async
 
 test("Test application cancelled when applications closed", async () => {
   const [, applicant] = getUniqueApplicant();
-  when(mockApplicantService.findOne(requestUser.authId, "authId")).thenResolve(applicant);
+  when(mockApplicantService.findOne(requestUser.id, "authId")).thenResolve(applicant);
   when(mockApplicantService.delete(applicant.id)).thenReject();
 
   // Perform the request along /apply/cancel
   const response = await request(bApp).get("/apply/cancel");
 
   // Check that we get a REDIRECT (302) response code
-  verify(mockApplicantService.findOne(requestUser.authId, "authId")).once();
+  verify(mockApplicantService.findOne(requestUser.id, "authId")).once();
   verify(mockApplicantService.delete(applicant.id)).never();
   expect(response.status).toBe(HttpResponseCode.REDIRECT);
   expect(applicant.applicationStatus).toBe(ApplicantStatus.Cancelled);
@@ -178,7 +178,7 @@ test.skip("Test error thrown when cancel application and doesn't exist", async (
   expect.assertions(1);
 
   const [, applicant] = getUniqueApplicant();
-  when(mockApplicantService.findOne(requestUser.authId, "authId")).thenThrow();
+  when(mockApplicantService.findOne(requestUser.id, "authId")).thenThrow();
 
   // Perform the request along /apply/cancel
   const response = await request(bApp).get("/apply/cancel");
