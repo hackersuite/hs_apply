@@ -138,7 +138,7 @@ afterEach(() => {
 test('Test application page loads, applications open, no application submitted', async () => {
 	// Mock out the cache and question loader
 	when(mockCache.getAll(Sections.name)).thenReturn([new Sections([])]);
-	when(mockApplicantService.findOne(anything(), anything())).thenResolve(undefined);
+	when(mockApplicantService.findOne(anything(), anything())).thenReject(new Error('Failed to find an applicant:\nApplicant does not exist'));
 
 	// Perform the request along /apply
 	const response = await request(bApp).get('/apply');
