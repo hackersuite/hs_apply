@@ -1,14 +1,12 @@
 import { when, mock, instance, anything } from 'ts-mockito';
 import { Express, NextFunction, Request, Response } from 'express';
 import { initEnv } from '../../../util';
-import { SettingLoader, RequestAuthenticationInterface } from '../../../../src/util';
-import { AuthLevel } from '@unicsmcr/hs_auth_client';
+import { SettingLoader, RequestAuthenticationInterface, RequestAuthentication } from '../../../../src/util';
+import { AuthLevel, getCurrentUser as authUserReq } from '@unicsmcr/hs_auth_client';
 import container from '../../../../src/inversify.config';
 import { TYPES } from '../../../../src/types';
-import { RequestAuthentication } from '../../../../src/util';
 import { Cache } from '../../../../src/util/cache';
 import { ApplicantService } from '../../../../src/services';
-import { getCurrentUser as authUserReq } from '@unicsmcr/hs_auth_client';
 
 let mockCache: Cache;
 let mockSettingLoader: SettingLoader;
@@ -37,7 +35,7 @@ beforeAll(() => {
 			shortName: 'Hackathon',
 			fullName: 'Hackathon',
 			applicationsOpen: new Date().toString(),
-			applicationsClose: new Date(Date.now() + 10800 * 1000).toString() // 3 hours from now
+			applicationsClose: new Date(Date.now() + (10800 * 1000)).toString() // 3 hours from now
 		};
 	});
 
@@ -64,7 +62,7 @@ beforeEach(() => {
 
 describe('Check Auth Level tests', () => {
 	describe('Auth level valid', () => {
-		test('Test organiser is authenticated as such, not redirected', async () => {
+		test('Test organiser is authenticated as such, not redirected', () => {
 			// Setup the user in the request
 			reqMock.user = { ...requestUser, authLevel: AuthLevel.Organiser };
 
@@ -76,7 +74,7 @@ describe('Check Auth Level tests', () => {
 			expect(nextFunctionMock.mock.calls.length).toBe(1);
 		});
 
-		test('Test volunteer is authenticated as such, not redirected', async () => {
+		test('Test volunteer is authenticated as such, not redirected', () => {
 			// Setup the user in the request
 			reqMock.user = { ...requestUser, authLevel: AuthLevel.Volunteer };
 
@@ -88,7 +86,7 @@ describe('Check Auth Level tests', () => {
 			expect(nextFunctionMock.mock.calls.length).toBe(1);
 		});
 
-		test('Test attendee is authenticated as such, not redirected', async () => {
+		test('Test attendee is authenticated as such, not redirected', () => {
 			// Setup the user in the request
 			reqMock.user = { ...requestUser, authLevel: AuthLevel.Attendee };
 
@@ -103,7 +101,7 @@ describe('Check Auth Level tests', () => {
 	});
 
 	describe('Auth level invalid', () => {
-		test('Test request as attendee fails when lower auth level', async () => {
+		test('Test request as attendee fails when lower auth level', () => {
 			// Setup the user in the request
 			reqMock.user = { ...requestUser, authLevel: AuthLevel.Unverified };
 			resMock.redirect = jest.fn();
@@ -118,7 +116,7 @@ describe('Check Auth Level tests', () => {
 			expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
 		});
 
-		test('Test request as volunteer fails when lower auth level', async () => {
+		test('Test request as volunteer fails when lower auth level', () => {
 			// Setup the user in the request
 			reqMock.user = { ...requestUser, authLevel: AuthLevel.Attendee };
 			resMock.redirect = jest.fn();
@@ -133,7 +131,7 @@ describe('Check Auth Level tests', () => {
 			expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
 		});
 
-		test('Test request as organiser fails when lower auth level', async () => {
+		test('Test request as organiser fails when lower auth level', () => {
 			// Setup the user in the request
 			reqMock.user = { ...requestUser, authLevel: AuthLevel.Volunteer };
 			resMock.redirect = jest.fn();
@@ -150,7 +148,7 @@ describe('Check Auth Level tests', () => {
 	});
 
 	describe('User not defined in check auth level', () => {
-		test('Test request redirected when user not valid', async () => {
+		test('Test request redirected when user not valid', () => {
 			// Setup the user in the request
 			reqMock.user = undefined;
 			resMock.redirect = jest.fn();
@@ -195,7 +193,7 @@ describe('Check logged in tests', () => {
 		await requestAuth.checkLoggedIn(reqMock, resMock, nextFunctionMock);
 
 		// Verify that the auth request failed and we are redirected to login
-		expect(mockGetCurrentUserRequest).rejects.toBe(getCurrentUserRejectError);
+		await expect(mockGetCurrentUserRequest).rejects.toBe(getCurrentUserRejectError);
 		expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
 		expect(resMock.locals.authLevel).toBeFalsy();
 	});
