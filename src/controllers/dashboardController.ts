@@ -5,6 +5,7 @@ import { TYPES } from '../types';
 import { Applicant } from '../models/db';
 import { ApplicantService } from '../services';
 import { User } from '@unicsmcr/hs_auth_client';
+import { ApplicantStatus } from '../services/applications/applicantStatus';
 
 export interface DashboardControllerInterface {
 	dashboard: (req: Request, res: Response, next: NextFunction) => void;
@@ -27,12 +28,16 @@ export class DashboardController implements DashboardControllerInterface {
 	}
 
 	public dashboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-		let applicant: Applicant;
+		let applicant: Applicant|undefined;
 		try {
 			applicant = await this._applicantService.findOne((req.user as User).id, 'authId');
 		} catch (err) {
-			return next(err);
+			if (!(err?.message as string).includes('Applicant does not exist')) {
+				return next(err);
+			}
 		}
+
+		const applicationStatus: ApplicantStatus = applicant?.applicationStatus ?? ApplicantStatus.Verified;
 
 		// Check that the applications are still open
 		// Get the open and close time from the predefined settings and compare to the current time
@@ -42,7 +47,7 @@ export class DashboardController implements DashboardControllerInterface {
 		const applicationsOpen: boolean = currentTime >= applicationsOpenTime && currentTime <= applicationsCloseTime;
 
 		res.render('pages/dashboard', {
-			applicationStatus: applicant.applicationStatus,
+			applicationStatus: applicationStatus,
 			applicantName: (req.user as User).name,
 			applicationsOpen: applicationsOpen
 		});
