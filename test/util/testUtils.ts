@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { Connection, createConnections, getConnection, ConnectionOptions } from 'typeorm';
 
 export function getTestDatabaseOptions(entities?: (string | Function)[], name?: string): ConnectionOptions[] {
 	return [
 		{
-			name: name || 'applications',
+			name: name ?? 'applications',
 			type: 'mysql',
 			database: 'hs_applications',
 			host: 'localhost',
@@ -11,7 +12,7 @@ export function getTestDatabaseOptions(entities?: (string | Function)[], name?: 
 			username: 'root',
 			synchronize: true,
 			logging: false,
-			entities: entities || [`${__dirname}/../../src/models/db/*{.js,.ts}`]
+			entities: entities ?? [`${__dirname}/../../src/models/db/*{.js,.ts}`]
 		}
 	];
 }

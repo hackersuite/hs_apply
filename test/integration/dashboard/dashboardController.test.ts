@@ -22,7 +22,7 @@ const requestUser = {
 	authLevel: AuthLevel.Organiser
 };
 
-beforeAll(done => {
+beforeAll(async done => {
 	initEnv();
 	mockCache = mock(Cache);
 	mockRequestAuth = mock(RequestAuthentication);
@@ -33,9 +33,10 @@ beforeAll(done => {
 	container.rebind(TYPES.SettingLoader).toConstantValue(instance(mockSettingLoader));
 
 	when(mockRequestAuth.passportSetup).thenReturn(() => null);
-	when(mockRequestAuth.checkLoggedIn).thenReturn(async (req, res, next: NextFunction) => {
+	when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
 		req.user = requestUser;
 		next();
+		return Promise.resolve();
 	});
 	when(mockRequestAuth.checkIsOrganiser).thenReturn((req, res, next: NextFunction) => {
 		next();
@@ -51,13 +52,13 @@ beforeAll(done => {
 			shortName: 'Hackathon',
 			fullName: 'Hackathon',
 			applicationsOpen: new Date().toString(),
-			applicationsClose: new Date(Date.now() + 10800 * 1000).toString() // 3 hours from now
+			applicationsClose: new Date(Date.now() + (10800 * 1000)).toString() // 3 hours from now
 		};
 	});
 
-	new App().buildApp((builtApp: Express, err: Error): void => {
+	await new App().buildApp((builtApp: Express, err?: Error): void => {
 		if (err) {
-			done(`${err.message}\n${err.stack}`);
+			done(`${err.message}\n${err.stack ?? ''}`);
 		} else {
 			bApp = builtApp;
 			done();

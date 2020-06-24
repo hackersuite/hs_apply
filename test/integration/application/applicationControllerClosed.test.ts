@@ -49,7 +49,7 @@ testApplicant.university = 'UoM';
 testApplicant.yearOfStudy = 'Foundation';
 testApplicant.workArea = 'This';
 testApplicant.hackathonCount = 0;
-testApplicant.skills = testApplicant.whyChooseHacker = testApplicant.pastProjects = testApplicant.hardwareRequests = undefined;
+// testApplicant.skills = testApplicant.whyChooseHacker = testApplicant.pastProjects = testApplicant.hardwareRequests = undefined;
 testApplicant.dietaryRequirements = 'Test';
 testApplicant.tShirtSize = 'M';
 testApplicant.hearAbout = 'Other';
@@ -74,7 +74,7 @@ const getUniqueApplicant = (): [any, Applicant] => {
 	return [applicantRequest, applicant];
 };
 
-beforeAll(done => {
+beforeAll(async done => {
 	initEnv();
 	mockCache = mock(Cache);
 	mockApplicantService = mock(ApplicantService);
@@ -87,9 +87,10 @@ beforeAll(done => {
 	container.rebind(TYPES.SettingLoader).toConstantValue(instance(mockSettingLoader));
 
 	when(mockRequestAuth.passportSetup).thenReturn(() => null);
-	when(mockRequestAuth.checkLoggedIn).thenReturn(async (req, res, next: NextFunction) => {
+	when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
 		req.user = requestUser;
 		next();
+		return Promise.resolve();
 	});
 	when(mockRequestAuth.checkIsOrganiser).thenReturn((req, res, next: NextFunction) => {
 		next();
@@ -109,9 +110,9 @@ beforeAll(done => {
 		};
 	});
 
-	new App().buildApp((builtApp: Express, err: Error): void => {
+	await new App().buildApp((builtApp: Express, err?: Error): void => {
 		if (err) {
-			done(`${err.message}\n${err.stack}`);
+			done(`${err.message}\n${err.stack ?? ''}`);
 		} else {
 			bApp = builtApp;
 			done();
