@@ -1,3 +1,6 @@
+/* eslint-disable no-duplicate-imports */
+/* This rule has been disabled as the imports are done logically */
+
 import { Container } from 'inversify';
 import { TYPES } from './types';
 

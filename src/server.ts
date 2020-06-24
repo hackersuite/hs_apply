@@ -15,4 +15,4 @@ new App().buildApp((app: Express, err?: Error) => {
 			logger.info('Press CTRL-C to stop\n');
 		});
 	}
-});
+}).catch(err => logger.error(err));

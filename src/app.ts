@@ -1,10 +1,9 @@
 import 'reflect-metadata';
-import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import { Express, Request, Response, NextFunction } from 'express';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import { ConnectionOptions, createConnections, Connection } from 'typeorm';
 import { RouterInterface } from './routes';
 import { TYPES } from './types';
@@ -40,7 +39,7 @@ export class App {
 		}
 
 		// Connecting to database
-		const databaseConnectionSettings: ConnectionOptions[] = connectionOptions || this.createDatabaseSettings();
+		const databaseConnectionSettings: ConnectionOptions[] = connectionOptions ?? this.createDatabaseSettings();
 
 		let connections: Connection[];
 		try {
@@ -83,8 +82,8 @@ export class App {
 		app.set('view engine', 'ejs');
 
 		// Express configuration
-		app.set('port', process.env.PORT || 3000);
-		app.set('env', process.env.ENVIRONMENT || 'production');
+		app.set('port', process.env.PORT ?? 3000);
+		app.set('env', process.env.ENVIRONMENT ?? 'production');
 		if (process.env.ENVIRONMENT === 'production') {
 			app.set('trust proxy', 1);
 		}
@@ -99,7 +98,7 @@ export class App {
 	private readonly middlewareSetup = (app: Express): void => {
 		app.use((req, res, next) => {
 			if (req.get('X-Forwarded-Proto') !== 'https' && process.env.USE_SSL) {
-				res.redirect(`https://${req.headers.host}${req.url}`);
+				res.redirect(`https://${req.headers.host ?? ''}${req.url}`);
 			} else {
 				return next();
 			}
