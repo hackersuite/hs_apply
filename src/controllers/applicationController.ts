@@ -35,20 +35,18 @@ export class ApplicationController implements ApplicationControllerInterface {
 
 	public apply = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		// Check if the user has already made an application using req.user.authId
-		let application: Applicant;
 		try {
-			application = await this._applicantService.findOne((req.user as User).id, 'authId');
-		} catch (err) {
-			return next(err);
-		}
-
-		if (application) {
-			// The application has been made, redirect to dashboard
+			await this._applicantService.findOne((req.user as User).id, 'authId');
 			return res.redirect('/');
+		} catch (err) {
+			if ((err?.message as string).includes('Applicant does not exist')) {
+				const cachedSections: Array<Sections> = this._cache.getAll(Sections.name);
+				const sections = cachedSections[0].sections;
+				res.render('pages/apply', { sections: sections });
+			} else {
+				return next(err);
+			}
 		}
-		const cachedSections: Array<Sections> = this._cache.getAll(Sections.name);
-		const sections = cachedSections[0].sections;
-		res.render('pages/apply', { sections: sections });
 	};
 
 	public submitApplication = async (req: Request, res: Response): Promise<void> => {
@@ -58,9 +56,9 @@ export class ApplicationController implements ApplicationControllerInterface {
 		const newApplication: any = new Applicant();
 
 		for (const [name, options] of applicationMapping.entries()) {
-			if (options && options.hasOther) {
+			if (options.hasOther) {
 				(newApplication)[name] = applicationFields[`${name}Other`] || applicationFields[name] || 'Other';
-			} else if (options && options.isNumeric) {
+			} else if (options.isNumeric) {
 				const fieldToCastNumeric = applicationFields[name];
 				(newApplication)[name] = this.isNumeric(fieldToCastNumeric) ? Number(fieldToCastNumeric) : undefined;
 			} else {

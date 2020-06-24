@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { Request, Response, NextFunction, application } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { Cache } from '../util/cache';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
@@ -92,9 +92,10 @@ export class AdminController implements AdminControllerInterface {
 			genders[genderSlice]++;
 
 			const tShirtSize = applicant.tShirtSize! as 'XS'|'S'|'M'|'L'|'XL'|'XXL';
-			tShirts[tShirtSize] = 1 + (tShirts[tShirtSize] ?? 0);
+			tShirts[tShirtSize]++;
 
-			dietryReq[applicant.dietaryRequirements!] = 1 + (dietryReq[applicant.dietaryRequirements!] ?? 0);
+			if (!dietryReq.hasOwnProperty(applicant.dietaryRequirements!)) dietryReq[applicant.dietaryRequirements!] = 0;
+			dietryReq[applicant.dietaryRequirements!]++;
 
 			if (
 				applicant.hardwareRequests &&
@@ -104,7 +105,8 @@ export class AdminController implements AdminControllerInterface {
 				hardwareReq.push(applicant.hardwareRequests);
 			}
 
-			university[applicant.university!] = 1 + (university[applicant.university!] ?? 0);
+			if (!university.hasOwnProperty(applicant.university!)) university[applicant.university!] = 0;
+			university[applicant.university!]++;
 
 			applicationStatusValue = ApplicantStatus[applicant.applicationStatus!];
 			appStatus[applicationStatusValue] = 1 + (appStatus[applicationStatusValue] || 0);
@@ -139,7 +141,7 @@ export class AdminController implements AdminControllerInterface {
 			'applicationStatus',
 			'createdAt'
 		];
-		const columnNames: object[] = [['Name'], ['Email'], ['University'], ['Year'], ['Status'], ['Manage']];
+		const columnNames = [['Name'], ['Email'], ['University'], ['Year'], ['Status'], ['Manage']];
 		const applications: Applicant[] = await this._applicantService.getAll(columnsToSelect);
 
 		const authUsers: Record<string, User> = {};
@@ -204,7 +206,7 @@ export class AdminController implements AdminControllerInterface {
 			application.whyChooseHacker = this.escapeForCSV(application.whyChooseHacker!);
 			application.pastProjects = this.escapeForCSV(application.pastProjects!);
 			application.skills = this.escapeForCSV(application.skills!);
-			csvContents += `${application.createdAt},${application.id},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree}"\n`;
+			csvContents += `${application.createdAt!.toISOString()},${application.id!},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree!}"\n`;
 		});
 		const csvStream = new PassThrough();
 		csvStream.end(Buffer.from(csvContents));

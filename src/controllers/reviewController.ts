@@ -5,7 +5,7 @@ import { ReviewService, ApplicantService } from '../services';
 import { Applicant, Review } from '../models/db';
 import { HttpResponseCode } from '../util/errorHandling';
 import { User } from '@unicsmcr/hs_auth_client';
-import { reviewApplicationMapping, logger } from '../util';
+import { reviewApplicationMapping } from '../util';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
 
 export interface ReviewControllerInterface {
@@ -32,6 +32,7 @@ export class ReviewController implements ReviewControllerInterface {
 
 	public reviewPage = async (req: Request, res: Response): Promise<void> => {
 		res.render('pages/review/review');
+		return Promise.resolve();
 	};
 
 	public nextReview = async (req: Request, res: Response): Promise<void> => {

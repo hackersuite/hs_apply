@@ -6,6 +6,7 @@ import { Applicant } from '../models/db';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
 import { HttpResponseCode } from '../util/errorHandling';
 import { getUsers, User } from '@unicsmcr/hs_auth_client';
+import { HackathonSettingsInterface } from '../settings';
 
 export interface InviteControllerInterface {
 	send: (req: Request, res: Response, next: NextFunction) => void;
@@ -33,9 +34,10 @@ export class InviteController implements InviteControllerInterface {
 			applicant.applicationStatus === ApplicantStatus.Applied ||
       applicant.applicationStatus === ApplicantStatus.Reviewed
 		) {
-			const subject = `[${req.app.locals.settings.shortName}] You've been accepted!`;
-			const confirmLink = `${req.app.locals.settings.hackathonURL}/invite/${applicant.id}/confirm`;
-			const hackathonLogoURL = `${req.app.locals.settings.hackathonURL}/img/logo.png`;
+			const settings = req.app.locals.settings as HackathonSettingsInterface;
+			const subject = `[${settings.shortName}] You've been accepted!`;
+			const confirmLink = `${settings.hackathonURL}/invite/${applicant.id}/confirm`;
+			const hackathonLogoURL = `${settings.hackathonURL}/img/logo.png`;
 
 			try {
 				// Send the email to the user
@@ -80,8 +82,9 @@ export class InviteController implements InviteControllerInterface {
 			applicant.applicationStatus === ApplicantStatus.Applied ||
       applicant.applicationStatus === ApplicantStatus.Reviewed
 		) {
-			const subject = `[${req.app.locals.settings.shortName}] Application Update`;
-			const hackathonLogoURL = `${req.app.locals.settings.hackathonURL}/img/logo.png`;
+			const settings = req.app.locals.settings as HackathonSettingsInterface;
+			const subject = `[${settings.shortName}] Application Update`;
+			const hackathonLogoURL = `${settings.hackathonURL}/img/logo.png`;
 
 			try {
 				// Send the email to the user
@@ -119,13 +122,14 @@ export class InviteController implements InviteControllerInterface {
 
 	private readonly sendDetails = async (req: Request, applicant: Applicant, name: string, email: string): Promise<boolean> => {
 		if (applicant.applicationStatus === ApplicantStatus.Confirmed) {
-			const subject = `[${req.app.locals.settings.shortName}] Important Information`;
-			const hackathonLogoURL = `${req.app.locals.settings.hackathonURL}/img/logo.png`;
+			const settings = req.app.locals.settings as HackathonSettingsInterface;
+			const subject = `[${settings.shortName}] Important Information`;
+			const hackathonLogoURL = `${settings.hackathonURL}/img/logo.png`;
 
 			try {
 				// Send the email to the user
 				const result: boolean = await this._emailService.sendEmail(
-					`${req.app.locals.settings.shortName} <${req.app.locals.settings.mainEmail}>`,
+					`${settings.shortName} <${settings.mainEmail}>`,
 					email,
 					subject,
 					'details',
@@ -150,13 +154,14 @@ export class InviteController implements InviteControllerInterface {
 
 	private readonly sendFeedback = async (req: Request, applicant: Applicant, name: string, email: string): Promise<boolean> => {
 		if (applicant.applicationStatus === ApplicantStatus.Confirmed) {
-			const subject = `[${req.app.locals.settings.shortName}] Feedback`;
-			const hackathonLogoURL = `${req.app.locals.settings.hackathonURL}/img/logo.png`;
+			const settings = req.app.locals.settings as HackathonSettingsInterface;
+			const subject = `[${settings.shortName}] Feedback`;
+			const hackathonLogoURL = `${settings.hackathonURL}/img/logo.png`;
 
 			try {
 				// Send the email to the user
 				const result: boolean = await this._emailService.sendEmail(
-					`${req.app.locals.settings.shortName} <${req.app.locals.settings.mainEmail}>`,
+					`${settings.shortName} <${settings.mainEmail}>`,
 					email,
 					subject,
 					'feedback',
@@ -229,7 +234,6 @@ export class InviteController implements InviteControllerInterface {
 		let applicant: Applicant;
 		try {
 			applicant = await this._applicantService.findOne(req.params.id, 'id');
-			if (!applicant) throw new Error('Failed to send invite');
 		} catch (err) {
 			res.status(HttpResponseCode.BAD_REQUEST).send({
 				message: 'Failed to send invite'
@@ -255,9 +259,8 @@ export class InviteController implements InviteControllerInterface {
 		let applicant: Applicant;
 		try {
 			applicant = await this._applicantService.findOne(req.params.id, 'id');
-			if (!applicant) throw new Error('Failed to confirm attendence, please contact us for help');
 		} catch (err) {
-			return next(err);
+			return next(new Error('Failed to confirm attendence, please contact us for help'));
 		}
 
 		let notifyMessage: string;
