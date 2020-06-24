@@ -192,7 +192,7 @@ export class InviteController implements InviteControllerInterface {
     const authUsersResult = await getUsers(req.cookies["Authorization"]);
 
     // Mapping like in the admin overvire page for ease of use
-    const authUsers = {};
+    const authUsers: Record<string, User> = {};
     authUsersResult.forEach(a => {
       authUsers[a.id] = { ...a };
     });
@@ -203,22 +203,21 @@ export class InviteController implements InviteControllerInterface {
       userIds.map(async (id: string) => {
         if (!id || id.length === 0) return { status: "rejected", err: "Not defined id" };
         const applicant: Applicant = await this._applicantService.findOne(id);
-        const authUser: any = authUsers[applicant.authId];
-        let result: boolean;
+        const authUser: any = authUsers[applicant.authId!];
         try {
           if (emailType === "invite") {
-            result = await this.sendInvite(req, applicant, authUser.name, authUser.email);
+            await this.sendInvite(req, applicant, authUser.name, authUser.email);
           } else if (emailType === "reject") {
-            result = await this.sendReject(req, applicant, authUser.name, authUser.email);
+            await this.sendReject(req, applicant, authUser.name, authUser.email);
           } else if (emailType === "details") {
-            result = await this.sendDetails(req, applicant, authUser.name, authUser.email);
+            await this.sendDetails(req, applicant, authUser.name, authUser.email);
           } else if (emailType === "feedback") {
-            result = await this.sendFeedback(req, applicant, authUser.name, authUser.email);
+            await this.sendFeedback(req, applicant, authUser.name, authUser.email);
           }
         } catch (err) {
-          return { status: "rejected", err };
+          return { status: "rejected", err: "Failed to send email." };
         }
-        return result ? { status: "fulfilled", id } : { status: "rejected", err: "Failed to send email." };
+        return { status: "fulfilled", id };
       })
     );
     res.send(results);

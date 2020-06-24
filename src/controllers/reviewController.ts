@@ -36,9 +36,10 @@ export class ReviewController implements ReviewControllerInterface {
   };
 
   public nextReview = async (req: Request, res: Response): Promise<void> => {
-    let nextApplication: Applicant;
+    let nextApplication: Applicant | undefined;
     try {
       nextApplication = await this._reviewService.getNextApplication((req.user as User).id);
+      if (!nextApplication) throw new Error('No new application');
     } catch (err) {
       res.status(HttpResponseCode.INTERNAL_ERROR).send({ message: "Failed to get another application" });
       return;

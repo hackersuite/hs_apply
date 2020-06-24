@@ -60,26 +60,27 @@ export class ApplicationController implements ApplicationControllerInterface {
 
     for (const [name, options] of applicationMapping.entries()) {
       if (options && options.hasOther) {
-        newApplication[name] = applicationFields[`${name}Other`] || applicationFields[name] || "Other";
+        (newApplication as any)[name] = applicationFields[`${name}Other`] || applicationFields[name] || "Other";
       } else if (options && options.isNumeric) {
         const fieldToCastNumeric = applicationFields[name];
-        newApplication[name] = this.isNumeric(fieldToCastNumeric) ? Number(fieldToCastNumeric) : undefined;
+        (newApplication as any) = this.isNumeric(fieldToCastNumeric) ? Number(fieldToCastNumeric) : undefined;
       } else {
-        newApplication[name] = applicationFields[name];
+        (newApplication as any) = applicationFields[name];
       }
     }
     newApplication.authId = (req.user as User).id;
     newApplication.applicationStatus = ApplicantStatus.Applied;
 
     // Handling the CV file
-    let cvFile: Buffer;
-    if (req.files && req.files.length === 1 && req.files[0].fieldname === "cv") {
+    let cvFile: Buffer = Buffer.from('');
+    const files = req.files as Express.Multer.File[] | undefined;
+    if (files && files.length === 1 && files[0].fieldname === "cv") {
       // Remove all non-ascii characters from the name and filename
       /* eslint no-control-regex: "off" */
       const nameCleaned: string = reqUser.name.replace(/[^\x00-\x7F]/g, "");
-      const fileNameCleaned: string = req.files[0].originalname.replace(/[^\x00-\x7F]/g, "");
+      const fileNameCleaned: string = files[0].originalname.replace(/[^\x00-\x7F]/g, "");
       newApplication.cv = `${nameCleaned}.${reqUser.email}.${fileNameCleaned}`;
-      cvFile = req.files[0].buffer;
+      cvFile = files[0].buffer;
     }
 
     try {

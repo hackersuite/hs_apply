@@ -1,6 +1,6 @@
 import fs from "fs";
 
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, application } from "express";
 import { Cache } from "../util/cache";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
@@ -58,11 +58,11 @@ export class AdminController implements AdminControllerInterface {
     }
 
     // Create an array of the application times
-    const createdAtTimes: Date[] = applications.map(applicant => applicant.createdAt);
+    const createdAtTimes: Date[] = applications.map(applicant => applicant.createdAt!);
 
     // Create the map of genders and their respective count
     const genders = { Male: 0, Female: 0, Other: 0 };
-    let genderSlice = "";
+    let genderSlice: "Male" | "Female" | "Other";
 
     // Create a map of T-Shirt sizes and their count
     const tShirts = {
@@ -75,25 +75,26 @@ export class AdminController implements AdminControllerInterface {
     };
 
     // Create a map for the dietry requirements
-    const dietryReq = {};
+    const dietryReq: Record<string, number> = {};
 
     // Create a map to contain the universities and counts
-    const university = {};
+    const university: Record<string, number> = {};
 
     // Create a map to contain the application status stats
-    const appStatus = {};
+    const appStatus: Record<string, number> = {};
     let applicationStatusValue: string;
 
     // Create an array with all the hardware requests
-    const hardwareReq = [];
+    const hardwareReq: string[] = [];
 
     applications.forEach(applicant => {
       genderSlice = applicant.gender === "Male" || applicant.gender === "Female" ? applicant.gender : "Other";
       genders[genderSlice]++;
 
-      tShirts[applicant.tShirtSize] = 1 + (tShirts[applicant.tShirtSize] || 0);
+      const tShirtSize = applicant.tShirtSize! as "XS"|"S"|"M"|"L"|"XL"|"XXL";
+      tShirts[tShirtSize] = 1 + (tShirts[tShirtSize] ?? 0);
 
-      dietryReq[applicant.dietaryRequirements] = 1 + (dietryReq[applicant.dietaryRequirements] || 0);
+      dietryReq[applicant.dietaryRequirements!] = 1 + (dietryReq[applicant.dietaryRequirements!] ?? 0);
 
       if (
         applicant.hardwareRequests &&
@@ -103,9 +104,9 @@ export class AdminController implements AdminControllerInterface {
         hardwareReq.push(applicant.hardwareRequests);
       }
 
-      university[applicant.university] = 1 + (university[applicant.university] || 0);
+      university[applicant.university!] = 1 + (university[applicant.university!] ?? 0);
 
-      applicationStatusValue = ApplicantStatus[applicant.applicationStatus];
+      applicationStatusValue = ApplicantStatus[applicant.applicationStatus!];
       appStatus[applicationStatusValue] = 1 + (appStatus[applicationStatusValue] || 0);
     });
 
@@ -127,6 +128,7 @@ export class AdminController implements AdminControllerInterface {
       authUsersResult = await getUsers(req.cookies["Authorization"]);
     } catch (err) {
       next(err);
+      return;
     }
 
     const columnsToSelect: (keyof Applicant)[] = [
@@ -140,7 +142,7 @@ export class AdminController implements AdminControllerInterface {
     const columnNames: object[] = [["Name"], ["Email"], ["University"], ["Year"], ["Status"], ["Manage"]];
     const applications: Applicant[] = await this._applicantService.getAll(columnsToSelect);
 
-    const authUsers = {};
+    const authUsers: Record<string, User> = {};
     authUsersResult.forEach(a => {
       authUsers[a.id] = { ...a };
     });
@@ -149,7 +151,7 @@ export class AdminController implements AdminControllerInterface {
     applications.forEach(a => {
       combinedApplications.push({
         ...a,
-        ...authUsers[a.authId],
+        ...authUsers[a.authId!],
         applicationStatus: ApplicantStatus[a.applicationStatus]
       });
     });
@@ -186,9 +188,10 @@ export class AdminController implements AdminControllerInterface {
       authUsersResult = await getUsers(req.cookies["Authorization"]);
     } catch (err) {
       res.send("Failed to get the users authentication info!");
+      return;
     }
 
-    const authUsers = {};
+    const authUsers: Record<string, User> = {};
     // Expand the auth user to use the auth id as the key for each object
     authUsersResult.forEach(a => {
       authUsers[a.id] = { ...a };
@@ -197,10 +200,10 @@ export class AdminController implements AdminControllerInterface {
     let csvContents = "";
     allApplicants.forEach(application => {
       // UID, TID, WhyChoose?, Proj, Skills, Degree
-      const team: string = authUsers[application.authId] ? authUsers[application.authId].team : "";
-      application.whyChooseHacker = this.escapeForCSV(application.whyChooseHacker);
-      application.pastProjects = this.escapeForCSV(application.pastProjects);
-      application.skills = this.escapeForCSV(application.skills);
+      const team: string = authUsers[application.authId!]?.team ?? "";
+      application.whyChooseHacker = this.escapeForCSV(application.whyChooseHacker!);
+      application.pastProjects = this.escapeForCSV(application.pastProjects!);
+      application.skills = this.escapeForCSV(application.skills!);
       csvContents += `${application.createdAt},${application.id},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree}"\n`;
     });
     const csvStream = new PassThrough();
