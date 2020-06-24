@@ -12,7 +12,6 @@
 		"rootDir": "src",
 		"inlineSourceMap": true,
 		"target": "ES2019",
-		"strict": true,
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
