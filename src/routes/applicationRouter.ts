@@ -34,7 +34,7 @@ export class ApplicationRouter implements RouterInterface {
       ) {
         return cb(new Error("Unsupported file format"), false);
       }
-      cb(undefined, true);
+      cb(null, true);
     }
   }).any();
 
