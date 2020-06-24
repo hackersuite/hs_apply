@@ -8,15 +8,17 @@ import { Applicant, Review } from "../../src/models/db";
 import { RequestAuthentication } from "../../src/util/auth";
 import { SettingLoader } from "../../src/util/fs";
 import { AuthLevel } from "@unicsmcr/hs_auth_client";
-import { mock, instance, when, anything } from "ts-mockito";
+import { mock, instance, when, anything, objectContaining } from "ts-mockito";
 import { TYPES } from "../../src/types";
 import { Repository } from "typeorm";
 import { ReviewRepository } from "../../src/repositories";
+import { ApplicantService } from "../../src/services";
 
 let bApp: Express;
 let reviewRepository: Repository<Review>;
 let mockRequestAuth: RequestAuthentication;
 let mockSettingLoader: SettingLoader;
+let mockApplicantService: ApplicantService;
 
 const newReviewRequest: any = {
   applicationID: "",
@@ -50,9 +52,11 @@ beforeAll(done => {
 
   mockRequestAuth = mock(RequestAuthentication);
   mockSettingLoader = mock(SettingLoader);
+  mockApplicantService = mock(ApplicantService);
 
   container.rebind(TYPES.RequestAuthentication).toConstantValue(instance(mockRequestAuth));
   container.rebind(TYPES.SettingLoader).toConstantValue(instance(mockSettingLoader));
+  container.rebind(TYPES.ApplicantService).toConstantValue(instance(mockApplicantService));
 
   when(mockRequestAuth.passportSetup).thenReturn(() => null);
   when(mockRequestAuth.checkLoggedIn).thenReturn(async (req, res, next: NextFunction) => {
@@ -76,6 +80,7 @@ beforeAll(done => {
       applicationsClose: new Date(Date.now() + 10800 * 1000).toString() // 3 hours from now
     };
   });
+  when(mockApplicantService.findOne(objectContaining({ id: "" }))).thenReturn(Promise.resolve(testApplicant));
 
   new App().buildApp((builtApp: Express, err: Error): void => {
     if (err) {
