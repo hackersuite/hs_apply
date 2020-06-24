@@ -1,9 +1,9 @@
 import "reflect-metadata";
-import * as express from "express";
-import * as dotenv from "dotenv";
-import * as path from "path";
-import * as cookieParser from "cookie-parser";
-import * as helmet from "helmet";
+import express from "express";
+import dotenv from "dotenv";
+import path from "path";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
 import { Express, Request, Response, NextFunction } from "express";
 import { ConnectionOptions, createConnections, Connection } from "typeorm";
 import { RouterInterface } from "./routes";

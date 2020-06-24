@@ -3,7 +3,7 @@ import { ApplicationController } from "../controllers";
 import { injectable, inject } from "inversify";
 import { RouterInterface } from "./registerableRouter";
 import { TYPES } from "../types";
-import * as multer from "multer";
+import multer from "multer";
 import { HttpResponseCode } from "../util/errorHandling";
 import { RequestAuthentication } from "../util/auth";
 

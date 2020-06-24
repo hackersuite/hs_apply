@@ -1,7 +1,7 @@
-import * as passport from "passport";
-import * as querystring from "querystring";
+import passport from "passport";
+import querystring from "querystring";
 import { Express, Request, Response, Application, NextFunction, CookieOptions } from "express";
-import * as CookieStrategy from "passport-cookie";
+import CookieStrategy from "passport-cookie";
 import { injectable, inject } from "inversify";
 import { TYPES } from "../../types";
 import { Cache } from "../cache";

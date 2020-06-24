@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import fs from "fs";
 import { logger } from "../logger";
 
 export type CleanupCallback = (writeError?: Error) => void;

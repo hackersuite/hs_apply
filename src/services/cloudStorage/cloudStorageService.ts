@@ -1,5 +1,5 @@
 import axios, { ResponseType, AxiosResponse } from "axios";
-import * as fs from "fs";
+import fs from "fs";
 import { injectable } from "inversify";
 import { logger, getSafeUnicode } from "../../util";
 import { dropboxAPIFactory, DropboxMethods } from "./dropboxAPIFactory";

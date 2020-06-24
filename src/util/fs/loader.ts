@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import fs from "fs";
 import { Express } from "express";
 import { ApplicationSectionInterface, HackathonSettingsInterface } from "../../settings";
 import { Sections, HackathonSettings } from "../../models";
