@@ -4,17 +4,17 @@ import { Applicant } from "../applicant";
 @Entity()
 export class Review {
   @PrimaryGeneratedColumn("uuid")
-  id: string;
+  id!: string;
 
   @ManyToOne(() => Applicant)
-  applicant: Applicant;
+  applicant!: Applicant;
 
   @Column()
-  createdByAuthID: string;
+  createdByAuthID!: string;
 
   @Column()
-  averageScore: number;
+  averageScore!: number;
 
   @Column("datetime", { nullable: false, default: () => "CURRENT_TIMESTAMP" })
-  createdAt: Date;
+  createdAt!: Date;
 }
