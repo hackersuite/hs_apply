@@ -71,7 +71,7 @@ export class RequestAuthentication {
    * @param res Response object from express
    */
 	public authenticate = (req: Request, res: Response): Promise<User> => new Promise((resolve, reject) => {
-		passport.authenticate('cookie', { session: false }, (err: any, user: User) => {
+		passport.authenticate('cookie', { session: false }, (err: any, user?: User) => {
 			if (err) reject(new Error(err));
 			else if (!user) reject(new Error('Not authenticated'));
 			resolve(user);
@@ -93,19 +93,19 @@ export class RequestAuthentication {
 			// Either user was not authenticated, or an error occured during authentication
 			// In both cases we redirect them to the login
 			const queryParam: string = querystring.encode({
-				returnto: `${process.env.APPLICATION_URL}${req.originalUrl}`
+				returnto: `${process.env.APPLICATION_URL ?? ''}${req.originalUrl}`
 			});
-			res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
+			res.redirect(`${process.env.AUTH_URL ?? ''}/login?${queryParam}`);
 			return;
 		}
 		res.locals.authLevel = user.authLevel;
 		return next();
 	};
 
-	public checkAuthLevel = (req: Request, res: Response, user: User, requiredAuth: AuthLevel): boolean => {
+	public checkAuthLevel = (req: Request, res: Response, user: User|undefined, requiredAuth: AuthLevel): boolean => {
 		if (!user || user.authLevel < requiredAuth) {
-			const queryParam: string = querystring.encode({ returnto: `${process.env.APPLICATION_URL}${req.originalUrl}` });
-			res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
+			const queryParam: string = querystring.encode({ returnto: `${process.env.APPLICATION_URL ?? ''}${req.originalUrl}` });
+			res.redirect(`${process.env.AUTH_URL ?? ''}/login?${queryParam}`);
 			return false;
 		}
 		return true;

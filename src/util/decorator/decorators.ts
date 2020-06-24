@@ -46,11 +46,10 @@ export const reviewApplicationMapping: Map<string, string[]> = new Map();
  * Include the properties that are found in the POST request
  */
 export function ApplicationMapped(options?: ApplicationMappingOptions) {
-	return function(object: Record<string, any>, propertyName: string): void {
-		if (options && options.reviewed) {
+	return (object: Record<string, any>, propertyName: string) => {
+		if (options?.reviewed) {
 			// Add mapping for all the properties that are to be included in the review
-			const groupKey = options.reviewed.group || (options.reviewed.isSeparateScore && 'ungrouped') || 'extra';
-			if (groupKey === undefined) return;
+			const groupKey = options.reviewed.group ?? (options.reviewed.isSeparateScore ? 'ungrouped' : 'extra');
 
 			const currentGroupArray = reviewApplicationMapping.get(groupKey);
 			if (currentGroupArray === undefined) {

@@ -58,7 +58,7 @@ export class SettingLoader implements SettingLoaderInterface {
 				shortName: 'Hackathon',
 				fullName: 'Hackathon',
 				applicationsOpen: new Date().toString(),
-				applicationsClose: new Date(Date.now() + 10800 * 1000).toString() // 3 hours from now
+				applicationsClose: new Date(Date.now() + (10800 * 1000)).toString() // 3 hours from now
 			};
 		}
 	}
@@ -73,7 +73,7 @@ export class SettingLoader implements SettingLoaderInterface {
 			settings = obj ? JSON.parse(fileBuffer)[obj] : JSON.parse(fileBuffer);
 			// Handle non-exception-throwing cases
 			if (!settings && typeof settings !== 'object') {
-				throw 'Failed to parse JSON';
+				throw new Error('Failed to parse JSON');
 			}
 		} catch (err) {
 			logger.warn('Failed to load settings!');
