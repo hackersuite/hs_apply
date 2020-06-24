@@ -13,7 +13,7 @@ export class BaseRepository<T> {
 		if (connectionManager.connections.length > 0) {
 			repository = connectionManager.get('applications').getRepository<T>(type);
 		} else {
-			throw 'Connection to the database is not setup!';
+			throw new Error('Connection to the database is not setup!');
 		}
 		return repository;
 	}
