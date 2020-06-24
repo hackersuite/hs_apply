@@ -19,7 +19,7 @@ export const errorHandler = (err: ApiError | Error, req: Request, res: Response)
       //   );
     }
 
-    logger.error(err.stack);
+    logger.error(`${err.message}\n${err.stack ?? ''}`);
     res.status(HttpResponseCode.INTERNAL_ERROR).send("An error occured.");
   } else {
     res.status(err.statusCode).send(err);
