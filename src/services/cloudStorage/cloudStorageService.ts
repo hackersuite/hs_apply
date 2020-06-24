@@ -30,7 +30,7 @@ export class CloudStorageService {
 
   constructor() {
     this.DROPBOX_BASE_PATH = "hackathon-cv"; // TODO: Add ability to load from config file
-    this.DROPBOX_API_TOKEN = process.env.DROPBOX_API_TOKEN;
+    this.DROPBOX_API_TOKEN = process.env.DROPBOX_API_TOKEN ?? '';
 
     this.httpHeaderSafeJson = this.httpHeaderSafeJson.bind(this);
   }

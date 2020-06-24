@@ -67,9 +67,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 
     try {
       const findColumn: keyof Applicant = findBy || "id";
-      const applicant = await this._applicantRepository.findOne({ [findColumn]: id });
-      if (!applicant) throw new Error('Failed to find applicant');
-      return applicant;
+      return await this._applicantRepository.findOneOrFail({ [findColumn]: id });
     } catch (err) {
       throw new Error(`Failed to find an applicant:\n${err}`);
     }
