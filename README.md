@@ -1,12 +1,18 @@
 # Hacker Suite Applications
 
 <p align="center">
-  <a href="https://travis-ci.org/unicsmcr/hs_application" alt="Build Status">
-    <img src="https://travis-ci.org/unicsmcr/hs_application.svg?branch=master" />
+  <a href="https://github.com/unicsmcr/hs_application/actions?query=workflow%3ATests" alt="Build Status">
+    <img src="https://github.com/unicsmcr/hs_application/workflows/Tests/badge.svg" />
   </a>
-  <a href="https://codecov.io/gh/unicsmcr/hs_application" alt="License">
+
+  <a href="https://github.com/unicsmcr/hs_application/actions?query=workflow%3ALint" alt="Build Status">
+    <img src="https://github.com/unicsmcr/hs_application/workflows/Lint/badge.svg" />
+  </a>
+
+  <a href="https://codecov.io/gh/unicsmcr/hs_application" alt="Coverage">
     <img src="https://codecov.io/gh/unicsmcr/hs_application/branch/master/graph/badge.svg" />
   </a>
+
   <a href="https://github.com/unicsmcr/hs_application/blob/master/LICENSE" alt="License">
     <img src="https://img.shields.io/github/license/unicsmcr/hs_application.svg" />
   </a>
