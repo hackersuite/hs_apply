@@ -6,7 +6,7 @@ import { logger } from "./util";
  * Start Express server.
  */
 
-new App().buildApp((app: Express, err: Error) => {
+new App().buildApp((app: Express, err?: Error) => {
   if (err) {
     logger.error("Could not start server!");
   } else {

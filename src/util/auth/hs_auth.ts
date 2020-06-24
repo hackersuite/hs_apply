@@ -1,6 +1,6 @@
 import passport from "passport";
 import querystring from "querystring";
-import { Express, Request, Response, Application, NextFunction, CookieOptions } from "express";
+import { Express, Request, Response, NextFunction, CookieOptions } from "express";
 import CookieStrategy from "passport-cookie";
 import { injectable, inject } from "inversify";
 import { TYPES } from "../../types";
@@ -8,7 +8,7 @@ import { Cache } from "../cache";
 import { getCurrentUser, User, AuthLevel } from "@unicsmcr/hs_auth_client";
 
 export interface RequestAuthenticationInterface {
-  passportSetup: (app: Application) => void;
+  passportSetup: (app: Express) => void;
 }
 
 @injectable()

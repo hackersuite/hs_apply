@@ -85,7 +85,7 @@ export class ApplicantService implements ApplicantServiceInterface {
       throw new Error("Failed to validate applicant");
     }
 
-    if (file) {
+    if (file && newApplicant.cv) {
       // Save the CV to dropbox if the CV is provided
       try {
         await this._cloudStorageService.upload(newApplicant.cv, file);
