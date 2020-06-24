@@ -118,7 +118,7 @@ describe('Review page tests', () => {
 			next();
 		});
 		when(mockRequestAuth.checkIsVolunteer).thenReturn((req, res, next: NextFunction) => {
-			if (req.user.authLevel < AuthLevel.Volunteer) {
+			if ((req.user as typeof requestUser).authLevel < AuthLevel.Volunteer) {
 				res.redirect('/test');
 				return;
 			}
