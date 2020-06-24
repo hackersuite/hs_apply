@@ -7,109 +7,109 @@ import { ApplicationMapped } from '../../../util';
 @Entity()
 export class Applicant {
 	@PrimaryGeneratedColumn('uuid')
-	id!: string;
+	public id!: string;
 
 	@Column('varchar', { nullable: true, unique: true })
 	@IsOptional()
-	authId?: string;
+	public authId?: string;
 
 	@Column('integer')
 	@IsDefined({ message: 'The applicants age is required' })
 	@IsInt()
 	@Min(18, { message: 'Minimum age is 18' })
 	@ApplicationMapped({ isNumeric: true })
-	age!: number;
+	public age!: number;
 
 	@Column('varchar')
 	@IsNotEmpty({ message: 'The applicants gender is required' })
 	@ApplicationMapped({ hasOther: true })
-	gender!: string;
+	public gender!: string;
 
 	@Column('varchar', { nullable: true })
 	@IsOptional()
 	@ApplicationMapped({ isOptional: true })
-	nationality?: string;
+	public nationality?: string;
 
 	@Column('varchar')
 	@IsNotEmpty({ message: 'The applicants country of origin is required' })
 	@ApplicationMapped()
-	country!: string;
+	public country!: string;
 
 	@Column('varchar')
 	@IsNotEmpty({ message: 'The applicants city is required' })
 	@ApplicationMapped()
-	city!: string;
+	public city!: string;
 
 	@Column('varchar')
 	@IsNotEmpty({ message: 'The applicants university is required' })
 	@ApplicationMapped()
-	university!: string;
+	public university!: string;
 
 	@Column('varchar')
 	@IsNotEmpty({ message: 'The applicants degree is required' })
 	@ApplicationMapped()
-	degree!: string;
+	public degree!: string;
 
 	@Column('varchar')
 	@IsNotEmpty({ message: 'The applicants year of study is required' })
 	@ApplicationMapped({ reviewed: { isSeparateScore: false } })
-	yearOfStudy!: string;
+	public yearOfStudy!: string;
 
 	@Column('varchar', { nullable: true })
 	@IsOptional()
 	@ApplicationMapped({ isOptional: true })
-	cv?: string;
+	public cv?: string;
 
 	@Column('varchar', { nullable: true })
 	@IsOptional()
 	@ApplicationMapped({ isOptional: true, hasOther: true })
-	workArea?: string;
+	public workArea?: string;
 
 	@Column('varchar', { nullable: true })
 	@IsOptional()
 	@ApplicationMapped({ isOptional: true, reviewed: { group: 'Enthusiasm' } })
-	skills?: string;
+	public skills?: string;
 
 	@Column('integer', { nullable: true })
 	@IsInt()
 	@Min(0, { message: 'Minimum number of hackathons is zero' })
 	@IsOptional()
 	@ApplicationMapped({ isOptional: true, isNumeric: true, reviewed: { group: 'Enthusiasm' } })
-	hackathonCount?: number;
+	public hackathonCount?: number;
 
 	@Column('text', { nullable: true })
 	@IsOptional()
 	@ApplicationMapped({ isOptional: true, reviewed: { isSeparateScore: true } })
-	whyChooseHacker?: string;
+	public whyChooseHacker?: string;
 
 	@Column('text', { nullable: true })
 	@IsOptional()
 	@ApplicationMapped({ isOptional: true, reviewed: { isSeparateScore: true } })
-	pastProjects?: string;
+	public pastProjects?: string;
 
 	@Column('text', { nullable: true })
 	@IsOptional()
 	@ApplicationMapped({ isOptional: true })
-	hardwareRequests?: string;
+	public hardwareRequests?: string;
 
 	@Column('varchar')
 	@IsNotEmpty({ message: 'The applicants dietary requirement is required' })
 	@ApplicationMapped({ hasOther: true })
-	dietaryRequirements!: string;
+	public dietaryRequirements!: string;
 
 	@Column('varchar')
 	@IsNotEmpty({ message: 'The applicants T-Shirt size is required' })
 	@ApplicationMapped()
-	tShirtSize!: string;
+	public tShirtSize!: string;
 
 	@Column('varchar')
 	@IsNotEmpty({ message: 'The applicant hearAbout is required' })
 	@ApplicationMapped({ hasOther: true })
-	hearAbout!: string;
+	public hearAbout!: string;
 
 	@Column('datetime', { nullable: true })
 	@IsOptional()
-	inviteAcceptDeadline?: Date;
+	public inviteAcceptDeadline?: Date;
 
 	// Applicant status, refers to the Enum ApplicationStatus
 	@Column({
@@ -117,14 +117,14 @@ export class Applicant {
 		'enum': ApplicantStatus,
 		'default': ApplicantStatus.Applied
 	})
-	applicationStatus!: ApplicantStatus;
+	public applicationStatus!: ApplicantStatus;
 
 	@OneToMany(
 		() => Review,
 		review => review.applicant
 	)
-	reviews!: Review[];
+	public reviews!: Review[];
 
 	@Column('datetime', { 'nullable': false, 'default': () => 'CURRENT_TIMESTAMP' })
-	createdAt!: Date;
+	public createdAt!: Date;
 }
