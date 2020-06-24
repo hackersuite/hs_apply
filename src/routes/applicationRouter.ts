@@ -39,7 +39,7 @@ export class ApplicationRouter implements RouterInterface {
 	}).any();
 
 	private readonly fileCheckMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-		this.fileUploadHandler(req, res, (err: Error) => {
+		this.fileUploadHandler(req, res, (err?: Error) => {
 			if (err) {
 				res.status(HttpResponseCode.BAD_REQUEST).send({
 					error: true,
