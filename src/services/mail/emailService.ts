@@ -37,7 +37,7 @@ export class EmailService implements EmailServiceInterface {
 			}
 		});
 
-		let response: [Response, {}];
+		let response: [Response, Record<string, any>];
 		try {
 			const emailHTML = await email.render(template, locals);
 			response = await sgMail.send({ ...msgOptions, html: emailHTML }, false);

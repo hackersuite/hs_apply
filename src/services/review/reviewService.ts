@@ -31,7 +31,7 @@ export class ReviewService implements ReviewServiceInterface {
 			const options = columns ? { select: columns } : undefined;
 			return await this._reviewRepository.find(options);
 		} catch (err) {
-			throw new Error(`Failed to get all reviews:\n${err}`);
+			throw new Error(`Failed to get all reviews:\n${(err as Error).message}`);
 		}
 	};
 
@@ -40,7 +40,7 @@ export class ReviewService implements ReviewServiceInterface {
 		// 2. Choose a random application from k and return
 
 		const applications: Applicant[] =
-      (await this._applicantService.getKRandomToReview(reviewerAuthID, chooseFromK)) || [];
+      await this._applicantService.getKRandomToReview(reviewerAuthID, chooseFromK);
 
 		// Set chooseFromK to applications length if too few remaining
 		// Also check for > 0 applications, prevents Array out of bounds
@@ -81,7 +81,7 @@ export class ReviewService implements ReviewServiceInterface {
 		try {
 			return await this._reviewRepository.save(newReview);
 		} catch (err) {
-			throw new Error(`Failed to save review:\n${err}`);
+			throw new Error(`Failed to save review:\n${(err as Error).message}`);
 		}
 	};
 }

@@ -28,7 +28,7 @@ export class CloudStorageService {
 	private readonly DROPBOX_BASE_PATH: string;
 	private readonly DROPBOX_API_TOKEN?: string;
 
-	constructor() {
+	public constructor() {
 		this.DROPBOX_BASE_PATH = 'hackathon-cv'; // TODO: Add ability to load from config file
 		this.DROPBOX_API_TOKEN = process.env.DROPBOX_API_TOKEN;
 

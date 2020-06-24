@@ -40,7 +40,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 			const options = columns ? { select: columns } : undefined;
 			return await this._applicantRepository.find(options);
 		} catch (err) {
-			throw new Error(`Failed to get all applicants:\n${err}`);
+			throw new Error(`Failed to get all applicants:\n${(err as Error).message}`);
 		}
 	};
 
@@ -49,7 +49,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 		orderBy?: keyof Applicant,
 		orderType?: 'ASC' | 'DESC'
 	): Promise<[Partial<Applicant>[], number]> => {
-		const orderOptions = orderBy && orderBy ? { [orderBy]: orderType } : undefined;
+		const orderOptions = orderBy ? { [orderBy]: orderType } : undefined;
 		try {
 			return await this._applicantRepository.findAndCount({
 				select: columns,
@@ -61,17 +61,13 @@ export class ApplicantService implements ApplicantServiceInterface {
 	};
 
 	public findOne = async (id: ApplicationID, findBy?: keyof Applicant): Promise<Applicant> => {
-		if (id === undefined) {
-			throw new Error('Applicant ID must be provided');
-		}
-
 		try {
-			const findColumn: keyof Applicant = findBy || 'id';
+			const findColumn: keyof Applicant = findBy ?? 'id';
 			const applicant = await this._applicantRepository.findOne({ [findColumn]: id });
 			if (!applicant) throw new Error('Failed to find applicant');
 			return applicant;
 		} catch (err) {
-			throw new Error(`Failed to find an applicant:\n${err}`);
+			throw new Error(`Failed to find an applicant:\n${(err as Error).message}`);
 		}
 	};
 
@@ -99,13 +95,11 @@ export class ApplicantService implements ApplicantServiceInterface {
 		try {
 			return await this._applicantRepository.save(newApplicant);
 		} catch (err) {
-			throw new Error(`Failed to save applicant:\n${err}`);
+			throw new Error(`Failed to save applicant:\n${(err as Error).message}`);
 		}
 	};
 
 	public delete = async (id: ApplicationID): Promise<DeleteResult> => {
-		if (id === undefined) throw new Error('Applicant ID must be provided');
-
 		// Find the applicant via the provided ID
 		let applicant: Applicant;
 		try {
@@ -125,7 +119,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 		try {
 			return await this._applicantRepository.delete(id);
 		} catch (err) {
-			throw new Error(`Failed to remove an applicant:\n${err}`);
+			throw new Error(`Failed to remove an applicant:\n${(err as Error).message}`);
 		}
 	};
 
