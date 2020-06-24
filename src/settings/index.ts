@@ -1,2 +1,2 @@
-export * from "./questionsInterface";
-export * from "./hackathonInterface";
+export * from './questionsInterface';
+export * from './hackathonInterface';
