@@ -7,7 +7,7 @@ import { ApplicantService } from "../applications/applicantService";
 
 export interface ReviewServiceInterface {
   getAll: () => Promise<Review[]>;
-  getNextApplication: (reviewerID: string, chooseFromK: number) => Promise<Applicant>;
+  getNextApplication: (reviewerID: string, chooseFromK: number) => Promise<Applicant|undefined>;
   save: (newReview: Review) => Promise<Review>;
   getReviewCountByApplicantID: (applicantID: string) => Promise<number>;
   getReviewCountByAuthID: (reviewerAuthID: string) => Promise<number>;
@@ -28,14 +28,14 @@ export class ReviewService implements ReviewServiceInterface {
 
   public getAll = async (columns?: (keyof Review)[]): Promise<Review[]> => {
     try {
-      const options: object = columns ? { select: columns } : undefined;
+      const options = columns ? { select: columns } : undefined;
       return await this._reviewRepository.find(options);
     } catch (err) {
       throw new Error(`Failed to get all reviews:\n${err}`);
     }
   };
 
-  public getNextApplication = async (reviewerAuthID: string, chooseFromK = 10): Promise<Applicant> => {
+  public getNextApplication = async (reviewerAuthID: string, chooseFromK = 10): Promise<Applicant|undefined> => {
     // 1. Select next k applicants, ordered by the oldest applications first (with < 2 reviews)
     // 2. Choose a random application from k and return
 

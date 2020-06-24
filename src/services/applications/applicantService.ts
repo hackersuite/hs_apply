@@ -37,7 +37,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 
   public getAll = async (columns?: (keyof Applicant)[]): Promise<Applicant[]> => {
     try {
-      const options: object = columns ? { select: columns } : undefined;
+      const options = columns ? { select: columns } : undefined;
       return await this._applicantRepository.find(options);
     } catch (err) {
       throw new Error(`Failed to get all applicants:\n${err}`);
@@ -49,7 +49,7 @@ export class ApplicantService implements ApplicantServiceInterface {
     orderBy?: keyof Applicant,
     orderType?: "ASC" | "DESC"
   ): Promise<[Partial<Applicant>[], number]> => {
-    const orderOptions: object = orderBy && orderBy ? { [orderBy]: orderType } : undefined;
+    const orderOptions = orderBy && orderBy ? { [orderBy]: orderType } : undefined;
     try {
       return await this._applicantRepository.findAndCount({
         select: columns,
@@ -67,7 +67,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 
     try {
       const findColumn: keyof Applicant = findBy || "id";
-      return await this._applicantRepository.findOne({ [findColumn]: id });
+      return await this._applicantRepository.findOneOrFail({ [findColumn]: id });
     } catch (err) {
       throw new Error(`Failed to find an applicant:\n${err}`);
     }
@@ -107,7 +107,7 @@ export class ApplicantService implements ApplicantServiceInterface {
     // Find the applicant via the provided ID
     let applicant: Applicant;
     try {
-      applicant = await this._applicantRepository.findOne(id);
+      applicant = await this._applicantRepository.findOneOrFail(id);
     } catch (err) {
       throw new Error("Failed to find applicant using the provided ID");
     }
@@ -160,7 +160,7 @@ export class ApplicantService implements ApplicantServiceInterface {
         .getMany();
     } catch (err) {
       logger.error(err);
-      return undefined;
+      return [];
     }
 
     return applications;
