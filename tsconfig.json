@@ -1,18 +1,31 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2017",
-    "moduleResolution": "node",
-    "lib": ["dom"],
-    "noImplicitAny": false,
-    "outDir": "dist",
-    "types": ["reflect-metadata", "jest"],
-    "typeRoots": ["./types", "./node_modules/@types"],
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
-  },
-  "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"],
-  "include": ["./src/**/*.ts"]
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"declaration": false,
+		"lib": [
+			"ES2019",
+			"ESNext.AsyncIterable"
+		],
+		"module": "CommonJS",
+		"outDir": "dist",
+		"rootDir": "src",
+		"inlineSourceMap": true,
+		"target": "ES2019",
+		"strict": true,
+		"esModuleInterop": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"skipLibCheck": true
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.js"
+	],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"src/**/*.test.ts",
+		"src/**/*.spec.ts",
+	]
 }
