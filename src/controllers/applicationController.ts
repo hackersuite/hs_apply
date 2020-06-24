@@ -56,16 +56,16 @@ export class ApplicationController implements ApplicationControllerInterface {
     const reqUser: User = req.user as User;
 
     const applicationFields: any = req.body;
-    const newApplication: Applicant = new Applicant();
+    const newApplication: any = new Applicant();
 
     for (const [name, options] of applicationMapping.entries()) {
       if (options && options.hasOther) {
         (newApplication as any)[name] = applicationFields[`${name}Other`] || applicationFields[name] || "Other";
       } else if (options && options.isNumeric) {
         const fieldToCastNumeric = applicationFields[name];
-        (newApplication as any) = this.isNumeric(fieldToCastNumeric) ? Number(fieldToCastNumeric) : undefined;
+        (newApplication as any)[name] = this.isNumeric(fieldToCastNumeric) ? Number(fieldToCastNumeric) : undefined;
       } else {
-        (newApplication as any) = applicationFields[name];
+        (newApplication as any)[name] = applicationFields[name];
       }
     }
     newApplication.authId = (req.user as User).id;
