@@ -1,4 +1,4 @@
-import * as request from "supertest";
+import request from "supertest";
 import { App } from "../../src/app";
 import { Express, NextFunction } from "express";
 import { initEnv, getTestDatabaseOptions } from "../util/testUtils";

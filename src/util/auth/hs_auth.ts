@@ -1,14 +1,14 @@
-import * as passport from "passport";
-import * as querystring from "querystring";
-import { Express, Request, Response, Application, NextFunction, CookieOptions } from "express";
-import * as CookieStrategy from "passport-cookie";
+import passport from "passport";
+import querystring from "querystring";
+import { Express, Request, Response, NextFunction, CookieOptions } from "express";
+import CookieStrategy from "passport-cookie";
 import { injectable, inject } from "inversify";
 import { TYPES } from "../../types";
 import { Cache } from "../cache";
 import { getCurrentUser, User, AuthLevel } from "@unicsmcr/hs_auth_client";
 
 export interface RequestAuthenticationInterface {
-  passportSetup: (app: Application) => void;
+  passportSetup: (app: Express) => void;
 }
 
 @injectable()
@@ -20,7 +20,7 @@ export class RequestAuthentication {
   }
 
   private logout = (app: Express): void => {
-    let logoutCookieOptions: CookieOptions = undefined;
+    let logoutCookieOptions: CookieOptions;
     if (app.get("env") === "production") {
       logoutCookieOptions = {
         domain: app.locals.settings.rootDomain,
@@ -48,7 +48,7 @@ export class RequestAuthentication {
         },
         // Defines the callback function which is executed after the cookie strategy is completed
         // We call the API endpoint on hs_auth to return the user based on the token
-        async (req: Request, token: string, done: (error: string, user?: any) => void): Promise<void> => {
+        async (req: Request, token: string, done: (error?: string, user?: any) => void): Promise<void> => {
           let apiResult: User;
           try {
             apiResult = await getCurrentUser(token, req.originalUrl);
@@ -108,7 +108,7 @@ export class RequestAuthentication {
     if (!user || user.authLevel < requiredAuth) {
       const queryParam: string = querystring.encode({ returnto: `${process.env.APPLICATION_URL}${req.originalUrl}` });
       res.redirect(`${process.env.AUTH_URL}/login?${queryParam}`);
-      return;
+      return false;
     }
     return true;
   };

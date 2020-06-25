@@ -1,5 +1,5 @@
 import axios, { ResponseType, AxiosResponse } from "axios";
-import * as fs from "fs";
+import fs from "fs";
 import { injectable } from "inversify";
 import { logger, getSafeUnicode } from "../../util";
 import { dropboxAPIFactory, DropboxMethods } from "./dropboxAPIFactory";
@@ -26,11 +26,11 @@ interface DropboxAPIRequest {
 @injectable()
 export class CloudStorageService {
   private readonly DROPBOX_BASE_PATH: string;
-  private readonly DROPBOX_API_TOKEN: string;
+  private readonly DROPBOX_API_TOKEN?: string;
 
   constructor() {
     this.DROPBOX_BASE_PATH = "hackathon-cv"; // TODO: Add ability to load from config file
-    this.DROPBOX_API_TOKEN = process.env.DROPBOX_API_TOKEN || undefined;
+    this.DROPBOX_API_TOKEN = process.env.DROPBOX_API_TOKEN;
 
     this.httpHeaderSafeJson = this.httpHeaderSafeJson.bind(this);
   }
@@ -40,7 +40,7 @@ export class CloudStorageService {
   }
 
   private async apiRequest(params: DropboxAPIRequest): Promise<AxiosResponse> {
-    if (!process.env.DROPBOX_API_TOKEN)
+    if (!this.DROPBOX_API_TOKEN || this.DROPBOX_API_TOKEN.length === 0)
       throw new Error("Cannot make request to dropbox, Dropbox API token not defined");
 
     // Format the provided headers to be HTTP safe JSON

@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
 import { Response } from "request";
-import * as EmailTemplate from "email-templates";
-import * as sgMail from "@sendgrid/mail";
+import EmailTemplate from "email-templates";
+import sgMail from "@sendgrid/mail";
 import { HttpResponseCode } from "../../util/errorHandling";
 
 export interface EmailServiceInterface {

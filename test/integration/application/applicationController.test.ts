@@ -1,4 +1,4 @@
-import * as request from "supertest";
+import request from "supertest";
 import { App } from "../../../src/app";
 import { Express, NextFunction } from "express";
 import { initEnv, getTestDatabaseOptions } from "../../util/testUtils";
@@ -229,7 +229,7 @@ test("Test applicant created with valid request (with no Other input provided)",
 test("Test applicant not created with invalid input", async () => {
   const [applicantRequest] = getUniqueApplicant();
   // Mock out the application save call in the service
-  when(mockApplicantService.save(anything(), undefined)).thenReject(new Error(""));
+  when(mockApplicantService.save(anything(), anything())).thenReject(new Error(""));
 
   // Perform the post request along /apply
   const response = await request(bApp)

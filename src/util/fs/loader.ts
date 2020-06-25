@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import fs from "fs";
 import { Express } from "express";
 import { ApplicationSectionInterface, HackathonSettingsInterface } from "../../settings";
 import { Sections, HackathonSettings } from "../../models";
@@ -10,7 +10,7 @@ import { logger } from "../logger";
 
 export interface SettingLoaderInterface {
   loadApplicationSettings: (app: Express) => Promise<void>;
-  loadSettingsFile: <T>(fileName: string, obj?: string) => Promise<T>;
+  loadSettingsFile: <T>(fileName: string, obj?: string) => Promise<T|undefined>;
 }
 
 @injectable()
@@ -37,7 +37,7 @@ export class SettingLoader implements SettingLoaderInterface {
   // TODO: Improve this function by not awaiting both loads seperately
   public async loadApplicationSettings(app: Express): Promise<void> {
     logger.info("Loading hackathon application questions...");
-    const sections: Array<ApplicationSectionInterface> = await this.loadSettingsFile("questions.json", "sections");
+    const sections: Array<ApplicationSectionInterface>|undefined = await this.loadSettingsFile("questions.json", "sections");
     if (sections) {
       const applicationSections: Sections = new Sections(sections);
       this.cache.set(Sections.name, applicationSections);
@@ -45,7 +45,7 @@ export class SettingLoader implements SettingLoaderInterface {
     }
 
     logger.info("Loading hackathon application settings...");
-    const settings: HackathonSettingsInterface = await this.loadSettingsFile("hackathon.json");
+    const settings: HackathonSettingsInterface|undefined = await this.loadSettingsFile("hackathon.json");
     if (settings) {
       // Add the hackathon settings to the cache and add them to app locals
       const hackathonSettings: HackathonSettings = new HackathonSettings(settings);
@@ -62,7 +62,7 @@ export class SettingLoader implements SettingLoaderInterface {
       };
     }
   }
-  public loadSettingsFile = async <T>(fileName: string, obj?: string): Promise<T> => {
+  public loadSettingsFile = async <T>(fileName: string, obj?: string): Promise<T|undefined> => {
     // Check if the file exists in the current directory, and if it is writable.
     let settings: T;
     try {

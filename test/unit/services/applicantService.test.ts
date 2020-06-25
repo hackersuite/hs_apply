@@ -26,6 +26,7 @@ testApplicantMale.hardwareRequests = "";
 testApplicantMale.dietaryRequirements = "Halal";
 testApplicantMale.tShirtSize = "M";
 testApplicantMale.hearAbout = "IDK";
+testApplicantMale.cv = "123";
 
 const testApplicantFemale: Applicant = new Applicant();
 testApplicantFemale.id = "7479a451-e826-4271-8073-929ccef522ee";
