@@ -1,1 +1,1 @@
-export * from "./hs_auth";
+export * from './hs_auth';

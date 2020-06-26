@@ -1,36 +1,39 @@
-import { Container } from "inversify";
-import { TYPES } from "./types";
+/* eslint-disable no-duplicate-imports */
+/* This rule has been disabled as the imports are done logically */
+
+import { Container } from 'inversify';
+import { TYPES } from './types';
 
 // Applicants
-import { ApplicantServiceInterface, ApplicantService } from "./services";
-import { ApplicationControllerInterface, ApplicationController } from "./controllers";
-import { ApplicantRepository } from "./repositories";
+import { ApplicantServiceInterface, ApplicantService } from './services';
+import { ApplicationControllerInterface, ApplicationController } from './controllers';
+import { ApplicantRepository } from './repositories';
 
 // Dashboard
-import { DashboardControllerInterface, DashboardController } from "./controllers";
+import { DashboardControllerInterface, DashboardController } from './controllers';
 
 // Admin
-import { AdminControllerInterface, AdminController } from "./controllers";
+import { AdminControllerInterface, AdminController } from './controllers';
 
 // Review
-import { ReviewService } from "./services";
-import { ReviewController } from "./controllers";
-import { ReviewRepository } from "./repositories";
+import { ReviewService } from './services';
+import { ReviewController } from './controllers';
+import { ReviewRepository } from './repositories';
 
 // Email
-import { EmailServiceInterface, EmailService } from "./services";
-import { InviteControllerInterface, InviteController } from "./controllers";
+import { EmailServiceInterface, EmailService } from './services';
+import { InviteControllerInterface, InviteController } from './controllers';
 
 // Cloud Storage
-import { CloudStorageServiceInterface, CloudStorageService } from "./services";
+import { CloudStorageServiceInterface, CloudStorageService } from './services';
 
 // Routers
-import { RouterInterface, ApplicationRouter, DashboardRouter, InviteRouter, AdminRouter, ReviewRouter } from "./routes";
-import { CacheInterface, Cache } from "./util/cache";
-import { RequestAuthenticationInterface, RequestAuthentication } from "./util/auth";
+import { RouterInterface, ApplicationRouter, DashboardRouter, InviteRouter, AdminRouter, ReviewRouter } from './routes';
+import { CacheInterface, Cache } from './util/cache';
+import { RequestAuthenticationInterface, RequestAuthentication } from './util/auth';
 
 // SettingLoader
-import { SettingLoaderInterface, SettingLoader } from "./util/fs";
+import { SettingLoaderInterface, SettingLoader } from './util/fs';
 
 const container = new Container();
 

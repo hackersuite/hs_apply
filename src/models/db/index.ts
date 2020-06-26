@@ -1,2 +1,2 @@
-export * from "./applicant/";
-export * from "./reviews/";
+export * from './applicant/';
+export * from './reviews/';

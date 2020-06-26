@@ -1,20 +1,20 @@
-import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Applicant } from "../applicant";
+import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Applicant } from '../applicant';
 
 @Entity()
 export class Review {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
+	@PrimaryGeneratedColumn('uuid')
+	public id!: string;
 
-  @ManyToOne(() => Applicant)
-  applicant!: Applicant;
+	@ManyToOne(() => Applicant)
+	public applicant!: Applicant;
 
-  @Column()
-  createdByAuthID!: string;
+	@Column()
+	public createdByAuthID!: string;
 
-  @Column()
-  averageScore!: number;
+	@Column()
+	public averageScore!: number;
 
-  @Column("datetime", { nullable: false, default: () => "CURRENT_TIMESTAMP" })
-  createdAt!: Date;
+	@Column('datetime', { 'nullable': false, 'default': () => 'CURRENT_TIMESTAMP' })
+	public createdAt!: Date;
 }

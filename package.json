@@ -12,9 +12,10 @@
     "test": "jest -i --forceExit",
     "test:watch": "jest -i --watch",
     "test:coverage": "jest -i --coverage --forceExit",
-    "start": "ts-node src/server.ts",
+    "start": "ts-node --files src/server.ts",
     "start:watch": "node ./node_modules/nodemon/bin/nodemon.js",
-    "lint": "eslint src"
+    "lint": "eslint src test --ignore-pattern \"src/public/**/*\" --ext .ts",
+    "lint:fix": "eslint src test --ignore-pattern \"src/public/**/*\" --ext .ts --fix"
   },
   "repository": {
     "type": "GitHub",

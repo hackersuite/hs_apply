@@ -1,2 +1,2 @@
-export * from "./cloudStorageService";
-export * from "./dropboxAPIFactory";
+export * from './cloudStorageService';
+export * from './dropboxAPIFactory';
