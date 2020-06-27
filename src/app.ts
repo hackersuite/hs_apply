@@ -1,5 +1,9 @@
 import 'reflect-metadata';
+
 import dotenv from 'dotenv';
+// Load environment variables from .env file
+dotenv.config({ path: '.env' });
+
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
@@ -12,9 +16,6 @@ import { error404Handler, errorHandler } from './util/errorHandling';
 import { RequestAuthentication } from './util/auth';
 import { SettingLoader } from './util/fs/loader';
 import { reqLogger, logger } from './util';
-
-// Load environment variables from .env file
-dotenv.config({ path: '.env' });
 
 export class App {
 	public async buildApp(
