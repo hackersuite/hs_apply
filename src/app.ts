@@ -8,7 +8,7 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import express, { Express, Request, Response, NextFunction } from 'express';
-import { ConnectionOptions, createConnections, Connection } from 'typeorm';
+import { ConnectionOptions, createConnections } from 'typeorm';
 import { RouterInterface } from './routes';
 import { TYPES } from './types';
 import container from './inversify.config';
@@ -19,9 +19,8 @@ import { reqLogger, logger } from './util';
 
 export class App {
 	public async buildApp(
-		callback: (app: Express, err?: Error) => void,
 		connectionOptions?: ConnectionOptions[]
-	): Promise<void> {
+	): Promise<Express> {
 		const app: Express = this.expressSetup();
 
 		// Set up express middleware for request routing
@@ -42,16 +41,10 @@ export class App {
 		// Connecting to database
 		const databaseConnectionSettings: ConnectionOptions[] = connectionOptions ?? this.createDatabaseSettings();
 
-		let connections: Connection[];
-		try {
-			connections = await createConnections(databaseConnectionSettings);
-			connections.forEach(element => {
-				logger.info(`Connection to database (${element.name}) established.`);
-			});
-		} catch (err) {
-			logger.error(err);
-			return callback(app, err);
-		}
+		const connections = await createConnections(databaseConnectionSettings);
+		connections.forEach(element => {
+			logger.info(`Connection to database (${element.name}) established.`);
+		});
 
 		// Set up passport for authentication
 		// Also add the logout route
@@ -68,7 +61,7 @@ export class App {
 		// Setting up error handlers
 		app.use(error404Handler);
 		app.use(errorHandler);
-		return callback(app);
+		return app;
 	}
 
 	/**

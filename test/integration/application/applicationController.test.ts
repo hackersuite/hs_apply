@@ -76,7 +76,7 @@ const getUniqueApplicant = (options?: { needsID: boolean }): [any, Applicant] =>
 	return [applicantRequest, applicant];
 };
 
-beforeAll(async done => {
+beforeAll(async () => {
 	initEnv();
 	mockCache = mock(Cache);
 	mockApplicantService = mock(ApplicantService);
@@ -112,14 +112,7 @@ beforeAll(async done => {
 		};
 	});
 
-	await new App().buildApp((builtApp: Express, err?: Error): void => {
-		if (err) {
-			done(`${err.message}\n${err.stack ?? ''}`);
-		} else {
-			bApp = builtApp;
-			done();
-		}
-	}, getTestDatabaseOptions());
+	bApp = await new App().buildApp(getTestDatabaseOptions());
 });
 
 beforeEach(() => {

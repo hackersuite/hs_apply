@@ -22,7 +22,7 @@ const requestUser = {
 	authLevel: AuthLevel.Organiser
 };
 
-beforeAll(async done => {
+beforeAll(async () => {
 	initEnv();
 	mockCache = mock(Cache);
 	mockRequestAuth = mock(RequestAuthentication);
@@ -56,14 +56,7 @@ beforeAll(async done => {
 		};
 	});
 
-	await new App().buildApp((builtApp: Express, err?: Error): void => {
-		if (err) {
-			done(`${err.message}\n${err.stack ?? ''}`);
-		} else {
-			bApp = builtApp;
-			done();
-		}
-	}, getTestDatabaseOptions());
+	bApp = await new App().buildApp(getTestDatabaseOptions());
 });
 
 beforeEach(() => {

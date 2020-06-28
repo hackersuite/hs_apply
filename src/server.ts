@@ -1,4 +1,3 @@
-import { Express } from 'express';
 import { App } from './app';
 import { logger } from './util';
 
@@ -6,13 +5,14 @@ import { logger } from './util';
  * Start Express server.
  */
 
-new App().buildApp((app: Express, err?: Error) => {
-	if (err) {
-		logger.error('Could not start server!');
-	} else {
+new App().buildApp()
+	.then(app => {
 		app.listen(app.get('port'), () => {
-			logger.info('App is running at http://localhost:%d in %s mode', app.get('port'), app.get('env'));
+			logger.info(`App is running at http://localhost:%d in %s mode`, app.get('port'), app.get('env'));
 			logger.info('Press CTRL-C to stop\n');
 		});
-	}
-}).catch(err => logger.error(err));
+	})
+	.catch(err => {
+		logger.error('Could not start server!');
+		logger.error(err);
+	});
