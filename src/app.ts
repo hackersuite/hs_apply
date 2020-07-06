@@ -1,8 +1,10 @@
 import 'reflect-metadata';
 
 import dotenv from 'dotenv';
-// Load environment variables from .env file
+import { Environment, getConfig } from './util/config';
+
 dotenv.config({ path: '.env' });
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 
 import path from 'path';
 import cookieParser from 'cookie-parser';
@@ -76,9 +78,9 @@ export class App {
 		app.set('view engine', 'ejs');
 
 		// Express configuration
-		app.set('port', process.env.PORT ?? 3000);
-		app.set('env', process.env.ENVIRONMENT ?? 'production');
-		if (process.env.ENVIRONMENT === 'production') {
+		app.set('port', getConfig().port);
+		app.set('env', getConfig().environment);
+		if (getConfig().environment === Environment.Production) {
 			app.set('trust proxy', 1);
 		}
 
@@ -91,7 +93,7 @@ export class App {
    */
 	private readonly middlewareSetup = (app: Express): void => {
 		app.use((req, res, next) => {
-			if (req.get('X-Forwarded-Proto') !== 'https' && process.env.USE_SSL) {
+			if (req.get('X-Forwarded-Proto') !== 'https' && getConfig().useSSL) {
 				res.redirect(`https://${req.headers.host ?? ''}${req.url}`);
 			} else {
 				return next();
@@ -129,11 +131,11 @@ export class App {
 		{
 			name: 'applications',
 			type: 'mysql',
-			host: process.env.DB_HOST,
-			port: Number(process.env.DB_PORT),
-			username: process.env.DB_USER,
-			password: process.env.DB_PASSWORD,
-			database: process.env.DB_DATABASE,
+			host: getConfig().db.host,
+			port: getConfig().db.port,
+			username: getConfig().db.user,
+			password: getConfig().db.password,
+			database: getConfig().db.database,
 			entities: [`${__dirname}/models/db/*{.js,.ts}`],
 			synchronize: true // Note: Unsafe in productionn, use migrations instead
 		}

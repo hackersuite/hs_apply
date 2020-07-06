@@ -1,13 +1,14 @@
-import { getEnv, intoNumber } from './util';
+import { getEnv, intoNumber, intoBoolean } from './util';
 
-enum Environment {
-	Dev,
-	Production
+export enum Environment {
+	Dev = 'dev',
+	Production = 'production'
 }
 
 interface EnvConfig {
 	port: number;
 	environment: Environment;
+	useSSL: boolean;
 	db: {
 		type: string;
 		host: string;
@@ -26,10 +27,11 @@ interface EnvConfig {
 	sendgridToken: string;
 }
 
-export function load(source: Record<string, string | undefined>): EnvConfig {
+export function load(source: Record<string, string | undefined> = process.env): EnvConfig {
 	return {
 		port: intoNumber(getEnv(source, 'PORT')),
 		environment: getEnv(source, 'ENVIRONMENT') === 'dev' ? Environment.Dev : Environment.Production,
+		useSSL: intoBoolean(getEnv(source, 'USE_SSL')),
 		db: {
 			type: getEnv(source, 'DB_TYPE'),
 			host: getEnv(source, 'DB_HOST'),
@@ -49,10 +51,14 @@ export function load(source: Record<string, string | undefined>): EnvConfig {
 	};
 }
 
-export function loadGlobal(source: Record<string, string | undefined>): EnvConfig {
-	globalConfig = load(source);
+let globalConfig: EnvConfig|undefined;
+
+export function getConfig(source?: Record<string, string | undefined>, refresh = false): EnvConfig {
+	if (globalConfig && refresh) {
+		globalConfig = Object.assign(globalConfig, load(source));
+	} else if (!globalConfig) {
+		globalConfig = load(source);
+	}
 	return globalConfig;
 }
 
-let globalConfig = load(process.env);
-export default globalConfig;

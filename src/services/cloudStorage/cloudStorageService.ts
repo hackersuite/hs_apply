@@ -3,6 +3,7 @@ import fs from 'fs';
 import { injectable } from 'inversify';
 import { logger, getSafeUnicode } from '../../util';
 import { dropboxAPIFactory, DropboxMethods } from './dropboxAPIFactory';
+import { getConfig } from '../../util/config';
 
 export interface CloudStorageServiceInterface {
 	upload: (fileName: string, file: Buffer) => Promise<string>;
@@ -30,7 +31,7 @@ export class CloudStorageService {
 
 	public constructor() {
 		this.DROPBOX_BASE_PATH = 'hackathon-cv'; // TODO: Add ability to load from config file
-		this.DROPBOX_API_TOKEN = process.env.DROPBOX_API_TOKEN;
+		this.DROPBOX_API_TOKEN = getConfig().dropboxToken;
 
 		this.httpHeaderSafeJson = this.httpHeaderSafeJson.bind(this);
 	}
