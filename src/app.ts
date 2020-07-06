@@ -28,7 +28,7 @@ export class App {
 		// Set up express middleware for request routing
 		this.middlewareSetup(app);
 
-		if (app.get('env') === 'dev') {
+		if (app.get('env') === Environment.Dev) {
 			this.devMiddlewareSetup(app);
 		}
 

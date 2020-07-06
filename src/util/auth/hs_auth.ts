@@ -6,7 +6,7 @@ import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
 import { Cache } from '../cache';
 import { getCurrentUser, User, AuthLevel } from '@unicsmcr/hs_auth_client';
-import { getConfig } from '../../util/config';
+import { getConfig, Environment } from '../../util/config';
 
 export interface RequestAuthenticationInterface {
 	passportSetup: (app: Express) => void;
@@ -22,7 +22,7 @@ export class RequestAuthentication {
 
 	private readonly logout = (app: Express): void => {
 		let logoutCookieOptions: CookieOptions;
-		if (app.get('env') === 'production') {
+		if (app.get('env') === Environment.Production) {
 			logoutCookieOptions = {
 				domain: app.locals.settings.rootDomain,
 				secure: true,

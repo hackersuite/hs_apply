@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Connection, createConnections, getConnection, ConnectionOptions } from 'typeorm';
-import { getConfig } from '../../src/util/config';
+import { getConfig, Environment } from '../../src/util/config';
 
 export function getTestDatabaseOptions(entities?: (string | Function)[], name?: string): ConnectionOptions[] {
 	return [
@@ -41,7 +41,7 @@ export function updateEnv(props: Record<string, string>) {
 
 export function initEnv(): void {
 	process.env.PORT = '3000';
-	process.env.ENVIRONMENT = 'dev';
+	process.env.ENVIRONMENT = Environment.Dev;
 	process.env.USE_SSL = 'false';
 
 	process.env.DB_TYPE = 'mysql';

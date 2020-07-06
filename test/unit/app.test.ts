@@ -3,6 +3,7 @@ initEnv();
 
 import { getConnection } from 'typeorm';
 import { App } from '../../src/app';
+import { Environment } from '../../src/util/config';
 
 /**
  * Setup the env variables for the tests
@@ -27,10 +28,10 @@ test('App should build without errors', async () => {
  */
 test('App should start in dev environment', async () => {
 	updateEnv({
-		ENVIRONMENT: 'dev'
+		ENVIRONMENT: Environment.Dev
 	});
 	const builtApp = await new App().buildApp(getTestDatabaseOptions());
-	expect(builtApp.get('env')).toBe('dev');
+	expect(builtApp.get('env')).toBe(Environment.Dev);
 	expect(getConnection('applications').isConnected).toBeTruthy();
 	await getConnection('applications').close();
 });
@@ -40,10 +41,10 @@ test('App should start in dev environment', async () => {
  */
 test('App should start in production environment', async () => {
 	updateEnv({
-		ENVIRONMENT: 'production'
+		ENVIRONMENT: Environment.Production
 	});
 	const builtApp = await new App().buildApp(getTestDatabaseOptions());
-	expect(builtApp.get('env')).toBe('production');
+	expect(builtApp.get('env')).toBe(Environment.Production);
 	expect(builtApp.get('trust proxy')).toBe(1);
 	expect(getConnection('applications').isConnected).toBeTruthy();
 	await getConnection('applications').close();
