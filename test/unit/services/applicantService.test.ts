@@ -1,3 +1,6 @@
+import { initEnv } from '../../util';
+initEnv();
+
 import { when, mock, instance, verify, anything, objectContaining, reset, resetCalls } from 'ts-mockito';
 import container from '../../../src/inversify.config';
 import { TYPES } from '../../../src/types';
