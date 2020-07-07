@@ -1,10 +1,9 @@
 import 'reflect-metadata';
 
 import dotenv from 'dotenv';
-import { Environment, getConfig } from './util/config';
-
 dotenv.config({ path: '.env' });
 
+import { Environment, getConfig } from './util/config';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
