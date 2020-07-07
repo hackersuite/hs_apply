@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import { Environment, getConfig } from './util/config';
 
 dotenv.config({ path: '.env' });
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 
 import path from 'path';
 import cookieParser from 'cookie-parser';
