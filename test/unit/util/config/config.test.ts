@@ -16,7 +16,7 @@ const fixture1: [Record<string, string>, EnvConfig] = [
 		AUTH_URL: 'http://localhost:8001',
 		GOOGLE_ANALYTICS_ID: 'analyticsId',
 		DROPBOX_API_TOKEN: '',
-		SENDGRID_API_KEY: 'token'
+		SENDGRID_API_TOKEN: 'token'
 	},
 	{
 		port: 8000,
@@ -54,7 +54,7 @@ const fixture2: [Record<string, string>, EnvConfig] = [
 		AUTH_URL: 'http://localhost:8001',
 		GOOGLE_ANALYTICS_ID: '',
 		DROPBOX_API_TOKEN: '',
-		SENDGRID_API_KEY: ''
+		SENDGRID_API_TOKEN: ''
 	},
 	{
 		port: 8000,

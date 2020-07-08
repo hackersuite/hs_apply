@@ -48,7 +48,7 @@ export function load(source: Record<string, string | undefined> = process.env): 
 		},
 		googleAnalyticsId: getEnv(source, 'GOOGLE_ANALYTICS_ID'),
 		dropboxToken: getEnv(source, 'DROPBOX_API_TOKEN'),
-		sendgridToken: getEnv(source, 'SENDGRID_API_KEY')
+		sendgridToken: getEnv(source, 'SENDGRID_API_TOKEN')
 	};
 }
 

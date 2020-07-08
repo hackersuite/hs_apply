@@ -55,6 +55,6 @@ export function initEnv(): void {
 
 	process.env.GOOGLE_ANALYTICS_ID = '';
 	process.env.DROPBOX_API_TOKEN = 'api_key';
-	process.env.SENDGRID_API_KEY = '';
+	process.env.SENDGRID_API_TOKEN = '';
 	getConfig(process.env, true);
 }
