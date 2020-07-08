@@ -13,7 +13,7 @@ export function getEnv(source: Record<string, string | undefined>, name: string)
 }
 
 export function intoNumber(str: string): number {
-	if (isNaN(Number(str))) throw new Error(`Value '${str}' is not a number.`);
+	if (!str.trim() || isNaN(Number(str))) throw new Error(`Value '${str}' is not a number.`);
 	return Number(str);
 }
 
