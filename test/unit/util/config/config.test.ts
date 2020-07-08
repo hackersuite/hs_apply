@@ -15,7 +15,6 @@ const fixture1: [Record<string, string>, EnvConfig] = [
 		DB_DATABASE: 'applications',
 		APPLICATION_URL: 'http://localhost:8080',
 		AUTH_URL: 'http://localhost:8001',
-		SESSION_SECRET: 'secret',
 		GOOGLE_ANALYTICS_ID: 'analyticsId',
 		DROPBOX_API_TOKEN: '',
 		SENDGRID_API_KEY: 'token'
@@ -36,7 +35,6 @@ const fixture1: [Record<string, string>, EnvConfig] = [
 			applicationUrl: 'http://localhost:8080',
 			authUrl: 'http://localhost:8001'
 		},
-		sessionSecret: 'secret',
 		googleAnalyticsId: 'analyticsId',
 		dropboxToken: '',
 		sendgridToken: 'token'
@@ -57,7 +55,6 @@ const fixture2: [Record<string, string>, EnvConfig] = [
 		DB_DATABASE: 'applications',
 		APPLICATION_URL: 'http://localhost:8080',
 		AUTH_URL: 'http://localhost:8001',
-		SESSION_SECRET: '',
 		GOOGLE_ANALYTICS_ID: '',
 		DROPBOX_API_TOKEN: '',
 		SENDGRID_API_KEY: ''
@@ -78,7 +75,6 @@ const fixture2: [Record<string, string>, EnvConfig] = [
 			applicationUrl: 'http://localhost:8080',
 			authUrl: 'http://localhost:8001'
 		},
-		sessionSecret: '',
 		googleAnalyticsId: '',
 		dropboxToken: '',
 		sendgridToken: ''

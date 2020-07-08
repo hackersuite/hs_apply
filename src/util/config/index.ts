@@ -21,7 +21,6 @@ export interface EnvConfig {
 		applicationUrl: string;
 		authUrl: string;
 	};
-	sessionSecret: string;
 	googleAnalyticsId: string;
 	dropboxToken: string;
 	sendgridToken: string;
@@ -49,7 +48,6 @@ export function load(source: Record<string, string | undefined> = process.env): 
 			applicationUrl: getEnv(source, 'APPLICATION_URL'),
 			authUrl: getEnv(source, 'AUTH_URL')
 		},
-		sessionSecret: getEnv(source, 'SESSION_SECRET'),
 		googleAnalyticsId: getEnv(source, 'GOOGLE_ANALYTICS_ID'),
 		dropboxToken: getEnv(source, 'DROPBOX_API_TOKEN'),
 		sendgridToken: getEnv(source, 'SENDGRID_API_KEY')

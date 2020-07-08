@@ -54,7 +54,6 @@ export function initEnv(): void {
 	process.env.AUTH_URL = 'localhost:auth';
 	process.env.APPLICATION_URL = 'localhost:applications';
 
-	process.env.SESSION_SECRET = 'cat';
 	process.env.GOOGLE_ANALYTICS_ID = '';
 	process.env.DROPBOX_API_TOKEN = 'api_key';
 	process.env.SENDGRID_API_KEY = '';
