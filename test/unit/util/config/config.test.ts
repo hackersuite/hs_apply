@@ -109,7 +109,7 @@ describe('load config', () => {
 		expect(load(fixture2[0]).environment).toStrictEqual(Environment.Production);
 		expect(() => load({ ...fixture1[0], ENVIRONMENT: 'invalid' })).toThrow();
 		expect(() => load({ ...fixture1[0], ENVIRONMENT: 'prod' })).toThrow();
-		expect(() => load({ ...fixture1[0], ENVIRONMENT: 'invalid' })).toThrow();
+		expect(() => load({ ...fixture1[0], ENVIRONMENT: 'development' })).toThrow();
 	});
 });
 
