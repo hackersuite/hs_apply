@@ -5,7 +5,7 @@ export enum Environment {
 	Production = 'production'
 }
 
-interface EnvConfig {
+export interface EnvConfig {
 	port: number;
 	environment: Environment;
 	useSSL: boolean;
@@ -28,9 +28,14 @@ interface EnvConfig {
 }
 
 export function load(source: Record<string, string | undefined> = process.env): EnvConfig {
+	const environment = getEnv(source, 'ENVIRONMENT');
+	if (![Environment.Dev, Environment.Production].includes(environment as Environment)) {
+		throw new Error(`Invalid ENVIRONMENT variable, must be 'dev' or 'production'`);
+	}
+
 	return {
 		port: intoNumber(getEnv(source, 'PORT')),
-		environment: getEnv(source, 'ENVIRONMENT') === 'dev' ? Environment.Dev : Environment.Production,
+		environment: environment === 'dev' ? Environment.Dev : Environment.Production,
 		useSSL: intoBoolean(getEnv(source, 'USE_SSL')),
 		db: {
 			type: getEnv(source, 'DB_TYPE'),
