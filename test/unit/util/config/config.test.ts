@@ -83,8 +83,11 @@ const fixture2: [Record<string, string>, EnvConfig] = [
 
 describe('load config', () => {
 	test('Valid env fixtures load correctly', () => {
+		// Test it works when passing in the variables as a param
 		expect(load(fixture1[0])).toEqual(fixture1[1]);
-		expect(load(fixture2[0])).toEqual(fixture2[1]);
+		// Test it works with environment variables
+		Object.assign(process.env, fixture2[0]);
+		expect(load()).toEqual(fixture2[1]);
 	});
 
 	test('Throws for missing values', () => {
