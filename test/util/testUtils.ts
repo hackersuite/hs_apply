@@ -44,7 +44,6 @@ export function initEnv(): void {
 	process.env.ENVIRONMENT = Environment.Dev;
 	process.env.USE_SSL = 'false';
 
-	process.env.DB_TYPE = 'mysql';
 	process.env.DB_HOST = '';
 	process.env.DB_PORT = '3000';
 	process.env.DB_USER = '';

@@ -7,7 +7,6 @@ const fixture1: [Record<string, string>, EnvConfig] = [
 		PORT: '8000',
 		ENVIRONMENT: 'dev',
 		USE_SSL: 'true',
-		DB_TYPE: 'mysql',
 		DB_HOST: 'localhost',
 		DB_PORT: '3306',
 		DB_USER: 'root',
@@ -24,7 +23,6 @@ const fixture1: [Record<string, string>, EnvConfig] = [
 		environment: Environment.Dev,
 		useSSL: true,
 		db: {
-			type: 'mysql',
 			host: 'localhost',
 			user: 'root',
 			port: 3306,
@@ -47,7 +45,6 @@ const fixture2: [Record<string, string>, EnvConfig] = [
 		PORT: '8000',
 		ENVIRONMENT: 'production',
 		USE_SSL: 'true',
-		DB_TYPE: 'mysql',
 		DB_HOST: 'localhost',
 		DB_PORT: '3306',
 		DB_USER: 'root',
@@ -64,7 +61,6 @@ const fixture2: [Record<string, string>, EnvConfig] = [
 		environment: Environment.Production,
 		useSSL: true,
 		db: {
-			type: 'mysql',
 			host: 'localhost',
 			user: 'root',
 			port: 3306,

@@ -10,7 +10,6 @@ export interface EnvConfig {
 	environment: Environment;
 	useSSL: boolean;
 	db: {
-		type: string;
 		host: string;
 		port: number;
 		user: string;
@@ -37,7 +36,6 @@ export function load(source: Record<string, string | undefined> = process.env): 
 		environment: environment === 'dev' ? Environment.Dev : Environment.Production,
 		useSSL: intoBoolean(getEnv(source, 'USE_SSL')),
 		db: {
-			type: getEnv(source, 'DB_TYPE'),
 			host: getEnv(source, 'DB_HOST'),
 			port: intoNumber(getEnv(source, 'DB_PORT')),
 			user: getEnv(source, 'DB_USER'),
