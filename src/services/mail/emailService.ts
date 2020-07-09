@@ -3,6 +3,7 @@ import { Response } from 'request';
 import EmailTemplate from 'email-templates';
 import sgMail from '@sendgrid/mail';
 import { HttpResponseCode } from '../../util/errorHandling';
+import { getConfig } from '../../util/config';
 
 export interface EmailServiceInterface {
 	sendEmail: (from: string, recipient: string, subject: string, template: string, locals: any) => Promise<boolean>;
@@ -17,9 +18,8 @@ export class EmailService implements EmailServiceInterface {
 		template: string,
 		locals: any
 	): Promise<boolean> => {
-		if (!process.env.SENDGRID_API_KEY) { throw new Error('Failed to send email via Sendgrid, check sendgrid env settings'); }
-
-		sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+		if (!getConfig().sendgridToken) { throw new Error('Failed to send email via Sendgrid, check sendgrid env settings'); }
+		sgMail.setApiKey(getConfig().sendgridToken);
 
 		const msgOptions = {
 			from: from,
