@@ -95,8 +95,7 @@ export class ApplicationRouter implements RouterInterface {
 
 		router.post('/partial',
 			this.fileCheckMiddleware,
-			this._applicationController.updateUnsubmittedApplication
-		);
+			this._applicationController.updateUnsubmittedApplication);
 
 		router.get('/cancel', this.doNothingIfApplicationsClosed, this._applicationController.cancel);
 

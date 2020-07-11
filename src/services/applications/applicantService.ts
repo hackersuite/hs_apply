@@ -80,9 +80,9 @@ export class ApplicantService implements ApplicantServiceInterface {
 	public findPartialApplication = async (id: ApplicationID, findBy?: keyof PartialApplicant): Promise<PartialApplicant> => {
 		try {
 			const findColumn: keyof PartialApplicant = findBy ?? 'authId';
-			const partialApplicant = await this._partialApplicantRepository.findOne({ [findColumn]: id});
+			const partialApplicant = await this._partialApplicantRepository.findOne({ [findColumn]: id });
 			if (!partialApplicant) throw new Error('Applicant does not exist');
-			return partialApplicant
+			return partialApplicant;
 		} catch (err) {
 			throw new Error(`Failed to find an applicant:\n${(err as Error).message}`);
 		}
@@ -121,7 +121,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 		const application = new PartialApplicant();
 		application.authId = id;
 		application.partialApplication = { ...rawApplication };
-		
+
 		// let questionName;
 		// for (const [name, options] of applicationMapping.entries()) {
 		// 	application.partialApplication[name] = rawApplication[name];

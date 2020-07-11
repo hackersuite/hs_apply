@@ -4,7 +4,7 @@ import { Sections } from '../models/sections';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
 import { ApplicantService } from '../services';
-import { Applicant, PartialApplicant } from '../models/db';
+import { Applicant } from '../models/db';
 import { HttpResponseCode } from '../util/errorHandling';
 import { User } from '@unicsmcr/hs_auth_client';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
@@ -28,7 +28,7 @@ export class ApplicationController implements ApplicationControllerInterface {
 	private readonly _applicantService: ApplicantService;
 
 	// TODO: Issue #10. Refactor error messages into something consistant across the project
-	private readonly applicantNotFound = "Applicant does not exist";
+	private readonly applicantNotFound = 'Applicant does not exist';
 
 	public constructor(
 	@inject(TYPES.Cache) cache: Cache,
@@ -39,10 +39,10 @@ export class ApplicationController implements ApplicationControllerInterface {
 	}
 
 	public apply = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-		const authID = (req.user as User).id
+		const authID = (req.user as User).id;
 
 		// Check if the user has started an application using the current auth ID
-		let partialApplication, application;
+		let partialApplication;
 		try {
 			partialApplication = await this._applicantService.findPartialApplication(authID);
 		} catch (err) {
@@ -72,7 +72,7 @@ export class ApplicationController implements ApplicationControllerInterface {
 		// The application is not yet complete, but save the partial application for the applicant
 		await this._applicantService.savePartialApplication((req.user as User).id, req.body);
 
-		res.send("Success!");
+		res.send('Success!');
 	};
 
 	public submitApplication = async (req: Request, res: Response): Promise<void> => {
