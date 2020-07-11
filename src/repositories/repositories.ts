@@ -1,4 +1,4 @@
-import { Applicant, Review } from '../models/db';
+import { Applicant, Review, PartialApplicant } from '../models/db';
 import { BaseRepository } from './baseRepository';
 import { injectable } from 'inversify';
 import { Repository } from 'typeorm';
@@ -9,6 +9,14 @@ export class ApplicantRepository extends BaseRepository<Applicant> {
 		return super.connect(Applicant);
 	}
 }
+
+@injectable()
+export class PartialApplicantRepository extends BaseRepository<PartialApplicant> {
+	public getRepository(): Repository<PartialApplicant> {
+		return super.connect(PartialApplicant);
+	}
+}
+
 
 @injectable()
 export class ReviewRepository extends BaseRepository<Review> {

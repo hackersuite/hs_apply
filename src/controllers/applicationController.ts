@@ -4,7 +4,7 @@ import { Sections } from '../models/sections';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
 import { ApplicantService } from '../services';
-import { Applicant } from '../models/db';
+import { Applicant, PartialApplicant } from '../models/db';
 import { HttpResponseCode } from '../util/errorHandling';
 import { User } from '@unicsmcr/hs_auth_client';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
@@ -13,8 +13,10 @@ import { logger } from '../util';
 
 export interface ApplicationControllerInterface {
 	apply: (req: Request, res: Response, next: NextFunction) => void;
+	updateUnsubmittedApplication: (req: Request, res: Response) => void;
 	submitApplication: (req: Request, res: Response, next: NextFunction) => void;
 	cancel: (req: Request, res: Response, next: NextFunction) => void;
+	checkin: (req: Request, res: Response, next: NextFunction) => void;
 }
 
 /**
@@ -25,6 +27,9 @@ export class ApplicationController implements ApplicationControllerInterface {
 	private readonly _cache: Cache;
 	private readonly _applicantService: ApplicantService;
 
+	// TODO: Issue #10. Refactor error messages into something consistant across the project
+	private readonly applicantNotFound = "Applicant does not exist";
+
 	public constructor(
 	@inject(TYPES.Cache) cache: Cache,
 		@inject(TYPES.ApplicantService) applicantService: ApplicantService
@@ -34,19 +39,40 @@ export class ApplicationController implements ApplicationControllerInterface {
 	}
 
 	public apply = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-		// Check if the user has already made an application using req.user.authId
+		const authID = (req.user as User).id
+
+		// Check if the user has started an application using the current auth ID
+		let partialApplication, application;
 		try {
-			await this._applicantService.findOne((req.user as User).id, 'authId');
-			return res.redirect('/');
+			partialApplication = await this._applicantService.findPartialApplication(authID);
 		} catch (err) {
-			if ((err?.message as string).includes('Applicant does not exist')) {
-				const cachedSections: Array<Sections> = this._cache.getAll(Sections.name);
-				const sections = cachedSections[0].sections;
-				res.render('pages/apply', { sections: sections });
-			} else {
+			if (!(err?.message as string).includes(this.applicantNotFound)) {
 				return next(err);
 			}
 		}
+
+		// Check if the user has already submitted an application
+		try {
+			// If the user has made an application, the findOne call succeeds an we redirect
+			// Otherwise, it throws an error
+			await this._applicantService.findOne(authID, 'authId');
+			return res.redirect('/');
+		} catch (err) {
+			if (!(err?.message as string).includes(this.applicantNotFound)) {
+				return next(err);
+			}
+		}
+
+		const cachedSections: Array<Sections> = this._cache.getAll(Sections.name);
+		const sections = cachedSections[0].sections;
+		res.render('pages/apply', { sections, partialApplication });
+	};
+
+	public updateUnsubmittedApplication = async (req: Request, res: Response): Promise<void> => {
+		// The application is not yet complete, but save the partial application for the applicant
+		await this._applicantService.savePartialApplication((req.user as User).id, req.body);
+
+		res.send("Success!");
 	};
 
 	public submitApplication = async (req: Request, res: Response): Promise<void> => {
@@ -57,7 +83,7 @@ export class ApplicationController implements ApplicationControllerInterface {
 
 		for (const [name, options] of applicationMapping.entries()) {
 			if (options.hasOther) {
-				(newApplication)[name] = applicationFields[`${name}Other`] || applicationFields[name] || 'Other';
+				newApplication[name] = applicationFields[`${name}Other`] || applicationFields[name] || 'Other';
 			} else if (options.isNumeric) {
 				const fieldToCastNumeric = applicationFields[name];
 				(newApplication)[name] = this.isNumeric(fieldToCastNumeric) ? Number(fieldToCastNumeric) : undefined;

@@ -7,7 +7,7 @@ import { TYPES } from './types';
 // Applicants
 import { ApplicantServiceInterface, ApplicantService } from './services';
 import { ApplicationControllerInterface, ApplicationController } from './controllers';
-import { ApplicantRepository } from './repositories';
+import { ApplicantRepository, PartialApplicantRepository } from './repositories';
 
 // Dashboard
 import { DashboardControllerInterface, DashboardController } from './controllers';
@@ -48,6 +48,7 @@ container.bind<RouterInterface>(TYPES.Router).to(ReviewRouter);
 container.bind<ApplicantServiceInterface>(TYPES.ApplicantService).to(ApplicantService);
 container.bind<ApplicationControllerInterface>(TYPES.ApplicationController).to(ApplicationController);
 container.bind<ApplicantRepository>(TYPES.ApplicantRepository).to(ApplicantRepository);
+container.bind<PartialApplicantRepository>(TYPES.PartialApplicantRepository).to(PartialApplicantRepository);
 
 // Dashboard
 container.bind<DashboardControllerInterface>(TYPES.DashboardController).to(DashboardController);
