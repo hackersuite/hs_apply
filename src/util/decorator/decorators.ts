@@ -61,6 +61,6 @@ export function ApplicationMapped(options?: ApplicationMappingOptions) {
 				reviewApplicationMapping.set(groupKey, currentGroupArray);
 			}
 		}
-		applicationMapping.set(propertyName, {});
+		applicationMapping.set(propertyName, { ...options });
 	};
 }
