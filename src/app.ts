@@ -125,9 +125,10 @@ export class App {
 
 		// Disable browser caching
 		app.use((req: Request, res: Response, next: NextFunction) => {
-			res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-			res.header('Expires', '-1');
-			res.header('Pragma', 'no-cache');
+			res.setHeader('Surrogate-Control', 'no-store');
+			res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+			res.setHeader('Pragma', 'no-cache');
+			res.setHeader('Expires', '0');
 			next();
 		});
 	};
