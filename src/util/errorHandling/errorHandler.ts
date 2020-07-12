@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ApiError } from './apiError';
 import { HttpResponseCode } from './httpResponseCode';
 import { logger } from '../logger';
+import { getConfig, Environment } from '../../util/config';
 
 // const toEmails: string[] = ["admin@unicsmcr.com"];
 
@@ -10,7 +11,7 @@ import { logger } from '../logger';
  */
 export const errorHandler = (err: ApiError | Error, req: Request, res: Response): void => {
 	if (err instanceof Error) {
-		if (process.env.ENVIRONMENT === 'production') {
+		if (getConfig().environment === Environment.Production) {
 			// Send notification to admins when an uncaught error occurs
 			//   sendEmail("noreply@unicsmcr.com",
 			//   toEmails,

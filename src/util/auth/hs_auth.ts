@@ -6,6 +6,7 @@ import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
 import { Cache } from '../cache';
 import { getCurrentUser, User, AuthLevel } from '@unicsmcr/hs_auth_client';
+import { getConfig, Environment } from '../../util/config';
 
 export interface RequestAuthenticationInterface {
 	passportSetup: (app: Express) => void;
@@ -21,7 +22,7 @@ export class RequestAuthentication {
 
 	private readonly logout = (app: Express): void => {
 		let logoutCookieOptions: CookieOptions;
-		if (app.get('env') === 'production') {
+		if (app.get('env') === Environment.Production) {
 			logoutCookieOptions = {
 				domain: app.locals.settings.rootDomain,
 				secure: true,
@@ -93,9 +94,9 @@ export class RequestAuthentication {
 			// Either user was not authenticated, or an error occured during authentication
 			// In both cases we redirect them to the login
 			const queryParam: string = querystring.encode({
-				returnto: `${process.env.APPLICATION_URL ?? ''}${req.originalUrl}`
+				returnto: `${getConfig().hs.applicationUrl}${req.originalUrl}`
 			});
-			res.redirect(`${process.env.AUTH_URL ?? ''}/login?${queryParam}`);
+			res.redirect(`${getConfig().hs.authUrl}/login?${queryParam}`);
 			return;
 		}
 		res.locals.authLevel = user.authLevel;
@@ -104,8 +105,8 @@ export class RequestAuthentication {
 
 	public checkAuthLevel = (req: Request, res: Response, user: User|undefined, requiredAuth: AuthLevel): boolean => {
 		if (!user || user.authLevel < requiredAuth) {
-			const queryParam: string = querystring.encode({ returnto: `${process.env.APPLICATION_URL ?? ''}${req.originalUrl}` });
-			res.redirect(`${process.env.AUTH_URL ?? ''}/login?${queryParam}`);
+			const queryParam: string = querystring.encode({ returnto: `${getConfig().hs.applicationUrl}${req.originalUrl}` });
+			res.redirect(`${getConfig().hs.authUrl}/login?${queryParam}`);
 			return false;
 		}
 		return true;

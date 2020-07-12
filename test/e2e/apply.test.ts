@@ -59,7 +59,7 @@ const requestUser = {
 	authLevel: AuthLevel.Organiser
 };
 
-beforeAll(async done => {
+beforeAll(async () => {
 	initEnv();
 
 	mockRequestAuth = mock(RequestAuthentication);
@@ -92,17 +92,9 @@ beforeAll(async done => {
 		};
 	});
 
-	await new App().buildApp((builtApp: Express, err?: Error): void => {
-		if (err) {
-			done(`${err.message}\n${err.stack ?? ''}`);
-		} else {
-			bApp = builtApp;
-
-			// After the application has been built and db connection established -- get the applicant repository
-			applicantRepository = container.get<ApplicantRepository>(TYPES.ApplicantRepository).getRepository();
-			done();
-		}
-	}, getTestDatabaseOptions());
+	bApp = await new App().buildApp(getTestDatabaseOptions());
+	// After the application has been built and db connection established -- get the applicant repository
+	applicantRepository = container.get<ApplicantRepository>(TYPES.ApplicantRepository).getRepository();
 });
 
 beforeEach(() => {

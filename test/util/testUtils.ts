@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Connection, createConnections, getConnection, ConnectionOptions } from 'typeorm';
+import { getConfig, Environment } from '../../src/util/config';
 
 export function getTestDatabaseOptions(entities?: (string | Function)[], name?: string): ConnectionOptions[] {
 	return [
@@ -33,14 +34,27 @@ export async function reloadTestDatabaseConnection(name?: string): Promise<void>
 	await getConnection(name).synchronize(true);
 }
 
+export function updateEnv(props: Record<string, string>) {
+	Object.assign(process.env, props);
+	getConfig(process.env, true);
+}
+
 export function initEnv(): void {
-	process.env.SALT = 'random';
-	process.env.ITERATIONS = '30000';
-	process.env.KEY_LENGTH = '32';
-	process.env.DIGEST = 'sha256';
-	process.env.SESSION_SECRET = 'cat';
-	process.env.ENVIRONMENT = 'dev';
+	process.env.PORT = '3000';
+	process.env.ENVIRONMENT = Environment.Dev;
+	process.env.USE_SSL = 'false';
+
+	process.env.DB_HOST = '';
+	process.env.DB_PORT = '3000';
+	process.env.DB_USER = '';
+	process.env.DB_PASSWORD = '';
+	process.env.DB_DATABASE = '';
+
 	process.env.AUTH_URL = 'localhost:auth';
 	process.env.APPLICATION_URL = 'localhost:applications';
+
+	process.env.GOOGLE_ANALYTICS_ID = '';
 	process.env.DROPBOX_API_TOKEN = 'api_key';
+	process.env.SENDGRID_API_TOKEN = '';
+	getConfig(process.env, true);
 }

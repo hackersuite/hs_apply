@@ -1,14 +1,14 @@
 import 'reflect-metadata';
 
 import dotenv from 'dotenv';
-// Load environment variables from .env file
 dotenv.config({ path: '.env' });
 
+import { Environment, getConfig } from './util/config';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import express, { Express, Request, Response, NextFunction } from 'express';
-import { ConnectionOptions, createConnections, Connection } from 'typeorm';
+import { ConnectionOptions, createConnections } from 'typeorm';
 import { RouterInterface } from './routes';
 import { TYPES } from './types';
 import container from './inversify.config';
@@ -19,15 +19,14 @@ import { reqLogger, logger } from './util';
 
 export class App {
 	public async buildApp(
-		callback: (app: Express, err?: Error) => void,
 		connectionOptions?: ConnectionOptions[]
-	): Promise<void> {
+	): Promise<Express> {
 		const app: Express = this.expressSetup();
 
 		// Set up express middleware for request routing
 		this.middlewareSetup(app);
 
-		if (app.get('env') === 'dev') {
+		if (app.get('env') === Environment.Dev) {
 			this.devMiddlewareSetup(app);
 		}
 
@@ -42,16 +41,10 @@ export class App {
 		// Connecting to database
 		const databaseConnectionSettings: ConnectionOptions[] = connectionOptions ?? this.createDatabaseSettings();
 
-		let connections: Connection[];
-		try {
-			connections = await createConnections(databaseConnectionSettings);
-			connections.forEach(element => {
-				logger.info(`Connection to database (${element.name}) established.`);
-			});
-		} catch (err) {
-			logger.error(err);
-			return callback(app, err);
-		}
+		const connections = await createConnections(databaseConnectionSettings);
+		connections.forEach(element => {
+			logger.info(`Connection to database (${element.name}) established.`);
+		});
 
 		// Set up passport for authentication
 		// Also add the logout route
@@ -68,7 +61,7 @@ export class App {
 		// Setting up error handlers
 		app.use(error404Handler);
 		app.use(errorHandler);
-		return callback(app);
+		return app;
 	}
 
 	/**
@@ -83,9 +76,9 @@ export class App {
 		app.set('view engine', 'ejs');
 
 		// Express configuration
-		app.set('port', process.env.PORT ?? 3000);
-		app.set('env', process.env.ENVIRONMENT ?? 'production');
-		if (process.env.ENVIRONMENT === 'production') {
+		app.set('port', getConfig().port);
+		app.set('env', getConfig().environment);
+		if (getConfig().environment === Environment.Production) {
 			app.set('trust proxy', 1);
 		}
 
@@ -98,7 +91,7 @@ export class App {
    */
 	private readonly middlewareSetup = (app: Express): void => {
 		app.use((req, res, next) => {
-			if (req.get('X-Forwarded-Proto') !== 'https' && process.env.USE_SSL) {
+			if (req.get('X-Forwarded-Proto') !== 'https' && getConfig().useSSL) {
 				res.redirect(`https://${req.headers.host ?? ''}${req.url}`);
 			} else {
 				return next();
@@ -137,11 +130,11 @@ export class App {
 		{
 			name: 'applications',
 			type: 'mysql',
-			host: process.env.DB_HOST,
-			port: Number(process.env.DB_PORT),
-			username: process.env.DB_USER,
-			password: process.env.DB_PASSWORD,
-			database: process.env.DB_DATABASE,
+			host: getConfig().db.host,
+			port: getConfig().db.port,
+			username: getConfig().db.user,
+			password: getConfig().db.password,
+			database: getConfig().db.database,
 			entities: [`${__dirname}/models/db/*{.js,.ts}`],
 			synchronize: true // Note: Unsafe in productionn, use migrations instead
 		}

@@ -1,4 +1,6 @@
-# Hacker Suite Applications
+# Hacker Suite: Applications
+
+Applications system for Hackathons.
 
 <p align="center">
   <a href="https://github.com/unicsmcr/hs_application/actions?query=workflow%3ATests" alt="Build Status">
