@@ -7,7 +7,9 @@
   <% question.answerOptions.forEach((multiradio, index) => { %>
     <div class="form-check form-check-radio">
       <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="<%= question.questionName %>" value="<%= multiradio %>" <%= question.required ? "required" : "" %>>
+          <input
+            data-hs-type="radio"
+            class="form-check-input" type="radio" name="<%= question.questionName %>" value="<%= multiradio %>" <%= question.required ? "required" : "" %>>
           <%= multiradio %>
           <span class="circle">
             <span class="check"></span>
@@ -19,7 +21,10 @@
     <div class="form-row">
       <div class="col-auto">
         <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="<%= question.questionName %>" value="Other" id="<%= `${currentID}` %>-radio-other" <%= question.required ? "required" : "" %>>
+            <input
+              data-hs-type="radio-other"
+              class="form-check-input" type="radio" name="<%= question.questionName %>"
+              value="Other" id="<%= `${currentID}` %>-radio-other" <%= question.required ? "required" : "" %>>
             Other
             <span class="circle">
                 <span class="check"></span>
@@ -27,7 +32,9 @@
         </label>
       </div>
       <div class="col-auto apply-form-radio-input-other">
-        <input class="form-control" type="text" name="<%= question.questionName %>Other" placeholder="Please specify"/>
+        <input
+          data-hs-type="radio-other-input"
+          class="form-control" type="text" name="<%= question.questionName %>Other" placeholder="Please specify"/>
       </div>
     </div>
   </div>

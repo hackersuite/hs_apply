@@ -3,5 +3,7 @@
   <%= question.questionText %>
   <%- question.required ? "<span class='label-req'> *</span>" : "" %>
   </label>
-  <input type="number" class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" min="0" <%= question.required ? "required" : "" %>>
+  <input
+    data-hs-type="number"
+    type="number" class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" min="0" <%= question.required ? "required" : "" %>>
 </div>

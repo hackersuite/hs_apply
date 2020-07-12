@@ -6,10 +6,12 @@
   </label>
 
   <textarea
-  class="form-control"
-  id="<%= currentID %>"
-  name="<%= question.questionName %>"
-  maxlength="<%= question.maxLength || "" %>"
-  rows="3"
-  <%= question.required ? "required" : "" %>></textarea>
+    data-hs-type="long"
+    class="form-control"
+    id="<%= currentID %>"
+    name="<%= question.questionName %>"
+    maxlength="<%= question.maxLength || "" %>"
+    rows="3"
+    <%= question.required ? "required" : "" %>>
+  </textarea>
 </div>

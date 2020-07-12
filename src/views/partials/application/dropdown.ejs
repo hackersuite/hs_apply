@@ -6,14 +6,15 @@
   </label>
 
   <select
-  class="form-control selectpicker"
-  id="<%= currentID %>"
-  name="<%= question.questionName %>"
-  title="Choose one of the following..."
-  data-style="btn btn-link"
-  data-live-search="true"
-  data-live-search-style="startsWith"
-  <%= question.required ? "required" : "" %> >
+    data-hs-type="dropdown"
+    class="form-control selectpicker"
+    id="<%= currentID %>"
+    name="<%= question.questionName %>"
+    title="Choose one of the following..."
+    data-style="btn btn-link"
+    data-live-search="true"
+    data-live-search-style="startsWith"
+    <%= question.required ? "required" : "" %> >
 
     <% if (question.hasOwnProperty('answerOptions')) { %>
       <% question.answerOptions.forEach(multioption => { %>

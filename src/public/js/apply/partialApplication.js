@@ -3,33 +3,43 @@ const applyFormRoot = '#applyForm';
 const saveProgressIndicator = $('#save-progress');
 const saveCompleteIndicator = $('#save-done');
 
-$(document).ready(() => {
+function fillPartialApplication() {
   // Get the partial application
   if (!applicationFields) return;
 
-  let field = null, type = null;
   for (const [key, value] of Object.entries(applicationFields)) {
-    // Skip any unfilled fields
-    if (value == "") continue;
+    // Skip any unfilled fields, or a <fieldname>Other which is instead used when <fieldname> is processed
+    if (value == "" || key.match(/Other$/i) !== null) continue;
 
-    field = $(`[name="${key}"]`);
-    if (field.is('select')) {
+    let field = $(`${applyFormRoot} [name="${key}"]`);
+    let questionType = field.attr('data-hs-type');
+    if (questionType === 'dropdown') {
       // The element is dropdown
       field.attr('title', value);
+      field.val(value);
       field.next().find('div .filter-option-inner-inner').text(value);
-    } else if (field.prop('type') == 'radio') {
+    } else if (questionType === 'radio') {
       // The element is radio select, field.length >= 1
       // Find the element with the value we want to select
-      // Beware, the "other" input box
-      let selected = $(`:input[name="${key}"][value="${value}"]`);
-      selected.prop('checked', true)
+      // Beware, the "other" input box, we need to select the radio button AND fill the input box
+      let selected;
+      selected = $(`:input[name="${key}"][value="${value}"]`);
+      if (value === 'Other') {
+        let inputBox = $(`:input[name="${key}Other"]`);
+        inputBox.val(applicationFields[`${key}Other`]).show();
+      }
+      selected.prop('checked', true);
+    } else if (field.parent().hasClass('twitter-typeahead')) {
+      let typeaheadInput = field.parent().parent();
+      typeaheadInput.addClass('is-filled');
+      field.val(value);
     } else {
-      // Short/Long text boxes
+      // Short/Long/Number text boxes
       field.val(value);
       field.parent().addClass('is-filled');
     }
   } 
-})
+}
 
 function psubmit() {
   showSavingStatus();
