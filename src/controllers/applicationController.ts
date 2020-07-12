@@ -13,7 +13,7 @@ import { logger } from '../util';
 
 export interface ApplicationControllerInterface {
 	apply: (req: Request, res: Response, next: NextFunction) => void;
-	updateUnsubmittedApplication: (req: Request, res: Response) => void;
+	updatePartialApplication: (req: Request, res: Response) => void;
 	submitApplication: (req: Request, res: Response, next: NextFunction) => void;
 	cancel: (req: Request, res: Response, next: NextFunction) => void;
 	checkin: (req: Request, res: Response, next: NextFunction) => void;
@@ -68,7 +68,7 @@ export class ApplicationController implements ApplicationControllerInterface {
 		res.render('pages/apply', { sections, partialApplication });
 	};
 
-	public updateUnsubmittedApplication = async (req: Request, res: Response): Promise<void> => {
+	public updatePartialApplication = async (req: Request, res: Response): Promise<void> => {
 		// The application is not yet complete, but save the partial application for the applicant
 		await this._applicantService.savePartialApplication((req.user as User).id, req.body);
 
@@ -86,9 +86,9 @@ export class ApplicationController implements ApplicationControllerInterface {
 				newApplication[name] = applicationFields[`${name}Other`] || applicationFields[name] || 'Other';
 			} else if (options.isNumeric) {
 				const fieldToCastNumeric = applicationFields[name];
-				(newApplication)[name] = this.isNumeric(fieldToCastNumeric) ? Number(fieldToCastNumeric) : undefined;
+				newApplication[name] = this.isNumeric(fieldToCastNumeric) ? Number(fieldToCastNumeric) : undefined;
 			} else {
-				(newApplication)[name] = applicationFields[name];
+				newApplication[name] = applicationFields[name];
 			}
 		}
 		newApplication.authId = (req.user as User).id;
@@ -107,7 +107,11 @@ export class ApplicationController implements ApplicationControllerInterface {
 		}
 
 		try {
+			// Save the new application
 			await this._applicantService.save(newApplication, cvFile);
+
+			// Remove the partial application
+			await this._applicantService.removePartialApplication(reqUser.id);
 		} catch (errors) {
 			logger.error(errors);
 			res.status(HttpResponseCode.BAD_REQUEST).send({

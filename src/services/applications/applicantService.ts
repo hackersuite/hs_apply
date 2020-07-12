@@ -21,6 +21,7 @@ export interface ApplicantServiceInterface {
 	findOne: (id: ApplicationID) => Promise<Applicant>;
 	save: (newApplicants: Applicant, file?: Buffer) => Promise<Applicant>;
 	savePartialApplication: (id: string, newApplicants: Record<string, string>, file?: Buffer) => Promise<void>;
+	removePartialApplication: (id: string) => Promise<void>;
 	delete: (id: ApplicationID) => Promise<DeleteResult>;
 	getKRandomToReview: (reviewerID: string, chooseFromK: number) => Promise<Applicant[]>;
 }
@@ -85,6 +86,14 @@ export class ApplicantService implements ApplicantServiceInterface {
 			return partialApplicant;
 		} catch (err) {
 			throw new Error(`Failed to find an applicant:\n${(err as Error).message}`);
+		}
+	};
+
+	public removePartialApplication = async (id: string): Promise<void> => {
+		try {
+			await this._partialApplicantRepository.delete(id);
+		} catch (err) {
+			throw new Error(`Failed to remove partial application. ${(err as Error).message}`);
 		}
 	};
 

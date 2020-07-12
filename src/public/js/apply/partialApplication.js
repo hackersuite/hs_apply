@@ -25,8 +25,7 @@ function fillPartialApplication() {
       // The element is radio select, field.length >= 1
       // Find the element with the value we want to select
       // Beware, the "other" input box, we need to select the radio button AND fill the input box
-      let selected;
-      selected = $(`:input[name="${key}"][value="${value}"]`);
+      let selected = $(`:input[name="${key}"][value="${value}"]`);
       if (value === 'Other') {
         let inputBox = $(`:input[name="${key}Other"]`);
         inputBox.val(applicationFields[`${key}Other`]).show();
