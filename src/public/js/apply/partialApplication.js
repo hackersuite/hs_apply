@@ -3,6 +3,9 @@ const applyFormRoot = '#applyForm';
 const saveProgressIndicator = $('#save-progress');
 const saveCompleteIndicator = $('#save-done');
 
+const saveIntervalMilliseconds = 10 * 1000;
+let lastSaveTime = Date.now();
+
 function fillPartialApplication() {
   // Get the partial application
   if (!applicationFields) return;
@@ -38,10 +41,29 @@ function fillPartialApplication() {
       field.val(value);
       field.parent().addClass('is-filled');
     }
-  } 
+  }
+
+  // In order to save the application as they fill it in, we attach listener events to the input fields
+  attachFocusOutEvents();
 }
 
-function psubmit() {
+function attachFocusOutEvents() {
+  for (const [key, value] of Object.entries(applicationFields)) {
+    $(`${applyFormRoot} [name="${key}"]`).bind('focusout', didFillField);
+  }
+}
+
+function didFillField() {
+  // Check if we should save the form, we only save every N seconds to prevent spamming of save events
+  let shouldSave = (Date.now() - lastSaveTime) > saveIntervalMilliseconds;
+  console.log(`Is saving ${shouldSave}`);
+  if (shouldSave) {
+    lastSaveTime = Date.now();
+    partialApplicationSubmit();
+  }
+}
+
+function partialApplicationSubmit() {
   showSavingStatus();
 
   // Extract the form data, gets all answers to questions
@@ -60,12 +82,12 @@ function psubmit() {
       showDoneStatus();
     },
     error: function (error) {
-      $('#submit-form-btn').prop('disabled', false);
-      $.notify({
-        message: error.responseJSON.message
-      }, {
-        type: 'danger'
-      });
+      //$('#submit-form-btn').prop('disabled', false);
+      // $.notify({
+      //   message: error.responseJSON.message
+      // }, {
+      //   type: 'danger'
+      // });
     }
   });
 }
