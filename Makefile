@@ -12,15 +12,6 @@ default: build test
 build:
 	npm run build
 
-# run all tests
-tests:
-	docker-compose -f $(test_docker_compose_file) up -d
-	while ! docker exec mysql_db_test mysql --user=root -e "SELECT 1" >/dev/null 2>&1; do \
-    sleep 5; \
-	done
-	-npm run test
-	docker-compose -f $(test_docker_compose_file) down -v
-
 # builds the docker image
 build-docker:
 	@echo "=============building hs_application============="
@@ -50,14 +41,21 @@ up-dev: setup-network
 			npm run start:watch; \
 	fi
 
+# run all tests
+tests:
+	docker-compose -f $(test_docker_compose_file) up -d
+	while ! docker exec mysql_db_test mysql --user=root -e "SELECT 1" >/dev/null 2>&1; do \
+    sleep 5; \
+	done
+	npm run test &&  (docker-compose -f $(test_docker_compose_file) down -v; exit) || (docker-compose -f $(test_docker_compose_file) down -v; exit 1)
+
 ci:
 	docker-compose -f $(test_docker_compose_file) up -d
 	while ! docker exec mysql_db_test mysql --user=root -e "SELECT 1" >/dev/null 2>&1; do \
     sleep 10; \
 	done
 	docker exec mysql_db_test mysql --user=root -e "CREATE DATABASE IF NOT EXISTS hs_applications;"
-	-npm run test:coverage
-	docker-compose -f $(test_docker_compose_file) down -v
+	npm run test:coverage &&  (docker-compose -f $(test_docker_compose_file) down -v; exit) || (docker-compose -f $(test_docker_compose_file) down -v; exit 1)
 	
 
 # prints the logs from all containers
