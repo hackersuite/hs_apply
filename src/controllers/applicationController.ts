@@ -3,7 +3,7 @@ import { Cache } from '../util/cache';
 import { Sections } from '../models/sections';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
-import { ApplicantService } from '../services';
+import { ApplicantService, PartialApplicantService } from '../services';
 import { Applicant } from '../models/db';
 import { HttpResponseCode } from '../util/errorHandling';
 import { User } from '@unicsmcr/hs_auth_client';
@@ -26,16 +26,19 @@ export interface ApplicationControllerInterface {
 export class ApplicationController implements ApplicationControllerInterface {
 	private readonly _cache: Cache;
 	private readonly _applicantService: ApplicantService;
+	private readonly _partialApplicantService: PartialApplicantService;
 
 	// TODO: Issue #10. Refactor error messages into something consistant across the project
 	private readonly applicantNotFound = 'Applicant does not exist';
 
 	public constructor(
 	@inject(TYPES.Cache) cache: Cache,
-		@inject(TYPES.ApplicantService) applicantService: ApplicantService
+		@inject(TYPES.ApplicantService) applicantService: ApplicantService,
+		@inject(TYPES.PartialApplicantService) partialApplicantService: PartialApplicantService
 	) {
 		this._cache = cache;
 		this._applicantService = applicantService;
+		this._partialApplicantService = partialApplicantService;
 	}
 
 	public apply = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -44,7 +47,7 @@ export class ApplicationController implements ApplicationControllerInterface {
 		// Check if the user has started an application using the current auth ID
 		let partialApplication;
 		try {
-			partialApplication = await this._applicantService.findPartialApplication(authID);
+			partialApplication = await this._partialApplicantService.find(authID);
 		} catch (err) {
 			if (!(err?.message as string).includes(this.applicantNotFound)) {
 				return next(err);
@@ -70,7 +73,7 @@ export class ApplicationController implements ApplicationControllerInterface {
 
 	public updatePartialApplication = async (req: Request, res: Response): Promise<void> => {
 		// The application is not yet complete, but save the partial application for the applicant
-		await this._applicantService.savePartialApplication((req.user as User).id, req.body);
+		await this._partialApplicantService.save((req.user as User).id, req.body);
 
 		res.send('Success!');
 	};
@@ -111,7 +114,7 @@ export class ApplicationController implements ApplicationControllerInterface {
 			await this._applicantService.save(newApplication, cvFile);
 
 			// Remove the partial application
-			await this._applicantService.removePartialApplication(reqUser.id);
+			await this._partialApplicantService.remove(reqUser.id);
 		} catch (errors) {
 			logger.error(errors);
 			res.status(HttpResponseCode.BAD_REQUEST).send({

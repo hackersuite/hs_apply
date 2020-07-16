@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
-import { Applicant, PartialApplicant } from '../../models/db/applicant';
-import { ApplicantRepository, PartialApplicantRepository } from '../../repositories';
+import { Applicant } from '../../models/db/applicant';
+import { ApplicantRepository } from '../../repositories';
 import { TYPES } from '../../types';
 import { ObjectID, Repository, DeleteResult } from 'typeorm';
 import { validateOrReject } from 'class-validator';
@@ -20,8 +20,6 @@ export interface ApplicantServiceInterface {
 	) => Promise<[Partial<Applicant>[], number]>;
 	findOne: (id: ApplicationID) => Promise<Applicant>;
 	save: (newApplicants: Applicant, file?: Buffer) => Promise<Applicant>;
-	savePartialApplication: (id: string, newApplicants: Record<string, string>, file?: Buffer) => Promise<void>;
-	removePartialApplication: (id: string) => Promise<void>;
 	delete: (id: ApplicationID) => Promise<DeleteResult>;
 	getKRandomToReview: (reviewerID: string, chooseFromK: number) => Promise<Applicant[]>;
 }
@@ -29,16 +27,13 @@ export interface ApplicantServiceInterface {
 @injectable()
 export class ApplicantService implements ApplicantServiceInterface {
 	private readonly _applicantRepository: Repository<Applicant>;
-	private readonly _partialApplicantRepository: Repository<PartialApplicant>;
 	private readonly _cloudStorageService: CloudStorageService;
 
 	public constructor(
 	@inject(TYPES.ApplicantRepository) applicantRepository: ApplicantRepository,
-		@inject(TYPES.PartialApplicantRepository) partialApplicantRepository: PartialApplicantRepository,
 		@inject(TYPES.CloudStorageService) cloudStorageService: CloudStorageService
 	) {
 		this._applicantRepository = applicantRepository.getRepository();
-		this._partialApplicantRepository = partialApplicantRepository.getRepository();
 		this._cloudStorageService = cloudStorageService;
 	}
 
@@ -78,25 +73,6 @@ export class ApplicantService implements ApplicantServiceInterface {
 		}
 	};
 
-	public findPartialApplication = async (id: ApplicationID, findBy?: keyof PartialApplicant): Promise<PartialApplicant> => {
-		try {
-			const findColumn: keyof PartialApplicant = findBy ?? 'authId';
-			const partialApplicant = await this._partialApplicantRepository.findOne({ [findColumn]: id });
-			if (!partialApplicant) throw new Error('Applicant does not exist');
-			return partialApplicant;
-		} catch (err) {
-			throw new Error(`Failed to find an applicant:\n${(err as Error).message}`);
-		}
-	};
-
-	public removePartialApplication = async (id: string): Promise<void> => {
-		try {
-			await this._partialApplicantRepository.delete(id);
-		} catch (err) {
-			throw new Error(`Failed to remove partial application. ${(err as Error).message}`);
-		}
-	};
-
 	public save = async (newApplicant: Applicant, file?: Buffer): Promise<Applicant> => {
 		try {
 			// Validate the new applicant using class-validation and fail if there is an error
@@ -122,24 +98,6 @@ export class ApplicantService implements ApplicantServiceInterface {
 			return await this._applicantRepository.save(newApplicant);
 		} catch (err) {
 			throw new Error(`Failed to save applicant:\n${(err as Error).message}`);
-		}
-	};
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	public savePartialApplication = async (id: string, rawApplication: Record<string, string>, _file?: Buffer): Promise<void> => {
-		const application = new PartialApplicant();
-		application.authId = id;
-		application.partialApplication = { ...rawApplication };
-
-		// let questionName;
-		// for (const [name, options] of applicationMapping.entries()) {
-		// 	application.partialApplication[name] = rawApplication[name];
-		// }
-
-		try {
-			await this._partialApplicantRepository.save(application);
-		} catch (err) {
-			logger.error(err);
 		}
 	};
 

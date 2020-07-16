@@ -1,7 +1,10 @@
 export const TYPES = {
 	Router: Symbol.for('Router'),
+
 	ApplicantService: Symbol.for('ApplicantService'),
 	ApplicantRepository: Symbol.for('ApplicantRepository'),
+
+	PartialApplicantService: Symbol.for('PartialApplicantService'),
 	PartialApplicantRepository: Symbol.for('PartialApplicantRepository'),
 
 	ApplicationController: Symbol.for('ApplicationController'),
@@ -16,7 +19,6 @@ export const TYPES = {
 	ReviewService: Symbol.for('ReviewService'),
 	ReviewController: Symbol.for('ReviewController'),
 	ReviewRepository: Symbol.for('ReviewRepository'),
-	ReviewerRepository: Symbol.for('ReviewerRepository'),
 
 	CloudStorageService: Symbol.for('CloudStorageService'),
 
