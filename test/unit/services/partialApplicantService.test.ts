@@ -1,7 +1,7 @@
 import { initEnv } from '../../util';
 initEnv();
 
-import { when, mock, instance, reset, resetCalls } from 'ts-mockito';
+import { when, mock, instance, reset, resetCalls, anything } from 'ts-mockito';
 import container from '../../../src/inversify.config';
 import { TYPES } from '../../../src/types';
 
@@ -48,11 +48,8 @@ afterEach(() => {
 
 describe('Partial application submisssion', () => {
 	test('Test that when valid partial application submitted it is accepted', async () => {
-		// when(mockPartialApplicantRepository.save(anything())).thenResolve(testPartialApplicant);
+		when(mockPartialApplicantRepository.save(anything())).thenResolve(testPartialApplicant);
 
-		// return expect(partialApplicantService.save('01aef', testRawPartialApplication))
-		// 	.resolves.toBeDefined();
-
-		expect(true).toBeTruthy();
+		return expect(partialApplicantService.save('01aef', testRawPartialApplication)).resolves.toBe(testPartialApplicant);
 	});
 });
