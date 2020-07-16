@@ -135,7 +135,7 @@ export class App {
 			username: getConfig().db.user,
 			password: getConfig().db.password,
 			database: getConfig().db.database,
-			entities: [`${__dirname}/models/db/*{.js,.ts}`],
+			entities: [`${__dirname}/models/db/**/*{.js,.ts}`],
 			synchronize: true // Note: Unsafe in productionn, use migrations instead
 		}
 	];
