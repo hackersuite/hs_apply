@@ -2,15 +2,15 @@ import { injectable, inject } from 'inversify';
 import { PartialApplicant } from '../../models/db/applicant';
 import { PartialApplicantRepository } from '../../repositories';
 import { TYPES } from '../../types';
-import { ObjectID, Repository } from 'typeorm';
+import { ObjectID, Repository, DeleteResult } from 'typeorm';
 import { logger } from '../../util';
 
 type ApplicationID = string | number | Date | ObjectID;
 
 export interface PartialApplicantServiceInterface {
 	find: (id: ApplicationID, findBy?: keyof PartialApplicant) => Promise<PartialApplicant>;
-	save: (id: string, newApplicants: Record<string, string>, file?: Buffer) => Promise<void>;
-	remove: (id: string) => Promise<void>;
+	save: (id: string, newApplicants: Record<string, string>, file?: Buffer) => Promise<PartialApplicant | undefined>;
+	remove: (id: string) => Promise<DeleteResult>;
 }
 
 @injectable()
@@ -34,16 +34,16 @@ export class PartialApplicantService implements PartialApplicantServiceInterface
 		}
 	};
 
-	public remove = async (id: string): Promise<void> => {
+	public remove = async (id: string): Promise<DeleteResult> => {
 		try {
-			await this._partialApplicantRepository.delete(id);
+			return this._partialApplicantRepository.delete(id);
 		} catch (err) {
 			throw new Error(`Failed to remove partial application. ${(err as Error).message}`);
 		}
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	public save = async (id: string, rawApplication: Record<string, string>, _file?: Buffer): Promise<void> => {
+	public save = async (id: string, rawApplication: Record<string, string>, _file?: Buffer): Promise<PartialApplicant | undefined> => {
 		const application = new PartialApplicant();
 		application.authId = id;
 		application.partialApplication = { ...rawApplication };
@@ -54,7 +54,7 @@ export class PartialApplicantService implements PartialApplicantServiceInterface
 		// }
 
 		try {
-			await this._partialApplicantRepository.save(application);
+			return this._partialApplicantRepository.save(application);
 		} catch (err) {
 			logger.error(err);
 		}
