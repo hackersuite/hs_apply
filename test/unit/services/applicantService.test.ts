@@ -1,4 +1,4 @@
-import { initEnv } from '../../util';
+import { initEnv, updateEnv } from '../../util';
 initEnv();
 
 import { when, mock, instance, verify, anything, objectContaining, reset, resetCalls } from 'ts-mockito';
@@ -9,6 +9,12 @@ import { ApplicantService } from '../../../src/services';
 import { ApplicantRepository } from '../../../src/repositories';
 import { Repository, DeleteResult } from 'typeorm';
 import { Applicant } from '../../../src/models/db';
+
+// We use jest to mock out axios requests since we sometimes call the dropbox api
+import axios from 'axios';
+jest.mock('axios');
+const axiosMock = axios as jest.Mocked<typeof axios>;
+const successResponse = 'Success';
 
 const testApplicantMale: Applicant = new Applicant();
 testApplicantMale.id = '7479a451-e968-4271-8073-729ddcf522ee';
@@ -69,6 +75,9 @@ beforeAll(() => {
 	mockApplicantRepository = mock(StubApplicationRepository);
 	when(stubApplicantRepository.getRepository()).thenReturn(instance(mockApplicantRepository));
 	container.rebind(TYPES.ApplicantRepository).toConstantValue(instance(stubApplicantRepository));
+
+	// Mock the POST Axios request for the cloud service requests
+	axiosMock.post.mockResolvedValue({ data: successResponse });
 });
 
 beforeEach(() => {
@@ -82,6 +91,9 @@ afterEach(() => {
 	container.restore();
 	resetCalls(mockApplicantRepository);
 	reset(mockApplicantRepository);
+
+	// Clear the axios mock to reset calls for cloud service requests
+	axiosMock.post.mockClear();
 });
 
 test('Test all applicants can be found', async () => {
@@ -185,11 +197,21 @@ test('Test that error thrown when applicant invalid', async () => {
 });
 
 test('Test that error thrown when API keys not set-up for file upload', async () => {
+	// Disable the Dropbox API token
+	updateEnv({ DROPBOX_API_TOKEN: '' });
+
+	// We also need to fetch the new version of the applicant service so the cloud service is re-injected
+	// with the new DROPBOX_API_TOKEN
+	applicantService = container.get(TYPES.ApplicantService);
+
 	// Try and create the applicant and check for error
 	await expect(applicantService.save(testApplicantMale, Buffer.from(''))).rejects.toThrow();
 
 	// Check the error actually is defined
 	verify(mockApplicantRepository.save(testApplicantInvalid)).never();
+
+	// Reload the original env config
+	initEnv();
 });
 
 test('Test that error thrown when delete is rejected', async () => {
