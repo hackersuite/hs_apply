@@ -7,7 +7,7 @@ import { TYPES } from '../../../src/types';
 
 import { PartialApplicantService } from '../../../src/services';
 import { PartialApplicantRepository } from '../../../src/repositories';
-import { Repository } from 'typeorm';
+import { Repository, DeleteResult } from 'typeorm';
 import { PartialApplicant } from '../../../src/models/db';
 
 const testPartialApplicant: PartialApplicant = new PartialApplicant();
@@ -47,9 +47,42 @@ afterEach(() => {
 });
 
 describe('Partial application submisssion', () => {
-	test('Test that when valid partial application submitted it is accepted', async () => {
+	test('Test when valid partial application submitted it is accepted', async () => {
 		when(mockPartialApplicantRepository.save(anything())).thenResolve(testPartialApplicant);
-
 		return expect(partialApplicantService.save('01aef', testRawPartialApplication)).resolves.toBe(testPartialApplicant);
+	});
+
+	test('Test when valid partial application submitted, and save fails, error thrown', async () => {
+		when(mockPartialApplicantRepository.save(anything())).thenReject(new Error());
+		return expect(partialApplicantService.save('01aef', testRawPartialApplication)).rejects.toBeInstanceOf(Error);
+	});
+});
+
+describe('Partial application find', () => {
+	test('Test when valid application ID submitted it returns applicant', async () => {
+		when(mockPartialApplicantRepository.findOne(anything())).thenResolve(testPartialApplicant);
+		return expect(partialApplicantService.find('01aef')).resolves.toBe(testPartialApplicant);
+	});
+
+	test('Test when invalid application ID submitted it throws error', async () => {
+		when(mockPartialApplicantRepository.findOne(anything())).thenResolve(undefined);
+		return expect(partialApplicantService.find('')).rejects.toThrowError('Applicant does not exist');
+	});
+
+	test('Test when DB error occurs error is thrown', async () => {
+		when(mockPartialApplicantRepository.findOne(anything())).thenThrow(new Error());
+		return expect(partialApplicantService.find('01aef')).rejects.toThrow();
+	});
+});
+
+describe('Partial application remove', () => {
+	test('Test when valid application ID submitted it successfully deletes entry', async () => {
+		when(mockPartialApplicantRepository.delete(anything())).thenResolve(new DeleteResult());
+		return expect(partialApplicantService.remove('01aef')).resolves.toBeInstanceOf(DeleteResult);
+	});
+
+	test('Test when invalid application ID submitted it throws error', async () => {
+		when(mockPartialApplicantRepository.delete(anything())).thenThrow(new Error());
+		return expect(partialApplicantService.remove('01aef')).rejects.toThrow();
 	});
 });

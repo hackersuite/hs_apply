@@ -3,7 +3,6 @@ import { PartialApplicant } from '../../models/db/applicant';
 import { PartialApplicantRepository } from '../../repositories';
 import { TYPES } from '../../types';
 import { ObjectID, Repository, DeleteResult } from 'typeorm';
-import { logger } from '../../util';
 
 type ApplicationID = string | number | Date | ObjectID;
 
@@ -23,10 +22,9 @@ export class PartialApplicantService implements PartialApplicantServiceInterface
 		this._partialApplicantRepository = partialApplicantRepository.getRepository();
 	}
 
-	public find = async (id: ApplicationID, findBy?: keyof PartialApplicant): Promise<PartialApplicant> => {
+	public find = async (id: ApplicationID): Promise<PartialApplicant> => {
 		try {
-			const findColumn: keyof PartialApplicant = findBy ?? 'authId';
-			const partialApplicant = await this._partialApplicantRepository.findOne({ [findColumn]: id });
+			const partialApplicant = await this._partialApplicantRepository.findOne(id);
 			if (!partialApplicant) throw new Error('Applicant does not exist');
 			return partialApplicant;
 		} catch (err) {
@@ -36,7 +34,7 @@ export class PartialApplicantService implements PartialApplicantServiceInterface
 
 	public remove = async (id: string): Promise<DeleteResult> => {
 		try {
-			return this._partialApplicantRepository.delete(id);
+			return await this._partialApplicantRepository.delete(id);
 		} catch (err) {
 			throw new Error(`Failed to remove partial application. ${(err as Error).message}`);
 		}
@@ -48,15 +46,10 @@ export class PartialApplicantService implements PartialApplicantServiceInterface
 		application.authId = id;
 		application.partialApplication = { ...rawApplication };
 
-		// let questionName;
-		// for (const [name, options] of applicationMapping.entries()) {
-		// 	application.partialApplication[name] = rawApplication[name];
-		// }
-
 		try {
-			return this._partialApplicantRepository.save(application);
+			return await this._partialApplicantRepository.save(application);
 		} catch (err) {
-			logger.error(err);
+			throw new Error('Failed to save/update application');
 		}
 	};
 }
