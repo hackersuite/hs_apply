@@ -3,11 +3,10 @@ import express from 'express';
 /**
  * In order to add a new route for requests, make sure you have done the following:
  * 1. Create a new class that implements this interface and has the `@injectable()` annotation
- * 2. Use constructor injection to inject the controller for the router
- * 3. Add the path from root for the request in the `getPathRoot()` function
- * 4. Add all the route handlers in the `register` function
- * 5. Finally, link to the inversify container using `container.bind<IRouter>(TYPES.Router).to(yourNewRouter);` in inversify.config.ts
- * 6. Create your `@injectable()` controller!
+ * 2. Inject a controller into the router constructor
+ * 3. Add the root path for the request in the `getPathRoot()` function. i.e. `/apply` or `/admin`
+ * 4. Add all the route handlers in the `register` function that returns an instace of `express.Router`
+ * 5. Add the new router to the `bindings.ts` file using `container.bind<RouterInterface>(TYPES.Router).to(yourNewRouter);`
  */
 export interface RouterInterface {
 	/**
