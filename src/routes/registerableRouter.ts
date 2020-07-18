@@ -10,11 +10,10 @@ export const provideRouter = function() {
 
 /**
  * In order to add a new route for requests, make sure you have done the following:
- * 1. Create a new class that implements this interface and has the `@injectable()` annotation
- * 2. Inject a controller into the router constructor
+ * 1. Create a new class that implements this interface and has the `@provideRouter()` annotation
+ * 2. Add a controller (that has the `@provide` annotation) into the router constructor
  * 3. Add the root path for the request in the `getPathRoot()` function. i.e. `/apply` or `/admin`
  * 4. Add all the route handlers in the `register` function that returns an instace of `express.Router`
- * 5. Add the new router to the `bindings.ts` file using `container.bind<RouterInterface>(TYPES.Router).to(yourNewRouter);`
  */
 export interface RouterInterface {
 	/**
