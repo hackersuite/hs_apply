@@ -1,10 +1,10 @@
-import container from '../../../src/inversify.config';
-import { TYPES } from '../../../src/types';
 import { initEnv } from '../../util';
 import { CloudStorageService } from '../../../src/services';
 import axios from 'axios';
 import { createWriteStream as writeStreamFunc } from 'fs';
 import { PassThrough } from 'stream';
+
+import container from '../../../src/inversify.config';
 
 let storageService: CloudStorageService;
 
@@ -18,7 +18,7 @@ beforeAll(() => {
 beforeEach(() => {
 	// Create a snapshot so each unit test can modify it without breaking other unit tests
 	container.snapshot();
-	storageService = container.get(TYPES.CloudStorageService);
+	storageService = container.get(CloudStorageService);
 });
 
 afterEach(() => {

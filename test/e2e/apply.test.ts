@@ -3,15 +3,15 @@ import { App } from '../../src/app';
 import { Express, NextFunction } from 'express';
 import { initEnv, getTestDatabaseOptions } from '../util/testUtils';
 import { HttpResponseCode } from '../../src/util/errorHandling';
-import container from '../../src/inversify.config';
 import { Applicant } from '../../src/models/db';
 import { RequestAuthentication } from '../../src/util/auth';
 import { SettingLoader } from '../../src/util/fs';
 import { AuthLevel } from '@unicsmcr/hs_auth_client';
 import { mock, instance, when, anything } from 'ts-mockito';
-import { TYPES } from '../../src/types';
 import { Repository } from 'typeorm';
 import { ApplicantRepository } from '../../src/repositories';
+
+import container from '../../src/inversify.config';
 
 let bApp: Express;
 let applicantRepository: Repository<Applicant>;
@@ -65,8 +65,8 @@ beforeAll(async () => {
 	mockRequestAuth = mock(RequestAuthentication);
 	mockSettingLoader = mock(SettingLoader);
 
-	container.rebind(TYPES.RequestAuthentication).toConstantValue(instance(mockRequestAuth));
-	container.rebind(TYPES.SettingLoader).toConstantValue(instance(mockSettingLoader));
+	container.rebind(RequestAuthentication).toConstantValue(instance(mockRequestAuth));
+	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
 
 	when(mockRequestAuth.passportSetup).thenReturn(() => null);
 	when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
@@ -94,7 +94,7 @@ beforeAll(async () => {
 
 	bApp = await new App().buildApp(getTestDatabaseOptions());
 	// After the application has been built and db connection established -- get the applicant repository
-	applicantRepository = container.get<ApplicantRepository>(TYPES.ApplicantRepository).getRepository();
+	applicantRepository = container.get<ApplicantRepository>(ApplicantRepository).getRepository();
 });
 
 beforeEach(() => {

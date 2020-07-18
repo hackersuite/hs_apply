@@ -1,11 +1,10 @@
 import { when, mock, instance, reset, resetCalls, objectContaining } from 'ts-mockito';
-import container from '../../../src/inversify.config';
-import { TYPES } from '../../../src/types';
-
 import { ApplicantService, ReviewService } from '../../../src/services';
 import { ReviewRepository } from '../../../src/repositories';
 import { Repository } from 'typeorm';
 import { Applicant, Review } from '../../../src/models/db';
+
+import container from '../../../src/inversify.config';
 
 const testApplicant: Applicant = new Applicant();
 testApplicant.id = '7479a451-e968-4271-8073-729ddcf522ee';
@@ -43,16 +42,16 @@ beforeAll(() => {
 	const stubReviewRepository: ReviewRepository = mock(ReviewRepository);
 	mockReviewRepository = mock(StubReviewRepository);
 	when(stubReviewRepository.getRepository()).thenReturn(instance(mockReviewRepository));
-	container.rebind(TYPES.ReviewRepository).toConstantValue(instance(stubReviewRepository));
+	container.rebind(ReviewRepository).toConstantValue(instance(stubReviewRepository));
 
 	mockApplicantService = mock(ApplicantService);
-	container.rebind(TYPES.ApplicantService).toConstantValue(instance(mockApplicantService));
+	container.rebind(ApplicantService).toConstantValue(instance(mockApplicantService));
 });
 
 beforeEach(() => {
 	// Create a snapshot so each unit test can modify it without breaking other unit tests
 	container.snapshot();
-	reviewService = container.get(TYPES.ReviewService);
+	reviewService = container.get(ReviewService);
 });
 
 afterEach(() => {
