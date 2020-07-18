@@ -2,8 +2,7 @@ import passport from 'passport';
 import querystring from 'querystring';
 import { Express, Request, Response, NextFunction, CookieOptions } from 'express';
 import CookieStrategy from 'passport-cookie';
-import { injectable, inject } from 'inversify';
-import { TYPES } from '../../types';
+import { provide } from 'inversify-binding-decorators';
 import { Cache } from '../cache';
 import { getCurrentUser, User, AuthLevel } from '@unicsmcr/hs_auth_client';
 import { getConfig, Environment } from '../../util/config';
@@ -12,11 +11,11 @@ export interface RequestAuthenticationInterface {
 	passportSetup: (app: Express) => void;
 }
 
-@injectable()
+@provide(RequestAuthentication)
 export class RequestAuthentication {
 	private readonly _cache: Cache;
 
-	public constructor(@inject(TYPES.Cache) cache: Cache) {
+	public constructor(cache: Cache) {
 		this._cache = cache;
 	}
 

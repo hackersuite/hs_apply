@@ -2,8 +2,7 @@ import fs from 'fs';
 
 import { Request, Response, NextFunction } from 'express';
 import { Cache } from '../util/cache';
-import { inject, injectable } from 'inversify';
-import { TYPES } from '../types';
+import { provide } from 'inversify-binding-decorators';
 import { ApplicantService } from '../services';
 import { Applicant } from '../models/db';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
@@ -21,16 +20,16 @@ export interface AdminControllerInterface {
 /**
  * A controller for admin methods
  */
-@injectable()
+@provide(AdminController)
 export class AdminController implements AdminControllerInterface {
 	private readonly _applicantService: ApplicantService;
 	private readonly _cloudStorageService: CloudStorageService;
 	private readonly _cache: Cache;
 
 	public constructor(
-	@inject(TYPES.ApplicantService) applicantService: ApplicantService,
-		@inject(TYPES.CloudStorageService) cloudStorageService: CloudStorageService,
-		@inject(TYPES.Cache) cache: Cache
+		applicantService: ApplicantService,
+		cloudStorageService: CloudStorageService,
+		cache: Cache
 	) {
 		this._cache = cache;
 		this._applicantService = applicantService;

@@ -1,4 +1,12 @@
 import express from 'express';
+import { fluentProvide } from 'inversify-binding-decorators';
+
+export const RouterSymbol = 'Router';
+export const provideRouter = function() {
+	return fluentProvide(RouterSymbol)
+		.whenTargetNamed(RouterSymbol)
+		.done();
+};
 
 /**
  * In order to add a new route for requests, make sure you have done the following:

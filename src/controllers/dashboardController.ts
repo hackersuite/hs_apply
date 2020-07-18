@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Cache } from '../util/cache';
-import { inject, injectable } from 'inversify';
-import { TYPES } from '../types';
+import { provide } from 'inversify-binding-decorators';
 import { Applicant } from '../models/db';
 import { ApplicantService } from '../services';
 import { User } from '@unicsmcr/hs_auth_client';
@@ -14,14 +13,14 @@ export interface DashboardControllerInterface {
 /**
  * A controller for dashboard methods
  */
-@injectable()
+@provide(DashboardController)
 export class DashboardController implements DashboardControllerInterface {
 	private readonly _cache: Cache;
 	private readonly _applicantService: ApplicantService;
 
 	public constructor(
-	@inject(TYPES.Cache) cache: Cache,
-		@inject(TYPES.ApplicantService) applicantService: ApplicantService
+		cache: Cache,
+		applicantService: ApplicantService
 	) {
 		this._cache = cache;
 		this._applicantService = applicantService;

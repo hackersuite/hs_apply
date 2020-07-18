@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { inject, injectable } from 'inversify';
-import { TYPES } from '../types';
+import { provide } from 'inversify-binding-decorators';
 import { ReviewService, ApplicantService } from '../services';
 import { Applicant, Review } from '../models/db';
 import { HttpResponseCode } from '../util/errorHandling';
@@ -17,14 +16,14 @@ export interface ReviewControllerInterface {
 /**
  * A controller for review methods
  */
-@injectable()
+@provide(ReviewController)
 export class ReviewController implements ReviewControllerInterface {
 	private readonly _reviewService: ReviewService;
 	private readonly _applicantService: ApplicantService;
 
 	public constructor(
-	@inject(TYPES.ReviewService) reviewService: ReviewService,
-		@inject(TYPES.ApplicantService) applicantService: ApplicantService
+		reviewService: ReviewService,
+		applicantService: ApplicantService
 	) {
 		this._reviewService = reviewService;
 		this._applicantService = applicantService;
