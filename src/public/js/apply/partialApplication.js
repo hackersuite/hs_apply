@@ -7,6 +7,9 @@ const saveIntervalMilliseconds = 10 * 1000;
 let lastSaveTime = Date.now();
 
 function fillPartialApplication() {
+  // In order to save the application as they fill it in, we attach listener events to the input fields
+  attachFocusOutEvents();
+
   // Get the partial application
   if (!applicationFields) return;
 
@@ -41,21 +44,17 @@ function fillPartialApplication() {
       field.parent().addClass('is-filled');
     }
   }
-
-  // In order to save the application as they fill it in, we attach listener events to the input fields
-  attachFocusOutEvents();
 }
 
 function attachFocusOutEvents() {
-  for (const [key, value] of Object.entries(applicationFields)) {
-    $(`${applyFormRoot} [name="${key}"]`).bind('focusout', didFillField);
-  }
+  $('[data-hs-type]').each(() => {
+    $(this).bind('focusout', didFillField);
+  });
 }
 
 function didFillField() {
   // Check if we should save the form, we only save every N seconds to prevent spamming of save events
-  let shouldSave = (Date.now() - lastSaveTime) > saveIntervalMilliseconds;
-  console.log(`Is saving ${shouldSave}`);
+  const shouldSave = (Date.now() - lastSaveTime) > saveIntervalMilliseconds;
   if (shouldSave) {
     lastSaveTime = Date.now();
     partialApplicationSubmit();
