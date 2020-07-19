@@ -4,7 +4,7 @@
   "description": "Application system for hackathons",
   "main": "app.ts",
   "engines": {
-    "node": ">=9.0.0"
+    "node": ">=10.0.0"
   },
   "scripts": {
     "build": "tsc -p .",
@@ -46,6 +46,7 @@
     "express": "^4.17.1",
     "helmet": "^3.22.0",
     "inversify": "^5.0.1",
+    "inversify-binding-decorators": "^4.0.0",
     "multer": "^1.4.2",
     "mysql": "^2.17.1",
     "passport": "^0.4.0",

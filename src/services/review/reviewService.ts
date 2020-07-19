@@ -1,7 +1,6 @@
-import { injectable, inject } from 'inversify';
+import { provide } from 'inversify-binding-decorators';
 import { Repository } from 'typeorm';
 import { Review, Applicant } from '../../models/db';
-import { TYPES } from '../../types';
 import { ReviewRepository } from '../../repositories/repositories';
 import { ApplicantService } from '../applications/applicantService';
 
@@ -13,14 +12,14 @@ export interface ReviewServiceInterface {
 	getReviewCountByAuthID: (reviewerAuthID: string) => Promise<number>;
 }
 
-@injectable()
+@provide(ReviewService)
 export class ReviewService implements ReviewServiceInterface {
 	private readonly _applicantService: ApplicantService;
 	private readonly _reviewRepository: Repository<Review>;
 
 	public constructor(
-	@inject(TYPES.ApplicantService) applicantService: ApplicantService,
-		@inject(TYPES.ReviewRepository) reviewRepository: ReviewRepository
+		applicantService: ApplicantService,
+		reviewRepository: ReviewRepository
 	) {
 		this._applicantService = applicantService;
 		this._reviewRepository = reviewRepository.getRepository();

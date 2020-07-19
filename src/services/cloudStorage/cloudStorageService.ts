@@ -1,6 +1,6 @@
 import axios, { ResponseType, AxiosResponse } from 'axios';
 import fs from 'fs';
-import { injectable } from 'inversify';
+import { provide } from 'inversify-binding-decorators';
 import { logger, getSafeUnicode } from '../../util';
 import { dropboxAPIFactory, DropboxMethods } from './dropboxAPIFactory';
 import { getConfig } from '../../util/config';
@@ -24,7 +24,7 @@ interface DropboxAPIRequest {
 	responseType?: ResponseType;
 }
 
-@injectable()
+@provide(CloudStorageService)
 export class CloudStorageService {
 	private readonly DROPBOX_BASE_PATH: string;
 	private readonly DROPBOX_API_TOKEN?: string;

@@ -2,10 +2,9 @@ import fs from 'fs';
 import { Express } from 'express';
 import { ApplicationSectionInterface, HackathonSettingsInterface } from '../../settings';
 import { Sections, HackathonSettings } from '../../models';
-import { TYPES } from '../../types';
 import { Cache } from '../cache';
 import { promisify } from 'util';
-import { injectable, inject } from 'inversify';
+import { provide } from 'inversify-binding-decorators';
 import { logger } from '../logger';
 
 export interface SettingLoaderInterface {
@@ -13,12 +12,12 @@ export interface SettingLoaderInterface {
 	loadSettingsFile: <T>(fileName: string, obj?: string) => Promise<T|undefined>;
 }
 
-@injectable()
+@provide(SettingLoader)
 export class SettingLoader implements SettingLoaderInterface {
 	private readonly readFileAsync = promisify(fs.readFile);
 	private readonly cache: Cache;
 
-	public constructor(@inject(TYPES.Cache) _cache: Cache) {
+	public constructor(_cache: Cache) {
 		this.cache = _cache;
 		this.loadApplicationSettings = this.loadApplicationSettings.bind(this);
 	}

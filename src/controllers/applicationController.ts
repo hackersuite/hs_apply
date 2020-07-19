@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Cache } from '../util/cache';
 import { Sections } from '../models/sections';
-import { inject, injectable } from 'inversify';
-import { TYPES } from '../types';
+import { provide } from 'inversify-binding-decorators';
 import { ApplicantService } from '../services';
 import { Applicant } from '../models/db';
 import { HttpResponseCode } from '../util/errorHandling';
@@ -20,14 +19,14 @@ export interface ApplicationControllerInterface {
 /**
  * A controller for application methods
  */
-@injectable()
+@provide(ApplicationController)
 export class ApplicationController implements ApplicationControllerInterface {
 	private readonly _cache: Cache;
 	private readonly _applicantService: ApplicantService;
 
 	public constructor(
-	@inject(TYPES.Cache) cache: Cache,
-		@inject(TYPES.ApplicantService) applicantService: ApplicantService
+		cache: Cache,
+		applicantService: ApplicantService
 	) {
 		this._cache = cache;
 		this._applicantService = applicantService;

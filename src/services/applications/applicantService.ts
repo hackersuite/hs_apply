@@ -1,7 +1,6 @@
-import { injectable, inject } from 'inversify';
+import { provide } from 'inversify-binding-decorators';
 import { Applicant } from '../../models/db/applicant';
 import { ApplicantRepository } from '../../repositories';
-import { TYPES } from '../../types';
 import { ObjectID, Repository, DeleteResult } from 'typeorm';
 import { validateOrReject } from 'class-validator';
 import { Review } from '../../models/db';
@@ -22,14 +21,14 @@ export interface ApplicantServiceInterface {
 	save: (newApplicants: Applicant, file?: Buffer) => Promise<Applicant>;
 }
 
-@injectable()
+@provide(ApplicantService)
 export class ApplicantService implements ApplicantServiceInterface {
 	private readonly _applicantRepository: Repository<Applicant>;
 	private readonly _cloudStorageService: CloudStorageService;
 
 	public constructor(
-	@inject(TYPES.ApplicantRepository) applicantRepository: ApplicantRepository,
-		@inject(TYPES.CloudStorageService) cloudStorageService: CloudStorageService
+		applicantRepository: ApplicantRepository,
+		cloudStorageService: CloudStorageService
 	) {
 		this._applicantRepository = applicantRepository.getRepository();
 		this._cloudStorageService = cloudStorageService;

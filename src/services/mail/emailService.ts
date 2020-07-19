@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import { provide } from 'inversify-binding-decorators';
 import { Response } from 'request';
 import EmailTemplate from 'email-templates';
 import sgMail from '@sendgrid/mail';
@@ -9,7 +9,7 @@ export interface EmailServiceInterface {
 	sendEmail: (from: string, recipient: string, subject: string, template: string, locals: any) => Promise<boolean>;
 }
 
-@injectable()
+@provide(EmailService)
 export class EmailService implements EmailServiceInterface {
 	public sendEmail = async (
 		from: string,

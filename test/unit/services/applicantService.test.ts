@@ -2,13 +2,12 @@ import { initEnv } from '../../util';
 initEnv();
 
 import { when, mock, instance, verify, anything, objectContaining, reset, resetCalls } from 'ts-mockito';
-import container from '../../../src/inversify.config';
-import { TYPES } from '../../../src/types';
-
 import { ApplicantService } from '../../../src/services';
 import { ApplicantRepository } from '../../../src/repositories';
 import { Repository, DeleteResult } from 'typeorm';
 import { Applicant } from '../../../src/models/db';
+
+import container from '../../../src/inversify.config';
 
 const testApplicantMale: Applicant = new Applicant();
 testApplicantMale.id = '7479a451-e968-4271-8073-729ddcf522ee';
@@ -68,13 +67,13 @@ beforeAll(() => {
 	const stubApplicantRepository: ApplicantRepository = mock(ApplicantRepository);
 	mockApplicantRepository = mock(StubApplicationRepository);
 	when(stubApplicantRepository.getRepository()).thenReturn(instance(mockApplicantRepository));
-	container.rebind(TYPES.ApplicantRepository).toConstantValue(instance(stubApplicantRepository));
+	container.rebind(ApplicantRepository).toConstantValue(instance(stubApplicantRepository));
 });
 
 beforeEach(() => {
 	// Create a snapshot so each unit test can modify it without breaking other unit tests
 	container.snapshot();
-	applicantService = container.get(TYPES.ApplicantService);
+	applicantService = container.get(ApplicantService);
 });
 
 afterEach(() => {

@@ -1,20 +1,18 @@
 import { Router, Request, Response, RequestHandler, NextFunction } from 'express';
 import { ApplicationController } from '../controllers';
-import { injectable, inject } from 'inversify';
-import { RouterInterface } from './registerableRouter';
-import { TYPES } from '../types';
+import { RouterInterface, provideRouter } from './registerableRouter';
 import multer from 'multer';
 import { HttpResponseCode } from '../util/errorHandling';
 import { RequestAuthentication } from '../util/auth';
 
-@injectable()
+@provideRouter()
 export class ApplicationRouter implements RouterInterface {
 	private readonly _applicationController: ApplicationController;
 	private readonly _requestAuth: RequestAuthentication;
 
 	public constructor(
-	@inject(TYPES.ApplicationController) applicationController: ApplicationController,
-		@inject(TYPES.RequestAuthentication) requestAuth: RequestAuthentication
+		applicationController: ApplicationController,
+		requestAuth: RequestAuthentication
 	) {
 		this._applicationController = applicationController;
 		this._requestAuth = requestAuth;
