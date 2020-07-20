@@ -2,7 +2,6 @@ import { initEnv } from '../../util';
 initEnv();
 
 import { when, mock, instance, reset, resetCalls, anything } from 'ts-mockito';
-
 import { PartialApplicantService } from '../../../src/services';
 import { PartialApplicantRepository } from '../../../src/repositories';
 import { Repository, DeleteResult } from 'typeorm';
