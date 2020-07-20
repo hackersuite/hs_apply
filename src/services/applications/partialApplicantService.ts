@@ -1,7 +1,6 @@
-import { injectable, inject } from 'inversify';
+import { provide } from 'inversify-binding-decorators';
 import { PartialApplicant } from '../../models/db/applicant';
 import { PartialApplicantRepository } from '../../repositories';
-import { TYPES } from '../../types';
 import { ObjectID, Repository, DeleteResult } from 'typeorm';
 
 type ApplicationID = string | number | Date | ObjectID;
@@ -12,12 +11,12 @@ export interface PartialApplicantServiceInterface {
 	remove: (id: string) => Promise<DeleteResult>;
 }
 
-@injectable()
+@provide(PartialApplicantService)
 export class PartialApplicantService implements PartialApplicantServiceInterface {
 	private readonly _partialApplicantRepository: Repository<PartialApplicant>;
 
 	public constructor(
-	@inject(TYPES.PartialApplicantRepository) partialApplicantRepository: PartialApplicantRepository
+		partialApplicantRepository: PartialApplicantRepository
 	) {
 		this._partialApplicantRepository = partialApplicantRepository.getRepository();
 	}
