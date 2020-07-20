@@ -4,5 +4,6 @@ module.exports = {
 		'ecmaVersion': 2019,
 		'project': 'tsconfig.eslint.json'
 	},
-	'extends': '@unicsmcr'
+	'extends': '@unicsmcr',
+	'ignorePatterns': ["src/public/**/*.js"],
 }

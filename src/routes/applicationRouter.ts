@@ -91,6 +91,10 @@ export class ApplicationRouter implements RouterInterface {
 			this._applicationController.submitApplication
 		);
 
+		router.post('/partial',
+			this.fileCheckMiddleware,
+			this._applicationController.updatePartialApplication);
+
 		router.get('/cancel', this.doNothingIfApplicationsClosed, this._applicationController.cancel);
 
 		router.put('/:id([a-f0-9-]+)/checkin', this._requestAuth.checkIsVolunteer, this._applicationController.checkin);

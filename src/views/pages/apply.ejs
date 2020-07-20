@@ -32,7 +32,19 @@
                 <div class="card apply-form-card">
                   <div class="card-header card-header-tabs card-header-primary">
                     <h2 class="card-title text-center"><%= section.name %></h2>
+
+                    <div id="save-progress" class="save-spinner" style="display: none;">
+                      <span>Saving...</span>
+                      <svg class="spinner" width="15px" height="15px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="path" fill="none" stroke-width="4" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+                      </svg>
+                    </div>
+
+                    <div id="save-done" class="save-complete">
+                      <span class="material-icons">done</span>
+                    </div>
                   </div>
+
                   <div class="card-body">
                     <div class="apply-form-section">
                       <% section.questions.forEach((question, questionIndex) => { %>
@@ -63,7 +75,13 @@
       integrity="sha256-tw5/wId1F+4LyUF2ZJnpRoHNXJ66jrK3IGhfq4LhLjY=" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.10/js/bootstrap-select.min.js" integrity="sha256-FXzZGmaRFZngOjUKy3lWZJq/MflaMpffBbu3lPT0izE=" crossorigin="anonymous"></script>
       <script src="/js/external/typeahead.min.js"></script>
-      <script src="/js/apply.js"></script>
+
+      <script>
+        const partialApplication = <%- JSON.stringify(partialApplication || null) %>;
+      </script>
+
+      <script src="/js/apply/partialApplication.js"></script>
+      <script src="/js/apply/apply.js"></script>
     </div>
   </div>
 </body>

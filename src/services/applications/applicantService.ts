@@ -19,6 +19,8 @@ export interface ApplicantServiceInterface {
 	) => Promise<[Partial<Applicant>[], number]>;
 	findOne: (id: ApplicationID) => Promise<Applicant>;
 	save: (newApplicants: Applicant, file?: Buffer) => Promise<Applicant>;
+	delete: (id: ApplicationID) => Promise<DeleteResult>;
+	getKRandomToReview: (reviewerID: string, chooseFromK: number) => Promise<Applicant[]>;
 }
 
 @provide(ApplicantService)

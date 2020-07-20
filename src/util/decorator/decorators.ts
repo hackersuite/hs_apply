@@ -38,7 +38,9 @@ export interface ReviewApplicationOptions {
 	isSeparateScore?: boolean;
 }
 
-export const applicationMapping: Map<string, ApplicationMappingOptions> = new Map();
+export type ApplicationQuestions = Map<string, ApplicationMappingOptions>;
+
+export const applicationMapping: ApplicationQuestions = new Map();
 export const reviewApplicationMapping: Map<string, string[]> = new Map();
 /**
  * Maps the applicant property to the application in a post request
@@ -59,6 +61,6 @@ export function ApplicationMapped(options?: ApplicationMappingOptions) {
 				reviewApplicationMapping.set(groupKey, currentGroupArray);
 			}
 		}
-		applicationMapping.set(propertyName, {});
+		applicationMapping.set(propertyName, { ...options });
 	};
 }

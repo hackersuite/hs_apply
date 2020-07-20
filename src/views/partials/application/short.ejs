@@ -4,5 +4,7 @@
   <%- question.required ? "<span class='label-req'> *</span>" : "" %>
   </label>
   
-  <input autocomplete="off" type="text" class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
+  <input
+    data-hs-type="short"
+    autocomplete="off" type="text" class="form-control" id="<%= currentID %>" name="<%= question.questionName %>" <%= question.required ? "required" : "" %>>
 </div>

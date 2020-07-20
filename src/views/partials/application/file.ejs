@@ -4,12 +4,13 @@
   </label>
   
   <input
-  id="customFile"
-  type="file"
-  class="inputFileHidden"
-  accept=".pdf,.doc,.docx"
-  name="<%= question.questionName %>"
-  <%= question.required ? "required" : "" %> >
+    data-hs-type="file-input"
+    id="customFile"
+    type="file"
+    class="inputFileHidden"
+    accept=".pdf,.doc,.docx"
+    name="<%= question.questionName %>"
+    <%= question.required ? "required" : "" %> >
 
   <div class="input-group">
     <span class="input-group-btn" id="attach-file-btn">
@@ -24,6 +25,8 @@
       </button>
     </span>
 
-    <input id="shownCVFileInput" type="text" class="form-control inputFileVisible" placeholder="Choose file (Maximum 5 MB)" aria-label="Choose CV to upload" readonly>
+    <input
+      data-hs-type="file-display"
+      id="shownCVFileInput" type="text" class="form-control inputFileVisible" placeholder="Choose file (Maximum 5 MB)" aria-label="Choose CV to upload" readonly>
   </div>
 </div>

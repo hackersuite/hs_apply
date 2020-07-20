@@ -256,4 +256,7 @@ $(document).ready(function() {
       })
     });
   }
-})
+
+  // The last thing we do is fill the partial application in the form
+  fillPartialApplication();
+});

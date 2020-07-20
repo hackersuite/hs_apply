@@ -108,11 +108,11 @@ afterEach(() => {
 });
 
 test('Test 404 page provided when invalid URL', async () => {
-	// Perform the request along .../apply
+	// Perform the request along an invalid page URL
 	const response = await request(bApp).get('/invalidpage-url-123');
 
-	// Check that we get a OK (200) response code
-	expect(response.status).toBe(HttpResponseCode.OK);
+	// Check that we get a NOT_FOUND (404) response code
+	expect(response.status).toBe(HttpResponseCode.NOT_FOUND);
 });
 
 test('Test applicant created with valid request', async () => {
