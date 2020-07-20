@@ -1,12 +1,14 @@
 import { when, mock, instance, anything } from 'ts-mockito';
 import { Express, NextFunction, Request, Response } from 'express';
 import { initEnv } from '../../../util';
-import { SettingLoader, RequestAuthenticationInterface, RequestAuthentication } from '../../../../src/util';
+import { SettingLoader, RequestAuthentication } from '../../../../src/util';
 import { AuthLevel, getCurrentUser as authUserReq } from '@unicsmcr/hs_auth_client';
-import container from '../../../../src/inversify.config';
-import { TYPES } from '../../../../src/types';
-import { Cache } from '../../../../src/util/cache';
 import { ApplicantService } from '../../../../src/services';
+import { Cache } from '../../../../src/util/cache';
+
+// Ensure the last import is the inversify container as we need all everything bound
+// before we create the container
+import container from '../../../../src/inversify.config';
 
 let mockCache: Cache;
 let mockSettingLoader: SettingLoader;
@@ -26,9 +28,9 @@ beforeAll(() => {
 	mockSettingLoader = mock(SettingLoader);
 	mockApplicantService = mock(ApplicantService);
 
-	container.rebind(TYPES.Cache).toConstantValue(instance(mockCache));
-	container.rebind(TYPES.SettingLoader).toConstantValue(instance(mockSettingLoader));
-	container.rebind(TYPES.ApplicantService).toConstantValue(instance(mockApplicantService));
+	container.rebind(Cache).toConstantValue(instance(mockCache));
+	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
+	container.rebind(ApplicantService).toConstantValue(instance(mockApplicantService));
 
 	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall((app: Express) => {
 		app.locals.settings = {
@@ -39,16 +41,7 @@ beforeAll(() => {
 		};
 	});
 
-	requestAuth = container.get<RequestAuthenticationInterface>(TYPES.RequestAuthentication) as RequestAuthentication;
-
-	// new App().buildApp((builtApp: Express, err: Error): void => {
-	//   if (err) {
-	//     done(err.message + "\n" + err.stack);
-	//   } else {
-	//     bApp = builtApp;
-	//     done();
-	//   }
-	// }, getTestDatabaseOptions());
+	requestAuth = container.get(RequestAuthentication);
 });
 
 let reqMock: Request = mock<Request>();

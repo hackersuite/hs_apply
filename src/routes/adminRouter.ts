@@ -1,18 +1,16 @@
 import { Router } from 'express';
 import { AdminController } from '../controllers';
-import { injectable, inject } from 'inversify';
-import { RouterInterface } from './registerableRouter';
-import { TYPES } from '../types';
+import { RouterInterface, provideRouter } from './registerableRouter';
 import { RequestAuthentication } from '../util/auth';
 
-@injectable()
+@provideRouter()
 export class AdminRouter implements RouterInterface {
 	private readonly _adminController: AdminController;
 	private readonly _requestAuth: RequestAuthentication;
 
 	public constructor(
-	@inject(TYPES.AdminController) adminController: AdminController,
-		@inject(TYPES.RequestAuthentication) requestAuth: RequestAuthentication
+		adminController: AdminController,
+		requestAuth: RequestAuthentication
 	) {
 		this._adminController = adminController;
 		this._requestAuth = requestAuth;

@@ -3,16 +3,16 @@ import { App } from '../../src/app';
 import { Express, NextFunction } from 'express';
 import { initEnv, getTestDatabaseOptions } from '../util/testUtils';
 import { HttpResponseCode } from '../../src/util/errorHandling';
-import container from '../../src/inversify.config';
 import { Applicant, Review } from '../../src/models/db';
 import { RequestAuthentication } from '../../src/util/auth';
 import { SettingLoader } from '../../src/util/fs';
 import { AuthLevel } from '@unicsmcr/hs_auth_client';
 import { mock, instance, when, anything, objectContaining } from 'ts-mockito';
-import { TYPES } from '../../src/types';
 import { Repository } from 'typeorm';
 import { ReviewRepository } from '../../src/repositories';
 import { ApplicantService } from '../../src/services';
+
+import container from '../../src/inversify.config';
 
 let bApp: Express;
 let reviewRepository: Repository<Review>;
@@ -54,9 +54,9 @@ beforeAll(async () => {
 	mockSettingLoader = mock(SettingLoader);
 	mockApplicantService = mock(ApplicantService);
 
-	container.rebind(TYPES.RequestAuthentication).toConstantValue(instance(mockRequestAuth));
-	container.rebind(TYPES.SettingLoader).toConstantValue(instance(mockSettingLoader));
-	container.rebind(TYPES.ApplicantService).toConstantValue(instance(mockApplicantService));
+	container.rebind(RequestAuthentication).toConstantValue(instance(mockRequestAuth));
+	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
+	container.rebind(ApplicantService).toConstantValue(instance(mockApplicantService));
 
 	when(mockRequestAuth.passportSetup).thenReturn(() => null);
 	when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
@@ -86,7 +86,7 @@ beforeAll(async () => {
 
 	bApp = await new App().buildApp(getTestDatabaseOptions());
 	// After the application has been built and db connection established -- get the applicant repository
-	reviewRepository = container.get<ReviewRepository>(TYPES.ReviewRepository).getRepository();
+	reviewRepository = container.get<ReviewRepository>(ReviewRepository).getRepository();
 });
 
 beforeEach(() => {

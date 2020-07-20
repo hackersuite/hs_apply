@@ -2,13 +2,12 @@ import { initEnv, updateEnv } from '../../util';
 initEnv();
 
 import { when, mock, instance, verify, anything, objectContaining, reset, resetCalls } from 'ts-mockito';
-import container from '../../../src/inversify.config';
-import { TYPES } from '../../../src/types';
-
 import { ApplicantService } from '../../../src/services';
 import { ApplicantRepository } from '../../../src/repositories';
 import { Repository, DeleteResult } from 'typeorm';
 import { Applicant } from '../../../src/models/db';
+
+import container from '../../../src/inversify.config';
 
 // We use jest to mock out axios requests since we sometimes call the dropbox api
 import axios from 'axios';
@@ -74,7 +73,7 @@ beforeAll(() => {
 	const stubApplicantRepository: ApplicantRepository = mock(ApplicantRepository);
 	mockApplicantRepository = mock(StubApplicationRepository);
 	when(stubApplicantRepository.getRepository()).thenReturn(instance(mockApplicantRepository));
-	container.rebind(TYPES.ApplicantRepository).toConstantValue(instance(stubApplicantRepository));
+	container.rebind(ApplicantRepository).toConstantValue(instance(stubApplicantRepository));
 
 	// Mock the POST Axios request for the cloud service requests
 	axiosMock.post.mockResolvedValue({ data: successResponse });
@@ -83,7 +82,7 @@ beforeAll(() => {
 beforeEach(() => {
 	// Create a snapshot so each unit test can modify it without breaking other unit tests
 	container.snapshot();
-	applicantService = container.get(TYPES.ApplicantService);
+	applicantService = container.get(ApplicantService);
 });
 
 afterEach(() => {
@@ -202,7 +201,7 @@ test('Test that error thrown when API keys not set-up for file upload', async ()
 
 	// We also need to fetch the new version of the applicant service so the cloud service is re-injected
 	// with the new DROPBOX_API_TOKEN
-	applicantService = container.get(TYPES.ApplicantService);
+	applicantService = container.get(ApplicantService);
 
 	// Try and create the applicant and check for error
 	await expect(applicantService.save(testApplicantMale, Buffer.from(''))).rejects.toThrow();

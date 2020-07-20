@@ -9,8 +9,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import express, { Express, Request, Response, NextFunction } from 'express';
 import { ConnectionOptions, createConnections } from 'typeorm';
-import { RouterInterface } from './routes';
-import { TYPES } from './types';
+import { RouterInterface, RouterSymbol } from './routes';
 import container from './inversify.config';
 import { error404Handler, errorHandler } from './util/errorHandling';
 import { RequestAuthentication } from './util/auth';
@@ -31,7 +30,7 @@ export class App {
 		}
 
 		// Load the hackathon application settings from disk
-		const settingLoader: SettingLoader = container.get(TYPES.SettingLoader);
+		const settingLoader: SettingLoader = container.get(SettingLoader);
 		try {
 			await settingLoader.loadApplicationSettings(app);
 		} catch (err) {
@@ -48,12 +47,12 @@ export class App {
 
 		// Set up passport for authentication
 		// Also add the logout route
-		const requestAuth: RequestAuthentication = container.get(TYPES.RequestAuthentication);
+		const requestAuth: RequestAuthentication = container.get(RequestAuthentication);
 		requestAuth.passportSetup(app);
 
 		// Routes set up for express, resolving dependencies
 		// This is performed after successful DB connection since some routers use TypeORM repositories in their DI
-		const routers: RouterInterface[] = container.getAll(TYPES.Router);
+		const routers: RouterInterface[] = container.getAll(RouterSymbol);
 		routers.forEach(router => {
 			app.use(router.getPathRoot(), router.register());
 		});

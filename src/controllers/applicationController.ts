@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Cache } from '../util/cache';
 import { Sections } from '../models/sections';
-import { inject, injectable } from 'inversify';
-import { TYPES } from '../types';
 import { ApplicantService, PartialApplicantService } from '../services';
+import { provide } from 'inversify-binding-decorators';
 import { Applicant } from '../models/db';
 import { HttpResponseCode } from '../util/errorHandling';
 import { User } from '@unicsmcr/hs_auth_client';
@@ -22,7 +21,7 @@ export interface ApplicationControllerInterface {
 /**
  * A controller for application methods
  */
-@injectable()
+@provide(ApplicationController)
 export class ApplicationController implements ApplicationControllerInterface {
 	private readonly _cache: Cache;
 	private readonly _applicantService: ApplicantService;
@@ -32,9 +31,9 @@ export class ApplicationController implements ApplicationControllerInterface {
 	private readonly applicantNotFound = 'Applicant does not exist';
 
 	public constructor(
-	@inject(TYPES.Cache) cache: Cache,
-		@inject(TYPES.ApplicantService) applicantService: ApplicantService,
-		@inject(TYPES.PartialApplicantService) partialApplicantService: PartialApplicantService
+		cache: Cache,
+		applicantService: ApplicantService,
+		partialApplicantService: PartialApplicantService
 	) {
 		this._cache = cache;
 		this._applicantService = applicantService;

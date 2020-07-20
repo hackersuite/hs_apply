@@ -4,11 +4,11 @@ import { Express, NextFunction } from 'express';
 import { initEnv, getTestDatabaseOptions } from '../../util/testUtils';
 import { HttpResponseCode } from '../../../src/util/errorHandling';
 import { instance, mock, reset, when, anything } from 'ts-mockito';
-import container from '../../../src/inversify.config';
-import { TYPES } from '../../../src/types';
 import { Cache } from '../../../src/util/cache';
 import { RequestAuthentication, SettingLoader } from '../../../src/util';
 import { AuthLevel } from '@unicsmcr/hs_auth_client';
+
+import container from '../../../src/inversify.config';
 
 let bApp: Express;
 let mockCache: Cache;
@@ -28,9 +28,9 @@ beforeAll(async () => {
 	mockRequestAuth = mock(RequestAuthentication);
 	mockSettingLoader = mock(SettingLoader);
 
-	container.rebind(TYPES.RequestAuthentication).toConstantValue(instance(mockRequestAuth));
-	container.rebind(TYPES.Cache).toConstantValue(instance(mockCache));
-	container.rebind(TYPES.SettingLoader).toConstantValue(instance(mockSettingLoader));
+	container.rebind(RequestAuthentication).toConstantValue(instance(mockRequestAuth));
+	container.rebind(Cache).toConstantValue(instance(mockCache));
+	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
 
 	when(mockRequestAuth.passportSetup).thenReturn(() => null);
 	when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {

@@ -1,18 +1,16 @@
 import { Router } from 'express';
 import { DashboardController } from '../controllers';
-import { injectable, inject } from 'inversify';
-import { RouterInterface } from './registerableRouter';
-import { TYPES } from '../types';
+import { RouterInterface, provideRouter } from './registerableRouter';
 import { RequestAuthentication } from '../util/auth';
 
-@injectable()
+@provideRouter()
 export class DashboardRouter implements RouterInterface {
 	private readonly _dashboardController: DashboardController;
 	private readonly _requestAuth: RequestAuthentication;
 
 	public constructor(
-	@inject(TYPES.DashboardController) dashboardController: DashboardController,
-		@inject(TYPES.RequestAuthentication) requestAuth: RequestAuthentication
+		dashboardController: DashboardController,
+		requestAuth: RequestAuthentication
 	) {
 		this._dashboardController = dashboardController;
 		this._requestAuth = requestAuth;

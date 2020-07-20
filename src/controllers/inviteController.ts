@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { inject, injectable } from 'inversify';
-import { TYPES } from '../types';
+import { provide } from 'inversify-binding-decorators';
 import { EmailService, ApplicantService } from '../services';
 import { Applicant } from '../models/db';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
@@ -16,14 +15,14 @@ export interface InviteControllerInterface {
 /**
  * A controller for dashboard methods
  */
-@injectable()
+@provide(InviteController)
 export class InviteController implements InviteControllerInterface {
 	private readonly _emailService: EmailService;
 	private readonly _applicantService: ApplicantService;
 
 	public constructor(
-	@inject(TYPES.ApplicantService) applicantService: ApplicantService,
-		@inject(TYPES.EmailService) emailService: EmailService
+		applicantService: ApplicantService,
+		emailService: EmailService
 	) {
 		this._applicantService = applicantService;
 		this._emailService = emailService;
