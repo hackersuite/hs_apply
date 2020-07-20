@@ -2,12 +2,13 @@ import { initEnv } from '../../util';
 initEnv();
 
 import { when, mock, instance, reset, resetCalls, anything } from 'ts-mockito';
-import container from '../../../src/inversify.config';
 
 import { PartialApplicantService } from '../../../src/services';
 import { PartialApplicantRepository } from '../../../src/repositories';
 import { Repository, DeleteResult } from 'typeorm';
 import { PartialApplicant } from '../../../src/models/db';
+
+import container from '../../../src/inversify.config';
 
 const testPartialApplicant: PartialApplicant = new PartialApplicant();
 testPartialApplicant.authId = '7479a451e929ccef522ee';
