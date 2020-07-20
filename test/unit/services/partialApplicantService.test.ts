@@ -3,7 +3,6 @@ initEnv();
 
 import { when, mock, instance, reset, resetCalls, anything } from 'ts-mockito';
 import container from '../../../src/inversify.config';
-import { TYPES } from '../../../src/types';
 
 import { PartialApplicantService } from '../../../src/services';
 import { PartialApplicantRepository } from '../../../src/repositories';
@@ -30,13 +29,13 @@ beforeAll(() => {
 	const stubPartialApplicantRepository: PartialApplicantRepository = mock(PartialApplicantRepository);
 	mockPartialApplicantRepository = mock(StubPartialApplicationRepository);
 	when(stubPartialApplicantRepository.getRepository()).thenReturn(instance(mockPartialApplicantRepository));
-	container.rebind(TYPES.PartialApplicantRepository).toConstantValue(instance(stubPartialApplicantRepository));
+	container.rebind(PartialApplicantRepository).toConstantValue(instance(stubPartialApplicantRepository));
 });
 
 beforeEach(() => {
 	// Create a snapshot so each unit test can modify it without breaking other unit tests
 	container.snapshot();
-	partialApplicantService = container.get(TYPES.PartialApplicantService);
+	partialApplicantService = container.get(PartialApplicantService);
 });
 
 afterEach(() => {
