@@ -1,6 +1,6 @@
 import pino from 'pino';
 import pinoHttp from 'pino-http';
-import pinoPrint from 'pino-http-print';
+import pinoPrint from '@unicsmcr/pino-http-print';
 
 const prettyPrint = pinoPrint({
 	all: true,

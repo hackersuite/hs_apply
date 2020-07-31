@@ -1,4 +1,4 @@
-declare module 'pino-http-print' {
+declare module '@unicsmcr/pino-http-print' {
 	interface HttpPrintOptions {
 		all: boolean;
 		colorize: boolean;
