@@ -5,7 +5,7 @@ import { getConfig, Environment } from '../../src/util/config';
 export function getTestDatabaseOptions(entities?: (string | Function)[], name?: string): ConnectionOptions[] {
 	return [
 		{
-			name: name ?? 'applications',
+			name: name ?? 'default',
 			type: 'mysql',
 			database: 'hs_applications',
 			host: 'localhost',
