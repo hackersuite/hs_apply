@@ -1,25 +1,25 @@
 import { Applicant, Review, PartialApplicant } from '../models/db';
-import { BaseRepository } from './baseRepository';
 import { provide } from 'inversify-binding-decorators';
+import { TransactionRepository } from './transactionRepository';
 import { Repository } from 'typeorm';
 
 @provide(ApplicantRepository)
-export class ApplicantRepository extends BaseRepository<Applicant> {
+export class ApplicantRepository extends TransactionRepository<Applicant> {
 	public getRepository(): Repository<Applicant> {
-		return super.connect(Applicant);
+		return super.manager.getRepository(Applicant);
 	}
 }
 
 @provide(PartialApplicantRepository)
-export class PartialApplicantRepository extends BaseRepository<PartialApplicant> {
+export class PartialApplicantRepository extends TransactionRepository<PartialApplicant> {
 	public getRepository(): Repository<PartialApplicant> {
-		return super.connect(PartialApplicant);
+		return super.manager.getRepository(PartialApplicant);
 	}
 }
 
 @provide(ReviewRepository)
-export class ReviewRepository extends BaseRepository<Review> {
+export class ReviewRepository extends TransactionRepository<Review> {
 	public getRepository(): Repository<Review> {
-		return super.connect(Review);
+		return super.manager.getRepository(Review);
 	}
 }
