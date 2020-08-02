@@ -6,9 +6,9 @@ import { dropboxAPIFactory, DropboxMethods } from './dropboxAPIFactory';
 import { getConfig } from '../../util/config';
 
 export interface CloudStorageServiceInterface {
-	upload: (fileName: string, file: Buffer) => Promise<string>;
-	delete: (fileName: string) => Promise<string>;
-	downloadAll: (writer: fs.WriteStream) => Promise<void>;
+	upload(fileName: string, file: Buffer): Promise<string>;
+	delete(fileName: string): Promise<string>;
+	downloadAll(writer: fs.WriteStream): Promise<void>;
 }
 
 enum ContentTypeOptions {
@@ -34,6 +34,9 @@ export class CloudStorageService {
 		this.DROPBOX_API_TOKEN = getConfig().dropboxToken;
 
 		this.httpHeaderSafeJson = this.httpHeaderSafeJson.bind(this);
+		this.upload = this.upload.bind(this);
+		this.delete = this.delete.bind(this);
+		this.downloadAll = this.downloadAll.bind(this);
 	}
 
 	private httpHeaderSafeJson(args: any): string {
@@ -76,7 +79,7 @@ export class CloudStorageService {
 		return result;
 	}
 
-	public upload = async (fileName: string, file: Buffer): Promise<string> => {
+	public async upload(fileName: string, file: Buffer): Promise<string> {
 		const customHeaders = {
 			'Dropbox-API-Arg': { path: `/${this.DROPBOX_BASE_PATH}/${fileName}`, mode: 'add', autorename: true, mute: false }
 		};
@@ -89,9 +92,9 @@ export class CloudStorageService {
 				body: file
 			})
 		).data;
-	};
+	}
 
-	public delete = async (fileName: string): Promise<string> => {
+	public async delete(fileName: string): Promise<string> {
 		if (!fileName || fileName.length === 0) throw new Error('File name is not valid to delete');
 		const requestBody = { path: `/${this.DROPBOX_BASE_PATH}/${fileName}` };
 
@@ -102,9 +105,9 @@ export class CloudStorageService {
 				body: requestBody
 			})
 		).data;
-	};
+	}
 
-	public downloadAll = async (writer: fs.WriteStream): Promise<void> => {
+	public async downloadAll(writer: fs.WriteStream): Promise<void> {
 		const customHeaders = {
 			'Dropbox-API-Arg': { path: `/${this.DROPBOX_BASE_PATH}` }
 		};
@@ -118,5 +121,5 @@ export class CloudStorageService {
 
 		// Pipe the result of the request to the write stream provided
 		(response.data as fs.WriteStream).pipe(writer);
-	};
+	}
 }

@@ -1,7 +1,7 @@
 import { provide } from 'inversify-binding-decorators';
 import { Applicant } from '../../models/db/applicant';
 import { ApplicantRepository } from '../../repositories';
-import { ObjectID, Repository, DeleteResult } from 'typeorm';
+import { ObjectID, DeleteResult, Repository } from 'typeorm';
 import { validateOrReject } from 'class-validator';
 import { Review } from '../../models/db';
 import { ApplicantStatus } from './applicantStatus';
@@ -11,16 +11,16 @@ import { CloudStorageService } from '../cloudStorage';
 type ApplicationID = string | number | Date | ObjectID;
 
 export interface ApplicantServiceInterface {
-	getAll: () => Promise<Applicant[]>;
-	getAllAndCountSelection: (
+	getAll(columns?: (keyof Applicant)[]): Promise<Applicant[]>;
+	getAllAndCountSelection(
 		columns: (keyof Applicant)[],
 		orderBy?: keyof Applicant,
 		orderType?: 'ASC' | 'DESC'
-	) => Promise<[Partial<Applicant>[], number]>;
-	findOne: (id: ApplicationID) => Promise<Applicant>;
-	save: (newApplicants: Applicant, file?: Buffer) => Promise<Applicant>;
-	delete: (id: ApplicationID) => Promise<DeleteResult>;
-	getKRandomToReview: (reviewerID: string, chooseFromK: number) => Promise<Applicant[]>;
+	): Promise<[Partial<Applicant>[], number]>;
+	findOne(id: ApplicationID): Promise<Applicant>;
+	save(newApplicants: Applicant, file?: Buffer): Promise<Applicant>;
+	delete(id: ApplicationID): Promise<DeleteResult>;
+	getKRandomToReview(reviewerID: string, chooseFromK: number): Promise<Applicant[]>;
 }
 
 @provide(ApplicantService)
@@ -36,20 +36,20 @@ export class ApplicantService implements ApplicantServiceInterface {
 		this._cloudStorageService = cloudStorageService;
 	}
 
-	public getAll = async (columns?: (keyof Applicant)[]): Promise<Applicant[]> => {
+	public async getAll(columns?: (keyof Applicant)[]): Promise<Applicant[]> {
 		try {
 			const options = columns ? { select: columns } : undefined;
 			return await this._applicantRepository.find(options);
 		} catch (err) {
 			throw new Error(`Failed to get all applicants:\n${(err as Error).message}`);
 		}
-	};
+	}
 
-	public getAllAndCountSelection = async (
+	public async getAllAndCountSelection(
 		columns: (keyof Applicant)[],
 		orderBy?: keyof Applicant,
 		orderType?: 'ASC' | 'DESC'
-	): Promise<[Partial<Applicant>[], number]> => {
+	): Promise<[Partial<Applicant>[], number]> {
 		const orderOptions = orderBy ? { [orderBy]: orderType } : undefined;
 		try {
 			return await this._applicantRepository.findAndCount({
@@ -59,20 +59,21 @@ export class ApplicantService implements ApplicantServiceInterface {
 		} catch (err) {
 			throw new Error(`Failed to get the list of applications`);
 		}
-	};
+	}
 
-	public findOne = async (id: ApplicationID, findBy?: keyof Applicant): Promise<Applicant> => {
+	public async findOne(id: ApplicationID, findBy?: keyof Applicant): Promise<Applicant> {
 		try {
 			const findColumn: keyof Applicant = findBy ?? 'id';
 			const applicant = await this._applicantRepository.findOne({ [findColumn]: id });
 			if (!applicant) throw new Error('Applicant does not exist');
 			return applicant;
 		} catch (err) {
+			logger.info(err);
 			throw new Error(`Failed to find an applicant:\n${(err as Error).message}`);
 		}
-	};
+	}
 
-	public save = async (newApplicant: Applicant, file?: Buffer): Promise<Applicant> => {
+	public async save(newApplicant: Applicant, file?: Buffer): Promise<Applicant> {
 		try {
 			// Validate the new applicant using class-validation and fail if there is an error
 			// Hide the target in the report for nicer error messages
@@ -98,9 +99,9 @@ export class ApplicantService implements ApplicantServiceInterface {
 		} catch (err) {
 			throw new Error(`Failed to save applicant:\n${(err as Error).message}`);
 		}
-	};
+	}
 
-	public delete = async (id: ApplicationID): Promise<DeleteResult> => {
+	public async delete(id: ApplicationID): Promise<DeleteResult> {
 		// Find the applicant via the provided ID
 		let applicant: Applicant;
 		try {
@@ -122,9 +123,9 @@ export class ApplicantService implements ApplicantServiceInterface {
 		} catch (err) {
 			throw new Error(`Failed to remove an applicant:\n${(err as Error).message}`);
 		}
-	};
+	}
 
-	public getKRandomToReview = async (reviewerID: string, chooseFromK = 5): Promise<Applicant[]> => {
+	public async getKRandomToReview(reviewerID: string, chooseFromK = 5): Promise<Applicant[]> {
 		// TODO: Refactor query below to make it more readable, there must be a better way...
 		let applications;
 		try {
@@ -161,8 +162,9 @@ export class ApplicantService implements ApplicantServiceInterface {
 		}
 
 		return applications;
-	};
+	}
 
+	// TODO: Move function into the Dropbox service
 	// public getCVLink = async (fileName: string): Promise<string> => {
 	//   if (!process.env.DROPBOX_API_TOKEN)
 	//     throw new Error(

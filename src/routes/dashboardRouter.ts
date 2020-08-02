@@ -23,7 +23,7 @@ export class DashboardRouter implements RouterInterface {
 
 		router.use(this._requestAuth.checkLoggedIn);
 
-		router.get('/', this._dashboardController.dashboard);
+		router.get('/', this._dashboardController.dashboard.bind(this._dashboardController));
 
 		return router;
 	};
