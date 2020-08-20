@@ -7,6 +7,7 @@ import { Review } from '../../models/db';
 import { ApplicantStatus } from './applicantStatus';
 import { logger } from '../../util';
 import { CloudStorageService } from '../cloudStorage';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 type ApplicationID = string | number | Date | ObjectID;
 
@@ -36,6 +37,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 		this._cloudStorageService = cloudStorageService;
 	}
 
+	@Transactional()
 	public async getAll(columns?: (keyof Applicant)[]): Promise<Applicant[]> {
 		try {
 			const options = columns ? { select: columns } : undefined;
@@ -45,6 +47,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 		}
 	}
 
+	@Transactional()
 	public async getAllAndCountSelection(
 		columns: (keyof Applicant)[],
 		orderBy?: keyof Applicant,
@@ -61,6 +64,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 		}
 	}
 
+	@Transactional()
 	public async findOne(id: ApplicationID, findBy?: keyof Applicant): Promise<Applicant> {
 		try {
 			const findColumn: keyof Applicant = findBy ?? 'id';
@@ -73,6 +77,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 		}
 	}
 
+	@Transactional()
 	public async save(newApplicant: Applicant, file?: Buffer): Promise<Applicant> {
 		try {
 			// Validate the new applicant using class-validation and fail if there is an error
@@ -101,6 +106,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 		}
 	}
 
+	@Transactional()
 	public async delete(id: ApplicationID): Promise<DeleteResult> {
 		// Find the applicant via the provided ID
 		let applicant: Applicant;
@@ -125,6 +131,7 @@ export class ApplicantService implements ApplicantServiceInterface {
 		}
 	}
 
+	@Transactional()
 	public async getKRandomToReview(reviewerID: string, chooseFromK = 5): Promise<Applicant[]> {
 		// TODO: Refactor query below to make it more readable, there must be a better way...
 		let applications;

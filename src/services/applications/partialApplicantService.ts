@@ -2,6 +2,7 @@ import { provide } from 'inversify-binding-decorators';
 import { PartialApplicant } from '../../models/db/applicant';
 import { PartialApplicantRepository } from '../../repositories';
 import { ObjectID, Repository, DeleteResult } from 'typeorm';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 type ApplicationID = string | number | Date | ObjectID;
 
@@ -21,6 +22,7 @@ export class PartialApplicantService implements PartialApplicantServiceInterface
 		this._partialApplicantRepository = partialApplicantRepository.getRepository();
 	}
 
+	@Transactional()
 	public async find(id: ApplicationID): Promise<PartialApplicant> {
 		try {
 			const partialApplicant = await this._partialApplicantRepository.findOne(id);
@@ -31,6 +33,7 @@ export class PartialApplicantService implements PartialApplicantServiceInterface
 		}
 	}
 
+	@Transactional()
 	public async remove(id: string): Promise<DeleteResult> {
 		try {
 			return await this._partialApplicantRepository.delete(id);
@@ -39,6 +42,7 @@ export class PartialApplicantService implements PartialApplicantServiceInterface
 		}
 	}
 
+	@Transactional()
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public async save(id: string, rawApplication: Record<string, string>, _file?: Buffer): Promise<PartialApplicant | undefined> {
 		const application = new PartialApplicant();
