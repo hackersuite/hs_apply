@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { App } from '../../../src/app';
 import { Express, NextFunction } from 'express';
-import { initEnv, getTestDatabaseOptions } from '../../util/testUtils';
+import { setupTestingEnvironment, getTestDatabaseOptions } from '../../util/testUtils';
 import { HttpResponseCode } from '../../../src/util/errorHandling';
 import { instance, mock, when, anything, reset, verify } from 'ts-mockito';
 import { RequestAuthentication, SettingLoader, logger } from '../../../src/util';
@@ -39,7 +39,7 @@ const requestUser = {
 };
 
 beforeAll(async () => {
-	initEnv();
+	setupTestingEnvironment();
 	mockRequestAuth = mock(RequestAuthentication);
 	mockSettingLoader = mock(SettingLoader);
 	mockApplicantService = mock(ApplicantService);

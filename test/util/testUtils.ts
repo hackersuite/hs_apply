@@ -58,3 +58,20 @@ export function initEnv(): void {
 	process.env.SENDGRID_API_TOKEN = '';
 	getConfig(process.env, true);
 }
+
+export function setupTestingEnvironment(): void {
+	initEnv();
+	mockTransactions();
+}
+
+export function mockTransactions(): void {
+	jest.mock('typeorm-transactional-cls-hooked', () => ({
+		Transactional: () => () => ({}),
+		// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+		BaseRepository: class { }
+	}));
+}
+
+export function unmockTransactions(): void {
+	jest.unmock('typeorm-transactional-cls-hooked');
+}

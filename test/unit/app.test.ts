@@ -1,6 +1,4 @@
 import { getTestDatabaseOptions, initEnv, updateEnv } from '../util/testUtils';
-initEnv();
-
 import { getConnection } from 'typeorm';
 import { App } from '../../src/app';
 import { Environment } from '../../src/util/config';

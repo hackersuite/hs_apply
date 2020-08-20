@@ -1,6 +1,6 @@
 import { when, mock, instance, anything } from 'ts-mockito';
 import { Express, NextFunction, Request, Response } from 'express';
-import { initEnv } from '../../../util';
+import { setupTestingEnvironment } from '../../../util';
 import { SettingLoader, RequestAuthentication } from '../../../../src/util';
 import { AuthLevel, getCurrentUser as authUserReq } from '@unicsmcr/hs_auth_client';
 import { ApplicantService } from '../../../../src/services';
@@ -23,7 +23,7 @@ const requestUser = {
 };
 
 beforeAll(() => {
-	initEnv();
+	setupTestingEnvironment();
 	mockCache = mock(Cache);
 	mockSettingLoader = mock(SettingLoader);
 	mockApplicantService = mock(ApplicantService);

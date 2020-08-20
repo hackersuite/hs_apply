@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { App } from '../../../src/app';
 import { Express, NextFunction } from 'express';
-import { initEnv, getTestDatabaseOptions } from '../../util/testUtils';
+import { setupTestingEnvironment, getTestDatabaseOptions } from '../../util/testUtils';
 import { HttpResponseCode } from '../../../src/util/errorHandling';
 import { instance, mock, when, reset, anything, objectContaining, verify } from 'ts-mockito';
 import { Cache } from '../../../src/util/cache';
@@ -75,7 +75,7 @@ const getUniqueApplicant = (): [any, Applicant] => {
 };
 
 beforeAll(async () => {
-	initEnv();
+	setupTestingEnvironment();
 	mockCache = mock(Cache);
 	mockApplicantService = mock(ApplicantService);
 	mockRequestAuth = mock(RequestAuthentication);
