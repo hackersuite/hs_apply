@@ -1,0 +1,20 @@
+version: "2.1"
+services:
+  hs_auth:
+    environment:
+      - ENVIRONMENT=dev
+      - PORT=80
+      - MONGO_HOST=mongo_db
+      - MONGO_DATABASE=hs_auth
+      - MONGO_USER=hs_auth
+      - MONGO_PASSWORD=password123
+      - JWT_SECRET="very secret phrase"
+      - SENDGRID_API_KEY=sumkey
+
+  mongo_db:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_SERVICE_DATABASE=hs_auth
+      - MONGO_SERVICE_USER_USERNAME=hs_auth
+      - MONGO_SERVICE_USER_PASSWORD=password123
