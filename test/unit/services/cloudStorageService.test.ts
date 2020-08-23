@@ -1,4 +1,4 @@
-import { initEnv } from '../../util';
+import { setupTestingEnvironment } from '../../util';
 import { CloudStorageService } from '../../../src/services';
 import axios from 'axios';
 import { createWriteStream as writeStreamFunc } from 'fs';
@@ -12,7 +12,7 @@ const failResponseAPIErr = new Error('Failed to make Dropbox API Request');
 const failResponseServiceErr = new Error('File name is not valid to delete');
 
 beforeAll(() => {
-	initEnv();
+	setupTestingEnvironment();
 });
 
 beforeEach(() => {

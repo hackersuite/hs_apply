@@ -23,15 +23,19 @@ export class ReviewRouter implements RouterInterface {
 
 		router.use(this._requestAuth.checkLoggedIn);
 
-		router.get('/', this._requestAuth.checkIsVolunteer, this._reviewController.reviewPage);
+		router.get('/',
+			this._requestAuth.checkIsVolunteer,
+			this._reviewController.reviewPage.bind(this._reviewController));
 
-		router.get('/next', this._requestAuth.checkIsVolunteer, this._reviewController.nextReview);
+		router.get('/next',
+			this._requestAuth.checkIsVolunteer,
+			this._reviewController.nextReview.bind(this._reviewController));
 
 		router.post(
 			'/submit',
 			this._requestAuth.checkLoggedIn,
 			this._requestAuth.checkIsVolunteer,
-			this._reviewController.submit
+			this._reviewController.submit.bind(this._reviewController)
 		);
 
 		return router;

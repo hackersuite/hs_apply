@@ -5,7 +5,7 @@ import { getConfig, Environment } from '../../src/util/config';
 export function getTestDatabaseOptions(entities?: (string | Function)[], name?: string): ConnectionOptions[] {
 	return [
 		{
-			name: name ?? 'applications',
+			name: name ?? 'default',
 			type: 'mysql',
 			database: 'hs_applications',
 			host: 'localhost',
@@ -57,4 +57,21 @@ export function initEnv(): void {
 	process.env.DROPBOX_API_TOKEN = 'api_key';
 	process.env.SENDGRID_API_TOKEN = '';
 	getConfig(process.env, true);
+}
+
+export function setupTestingEnvironment(): void {
+	initEnv();
+	mockTransactions();
+}
+
+export function mockTransactions(): void {
+	jest.mock('typeorm-transactional-cls-hooked', () => ({
+		Transactional: () => () => ({}),
+		// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+		BaseRepository: class { }
+	}));
+}
+
+export function unmockTransactions(): void {
+	jest.unmock('typeorm-transactional-cls-hooked');
 }

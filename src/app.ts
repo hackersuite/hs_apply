@@ -3,6 +3,9 @@ import 'reflect-metadata';
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
 
+import { initializeTransactionalContext } from 'typeorm-transactional-cls-hooked';
+initializeTransactionalContext(); // Initialize cls-hooked
+
 import { Environment, getConfig } from './util/config';
 import path from 'path';
 import cookieParser from 'cookie-parser';
@@ -127,7 +130,6 @@ export class App {
 
 	private readonly createDatabaseSettings = (): ConnectionOptions[] => [
 		{
-			name: 'applications',
 			type: 'mysql',
 			host: getConfig().db.host,
 			port: getConfig().db.port,
@@ -135,7 +137,7 @@ export class App {
 			password: getConfig().db.password,
 			database: getConfig().db.database,
 			entities: [`${__dirname}/models/db/**/*{.js,.ts}`],
-			synchronize: true // Note: Unsafe in productionn, use migrations instead
+			synchronize: true // Note: Unsafe in production, use migrations instead
 		}
 	];
 }
