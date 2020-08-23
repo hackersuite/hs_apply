@@ -82,22 +82,26 @@ export class ApplicationRouter implements RouterInterface {
 		// Ensure that at a minimum the user is logged in in order to access the apply page
 		router.use(this._requestAuth.checkLoggedIn);
 
-		router.get('/', this.redirectIfApplicationsClosed, this._applicationController.apply);
+		router.get('/',
+			this.redirectIfApplicationsClosed,
+			this._applicationController.apply.bind(this._applicationController));
 
-		router.post(
-			'/',
+		router.post('/',
 			this.redirectIfApplicationsClosed,
 			this.fileCheckMiddleware,
-			this._applicationController.submitApplication
-		);
+			this._applicationController.submitApplication.bind(this._applicationController));
 
 		router.post('/partial',
 			this.fileCheckMiddleware,
-			this._applicationController.updatePartialApplication);
+			this._applicationController.updatePartialApplication.bind(this._applicationController));
 
-		router.get('/cancel', this.doNothingIfApplicationsClosed, this._applicationController.cancel);
+		router.get('/cancel',
+			this.doNothingIfApplicationsClosed,
+			this._applicationController.cancel.bind(this._applicationController));
 
-		router.put('/:id([a-f0-9-]+)/checkin', this._requestAuth.checkIsVolunteer, this._applicationController.checkin);
+		router.put('/:id([a-f0-9-]+)/checkin',
+			this._requestAuth.checkIsVolunteer,
+			this._applicationController.checkin.bind(this._applicationController));
 
 		return router;
 	};

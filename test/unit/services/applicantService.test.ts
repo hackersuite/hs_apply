@@ -1,5 +1,5 @@
-import { initEnv, updateEnv } from '../../util';
-initEnv();
+import { setupTestingEnvironment, initEnv, updateEnv } from '../../util';
+setupTestingEnvironment();
 
 import { when, mock, instance, verify, anything, objectContaining, reset, resetCalls } from 'ts-mockito';
 import { ApplicantService } from '../../../src/services';

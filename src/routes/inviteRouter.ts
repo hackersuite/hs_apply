@@ -25,17 +25,18 @@ export class InviteRouter implements RouterInterface {
 			'/batchSend',
 			this._requestAuth.checkLoggedIn,
 			this._requestAuth.checkIsOrganiser,
-			this._inviteController.batchSend
+			this._inviteController.batchSend.bind(this._inviteController)
 		);
 
 		router.put(
 			'/:id([a-f0-9-]+)/send',
 			this._requestAuth.checkLoggedIn,
 			this._requestAuth.checkIsOrganiser,
-			this._inviteController.send
+			this._inviteController.send.bind(this._inviteController)
 		);
 
-		router.get('/:id([a-f0-9-]+)/confirm', this._inviteController.confirm);
+		router.get('/:id([a-f0-9-]+)/confirm',
+			this._inviteController.confirm.bind(this._inviteController));
 
 		return router;
 	};

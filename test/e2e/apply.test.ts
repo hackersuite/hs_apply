@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { App } from '../../src/app';
 import { Express, NextFunction } from 'express';
-import { initEnv, getTestDatabaseOptions } from '../util/testUtils';
+import { getTestDatabaseOptions, setupTestingEnvironment } from '../util/testUtils';
 import { HttpResponseCode } from '../../src/util/errorHandling';
 import { Applicant } from '../../src/models/db';
 import { RequestAuthentication } from '../../src/util/auth';
@@ -60,7 +60,7 @@ const requestUser = {
 };
 
 beforeAll(async () => {
-	initEnv();
+	setupTestingEnvironment();
 
 	mockRequestAuth = mock(RequestAuthentication);
 	mockSettingLoader = mock(SettingLoader);
