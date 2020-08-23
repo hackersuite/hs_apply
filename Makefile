@@ -1,5 +1,6 @@
-prod_docker_compose_file=./docker-compose.yml
+prod_docker_compose_file=./docker/docker-compose.yml
 dev_docker_compose_file=./docker/dev/docker-compose.yml
+dev_override_docker_compose_file=./docker/dev/docker-compose.override.yml
 test_docker_compose_file=./docker/test/docker-compose.yml
 
 prod_docker_file=./docker/prod/Dockerfile
@@ -33,7 +34,7 @@ up-dev: export ENVIRONMENT=dev
 up-dev: export DB_HOST=localhost
 up-dev: setup-network
 	@echo "=============starting hs_application (dev)============="
-	docker-compose -f $(dev_docker_compose_file) up -d
+	docker-compose -f $(dev_docker_compose_file) -f $(dev_override_docker_compose_file) up -d
 	if [ ! -d $(NODE_MODULES_DIR) ]; then \
 		@echo "node_modules does not exist, installing dependencies..."; \
 		npm i; \

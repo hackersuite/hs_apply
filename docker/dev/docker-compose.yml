@@ -1,5 +1,35 @@
 version: "2.1"
 services:
+  hs_auth:
+    container_name: hs_auth
+    image: unicsmcr/hs_auth:latest
+    ports:
+      - 8000:80
+    depends_on:
+      - mongo_db
+    networks:
+      - internal_hackathon
+
+  mongo_db:
+    image: mongo:4
+    restart: always
+    volumes:
+      - mongo_db_store:/data/db
+      - ./mongodb_setup.sh:/docker-entrypoint-initdb.d/initial_db_setup.sh:ro
+    ports:
+      - 8002:27017
+    healthcheck:
+      test:
+        - CMD
+        - mongo
+        - --eval
+        - "db.adminCommand('ping')"
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - internal_hackathon
+
   mysql_db:
     container_name: mysql_db
     image: mysql:5.7
@@ -24,6 +54,7 @@ services:
 # The volume for the database is persistent across launches
 volumes:
   db_store:
+  mongo_db_store:
 
 # The network allows multiple containers to connect together
 networks:
