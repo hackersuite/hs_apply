@@ -1,36 +1,34 @@
 import passport from 'passport';
 import querystring from 'querystring';
+import autoBind from 'auto-bind';
 import { Express, Request, Response, NextFunction, CookieOptions } from 'express';
 import CookieStrategy from 'passport-cookie';
 import { provide } from 'inversify-binding-decorators';
 import { Cache } from '../cache';
-import { getCurrentUser, User, AuthLevel } from '@unicsmcr/hs_auth_client';
+import { AuthApi, User } from '@unicsmcr/hs_auth_client';
 import { getConfig, Environment } from '../../util/config';
+import { RouterInterface } from '../../routes';
 
 export interface RequestAuthenticationInterface {
 	passportSetup(app: Express): void;
-	authenticate(req: Request, res: Response): Promise<User>;
-	checkLoggedIn(req: Request, res: Response, next: NextFunction): Promise<void>;
-	checkAuthLevel(req: Request, res: Response, user: User | undefined, requiredAuth: AuthLevel): boolean;
-	checkIsAttendee(req: Request, res: Response, next: NextFunction): void;
-	checkIsVolunteer(req: Request, res: Response, next: NextFunction): void;
-	checkIsOrganiser(req: Request, res: Response, next: NextFunction): void;
+	withAuthMiddleware(req: Request, res: Response, next: NextFunction): Promise<void>;
+	handleUnauthorized(req: Request, res: Response): void;
+	getAuthToken(req: Request): string;
 }
+
+type AuthMiddlewareFunction<T> = (req: Request, res: Response, next: NextFunction) => Promise<T>;
+type ExpressOpHandlerFunction = (req: Request, res: Response, next: NextFunction) => Promise<unknown>;
 
 @provide(RequestAuthentication)
 export class RequestAuthentication {
 	private readonly _cache: Cache;
+	public readonly authApi: AuthApi;
 
 	public constructor(cache: Cache) {
 		this._cache = cache;
+		this.authApi = new AuthApi('hs_apply');
 
-		this.passportSetup = this.passportSetup.bind(this);
-		this.authenticate = this.authenticate.bind(this);
-		this.checkLoggedIn = this.checkLoggedIn.bind(this);
-		this.checkAuthLevel = this.checkAuthLevel.bind(this);
-		this.checkIsAttendee = this.checkIsAttendee.bind(this);
-		this.checkIsVolunteer = this.checkIsVolunteer.bind(this);
-		this.checkIsOrganiser = this.checkIsOrganiser.bind(this);
+		autoBind(this);
 	}
 
 	private logout(app: Express): void {
@@ -65,26 +63,18 @@ export class RequestAuthentication {
 				async (req: Request, token: string, done: (error?: string, user?: any) => void): Promise<void> => {
 					let apiResult: User;
 					try {
-						apiResult = await getCurrentUser(token, req.originalUrl);
+						apiResult = await this.authApi.getCurrentUser(token);
 					} catch (err) {
-						return done(undefined, false);
+						return done(undefined, undefined);
 					}
 
-					req.user = apiResult;
 					return done(undefined, apiResult);
 				}
 			)
 		);
 	}
 
-	/**
-   * Authennticate function used to authenticate the current request
-   * Uses the token in the `Authorization` cookie, if it doesn't exist then the promise is rejected
-   * Calls the function defined above in `passport.use()`
-   * @param req Request object from express
-   * @param res Response object from express
-   */
-	public authenticate(req: Request, res: Response): Promise<User> {
+	private authenticate(req: Request, res: Response): Promise<User> {
 		return new Promise((resolve, reject) => {
 			passport.authenticate('cookie', { session: false }, (err: any, user?: User) => {
 				if (err) reject(new Error(err));
@@ -94,58 +84,37 @@ export class RequestAuthentication {
 		});
 	}
 
-	/**
-   * checkLoggedIn middleware calls the authentication function to
-   * validate the users request, is promise rejected, then redirect to login
-   * @param req Request object from express
-   * @param res Response object from express
-   * @param next Next Callback function used to move to the next middleware
-   */
-	public async checkLoggedIn(req: Request, res: Response, next: NextFunction): Promise<void> {
-		let user: User;
-		try {
-			user = await this.authenticate(req, res);
-		} catch (err) {
-			// Either user was not authenticated, or an error occured during authentication
-			// In both cases we redirect them to the login
-			const queryParam: string = querystring.encode({
-				returnto: `${getConfig().hs.applicationUrl}${req.originalUrl}`
-			});
-			res.redirect(`${getConfig().hs.authUrl}/login?${queryParam}`);
-			return;
-		}
-		res.locals.authLevel = user.authLevel;
-		return next();
+	public withAuthMiddleware(router: RouterInterface, operationHandler: ExpressOpHandlerFunction): AuthMiddlewareFunction<unknown> {
+		return async (req: Request, res: Response, next: NextFunction): Promise<unknown> => {
+			const userAuth = this.authenticate(req, res);
+
+			const routerName = Reflect.getPrototypeOf(router).constructor.name;
+			const formattedRouter = routerName.replace('Router', '');
+			const formattedOpHandler = operationHandler.name.split(' ')[1];
+
+			const requestUri = this.authApi.newUri(`${formattedRouter}:${formattedOpHandler}`);
+			const resourceAuth = this.authApi.getAuthorizedResources(this.getAuthToken(req), [requestUri]);
+
+			try {
+				const [user, permissions] = await Promise.all([userAuth, resourceAuth]);
+				if (permissions.length === 0) {
+					return this.handleUnauthorized(req, res);
+				}
+				req.user = user;
+			} catch (err) {
+				return this.handleUnauthorized(req, res);
+			}
+
+			return operationHandler(req, res, next);
+		};
 	}
 
-	public checkAuthLevel(req: Request, res: Response, user: User|undefined, requiredAuth: AuthLevel): boolean {
-		if (!user || user.authLevel < requiredAuth) {
-			const queryParam: string = querystring.encode({ returnto: `${getConfig().hs.applicationUrl}${req.originalUrl}` });
-			res.redirect(`${getConfig().hs.authUrl}/login?${queryParam}`);
-			return false;
-		}
-		return true;
+	public handleUnauthorized(req: Request, res: Response): void {
+		const queryParam: string = querystring.encode({ returnto: `${getConfig().hs.applicationUrl}${req.originalUrl}` });
+		res.redirect(`${getConfig().hs.authUrl}/login?${queryParam}`);
 	}
 
-	public checkIsAttendee(req: Request, res: Response, next: NextFunction): void {
-		if (this.checkAuthLevel(req, res, req.user as User, AuthLevel.Attendee)) {
-			res.locals.isAttendee = true;
-			return next();
-		}
-	}
-
-	public checkIsVolunteer(req: Request, res: Response, next: NextFunction): void {
-		if (this.checkAuthLevel(req, res, req.user as User, AuthLevel.Volunteer)) {
-			res.locals.isVolunteer = true;
-			return next();
-		}
-	}
-
-	public checkIsOrganiser(req: Request, res: Response, next: NextFunction): void {
-		if (this.checkAuthLevel(req, res, req.user as User, AuthLevel.Organiser)) {
-			res.locals.isOrganiser = true;
-			res.locals.isVolunteer = true;
-			return next();
-		}
+	public getAuthToken(req: Request): string {
+		return req.cookies['Authorization'];
 	}
 }

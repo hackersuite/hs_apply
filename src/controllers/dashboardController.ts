@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import autoBind from 'auto-bind';
 import { Cache } from '../util/cache';
 import { provide } from 'inversify-binding-decorators';
 import { Applicant } from '../models/db';
@@ -24,9 +25,11 @@ export class DashboardController implements DashboardControllerInterface {
 	) {
 		this._cache = cache;
 		this._applicantService = applicantService;
+
+		autoBind(this);
 	}
 
-	public dashboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+	public async dashboard(req: Request, res: Response, next: NextFunction): Promise<void> {
 		let applicant: Applicant|undefined;
 		try {
 			applicant = await this._applicantService.findOne((req.user as User).id, 'authId');
@@ -50,5 +53,5 @@ export class DashboardController implements DashboardControllerInterface {
 			applicantName: (req.user as User).name,
 			applicationsOpen: applicationsOpen
 		});
-	};
+	}
 }

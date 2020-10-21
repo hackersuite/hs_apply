@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import autoBind from 'auto-bind';
 import { provide } from 'inversify-binding-decorators';
 import { ReviewService, ApplicantService } from '../services';
 import { Applicant, Review } from '../models/db';
@@ -27,14 +28,16 @@ export class ReviewController implements ReviewControllerInterface {
 	) {
 		this._reviewService = reviewService;
 		this._applicantService = applicantService;
+
+		autoBind(this);
 	}
 
-	public reviewPage = async (req: Request, res: Response): Promise<void> => {
+	public async reviewPage(req: Request, res: Response): Promise<void> {
 		res.render('pages/review/review');
 		return Promise.resolve();
-	};
+	}
 
-	public nextReview = async (req: Request, res: Response): Promise<void> => {
+	public async nextReview(req: Request, res: Response): Promise<void> {
 		let nextApplication: Applicant | undefined;
 		try {
 			nextApplication = await this._reviewService.getNextApplication((req.user as User).id);
@@ -57,9 +60,9 @@ export class ReviewController implements ReviewControllerInterface {
 			reviewFields: Array.from(reviewApplicationMapping),
 			totalReviews: totalReviewsByUser
 		});
-	};
+	}
 
-	public submit = async (req: Request, res: Response): Promise<void> => {
+	public async submit(req: Request, res: Response): Promise<void> {
 		const { applicationID, averageScore } = req.body;
 
 		// Find the applicant by the provided ID
@@ -111,5 +114,5 @@ export class ReviewController implements ReviewControllerInterface {
 		}
 
 		res.send({ message: 'Saved review' });
-	};
+	}
 }
