@@ -5,7 +5,7 @@ import { EmailService, ApplicantService } from '../services';
 import { Applicant } from '../models/db';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
 import { HttpResponseCode } from '../util/errorHandling';
-import { User, AuthApi } from '@unicsmcr/hs_auth_client';
+import { User } from '@unicsmcr/hs_auth_client';
 import { HackathonSettingsInterface } from '../settings';
 import { RequestAuthentication } from '../util';
 
@@ -21,7 +21,7 @@ export interface InviteControllerInterface {
 export class InviteController implements InviteControllerInterface {
 	private readonly _emailService: EmailService;
 	private readonly _applicantService: ApplicantService;
-	private readonly authApi: AuthApi;
+	private readonly _requestAuth: RequestAuthentication;
 
 	public constructor(
 		applicantService: ApplicantService,
@@ -30,7 +30,7 @@ export class InviteController implements InviteControllerInterface {
 	) {
 		this._applicantService = applicantService;
 		this._emailService = emailService;
-		this.authApi = requestAuth.authApi;
+		this._requestAuth = requestAuth;
 
 		autoBind(this);
 	}
@@ -200,7 +200,8 @@ export class InviteController implements InviteControllerInterface {
 			return;
 		}
 
-		const authUsersResult = await this.authApi.getUsers(req.cookies['Authorization']);
+		const authToken = this._requestAuth.getAuthToken(req);
+		const authUsersResult = await this._requestAuth.authApi.getUsers(authToken);
 
 		// Mapping like in the admin overvire page for ease of use
 		const authUsers: Record<string, User> = {};

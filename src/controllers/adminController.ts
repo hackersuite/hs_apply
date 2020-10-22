@@ -7,7 +7,7 @@ import { provide } from 'inversify-binding-decorators';
 import { ApplicantService } from '../services';
 import { Applicant } from '../models/db';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
-import { User, AuthApi } from '@unicsmcr/hs_auth_client';
+import { User } from '@unicsmcr/hs_auth_client';
 import { CloudStorageService } from '../services/cloudStorage/cloudStorageService';
 import { createWriteableStream, WriteableStreamCallback, CleanupCallback, logger, RequestAuthentication } from '../util';
 import { HttpResponseCode } from '../util/errorHandling';
@@ -26,7 +26,7 @@ export class AdminController implements AdminControllerInterface {
 	private readonly _applicantService: ApplicantService;
 	private readonly _cloudStorageService: CloudStorageService;
 	private readonly _cache: Cache;
-	private readonly _authApi: AuthApi;
+	private readonly _requestAuth: RequestAuthentication;
 
 	public constructor(
 		requestAuth: RequestAuthentication,
@@ -37,7 +37,7 @@ export class AdminController implements AdminControllerInterface {
 		this._cache = cache;
 		this._applicantService = applicantService;
 		this._cloudStorageService = cloudStorageService;
-		this._authApi = requestAuth.authApi;
+		this._requestAuth = requestAuth;
 
 		autoBind(this);
 	}
@@ -132,7 +132,8 @@ export class AdminController implements AdminControllerInterface {
 	public async manage(req: Request, res: Response, next: NextFunction): Promise<void> {
 		let authUsersResult: User[];
 		try {
-			authUsersResult = await this._authApi.getUsers(req.cookies['Authorization']);
+			const authToken = this._requestAuth.getAuthToken(req);
+			authUsersResult = await this._requestAuth.authApi.getUsers(authToken);
 		} catch (err) {
 			next(err);
 			return;
@@ -192,7 +193,8 @@ export class AdminController implements AdminControllerInterface {
 
 		let authUsersResult: User[];
 		try {
-			authUsersResult = await this._authApi.getUsers(req.cookies['Authorization']);
+			const authToken = this._requestAuth.getAuthToken(req);
+			authUsersResult = await this._requestAuth.authApi.getUsers(authToken);
 		} catch (err) {
 			res.send('Failed to get the users authentication info!');
 			return;
