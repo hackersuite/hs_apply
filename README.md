@@ -32,7 +32,7 @@ Applications system for Hackathons.
 Run the following commands in the console:
 
 ```
-$ git clone https://github.com/unicsmcr/hs_hs_apply.git
+$ git clone https://github.com/unicsmcr/hs_apply.git
 $ cd hs_hs_apply
 $ cp .env.example .env
 ```
