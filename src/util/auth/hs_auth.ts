@@ -21,6 +21,8 @@ type ExpressOpHandlerFunction = (req: Request, res: Response, next: NextFunction
 
 @provide(RequestAuthentication)
 export class RequestAuthentication {
+	private readonly cookieName = 'Authorization';
+
 	private readonly _cache: Cache;
 	public readonly authApi: AuthApi;
 
@@ -55,7 +57,7 @@ export class RequestAuthentication {
 		passport.use(
 			new CookieStrategy(
 				{
-					cookieName: 'Authorization',
+					cookieName: this.cookieName,
 					passReqToCallback: true
 				},
 				// Defines the callback function which is executed after the cookie strategy is completed
@@ -88,12 +90,8 @@ export class RequestAuthentication {
 		return async (req: Request, res: Response, next: NextFunction): Promise<unknown> => {
 			const userAuth = this.authenticate(req, res);
 
-			const routerName = Reflect.getPrototypeOf(router).constructor.name;
-			const formattedRouter = routerName.replace('Router', '');
-			const formattedOpHandler = operationHandler.name.split(' ')[1];
-
-			const requestUri = this.authApi.newUri(`${formattedRouter}:${formattedOpHandler}`);
-			const resourceAuth = this.authApi.getAuthorizedResources(this.getAuthToken(req), [requestUri]);
+			const requestedUri = this.getUriFromRequest(router, operationHandler, req);
+			const resourceAuth = this.authApi.getAuthorizedResources(this.getAuthToken(req), [requestedUri]);
 
 			try {
 				const [user, permissions] = await Promise.all([userAuth, resourceAuth]);
@@ -115,6 +113,15 @@ export class RequestAuthentication {
 	}
 
 	public getAuthToken(req: Request): string {
-		return req.cookies['Authorization'];
+		return req.cookies[this.cookieName];
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private getUriFromRequest(router: RouterInterface, operationHandler: ExpressOpHandlerFunction, _req: Request): string {
+		const routerName = Reflect.getPrototypeOf(router).constructor.name.replace('Router', '');
+		const opHandlerParts = operationHandler.name.split(' ');
+		const opHandlerName = opHandlerParts[opHandlerParts.length - 1];
+
+		return this.authApi.newUri(`${routerName}:${opHandlerName}`);
 	}
 }
