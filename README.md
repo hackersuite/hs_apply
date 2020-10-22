@@ -33,7 +33,7 @@ Run the following commands in the console:
 
 ```
 $ git clone https://github.com/unicsmcr/hs_apply.git
-$ cd hs_hs_apply
+$ cd hs_apply
 $ cp .env.example .env
 ```
 
