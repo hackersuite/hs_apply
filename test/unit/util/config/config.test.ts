@@ -14,6 +14,7 @@ const fixture1: [Record<string, string>, EnvConfig] = [
 		DB_DATABASE: 'applications',
 		APPLICATION_URL: 'http://localhost:8080',
 		AUTH_URL: 'http://localhost:8001',
+		HS_AUTH_SERVICE_TOKEN: '',
 		GOOGLE_ANALYTICS_ID: 'analyticsId',
 		DROPBOX_API_TOKEN: '',
 		SENDGRID_API_TOKEN: 'token'
@@ -31,7 +32,8 @@ const fixture1: [Record<string, string>, EnvConfig] = [
 		},
 		hs: {
 			applicationUrl: 'http://localhost:8080',
-			authUrl: 'http://localhost:8001'
+			authUrl: 'http://localhost:8001',
+			serviceToken: ''
 		},
 		googleAnalyticsId: 'analyticsId',
 		dropboxToken: '',
@@ -52,6 +54,7 @@ const fixture2: [Record<string, string>, EnvConfig] = [
 		DB_DATABASE: 'applications',
 		APPLICATION_URL: 'http://localhost:8080',
 		AUTH_URL: 'http://localhost:8001',
+		HS_AUTH_SERVICE_TOKEN: '',
 		GOOGLE_ANALYTICS_ID: '',
 		DROPBOX_API_TOKEN: '',
 		SENDGRID_API_TOKEN: ''
@@ -69,7 +72,8 @@ const fixture2: [Record<string, string>, EnvConfig] = [
 		},
 		hs: {
 			applicationUrl: 'http://localhost:8080',
-			authUrl: 'http://localhost:8001'
+			authUrl: 'http://localhost:8001',
+			serviceToken: ''
 		},
 		googleAnalyticsId: '',
 		dropboxToken: '',

@@ -1,197 +1,95 @@
-import { when, mock, instance, anything } from 'ts-mockito';
+import { mock } from 'ts-mockito';
 import { Express, NextFunction, Request, Response } from 'express';
 import { setupTestingEnvironment } from '../../../util';
-import { SettingLoader, RequestAuthentication } from '../../../../src/util';
-import { AuthLevel, getCurrentUser as authUserReq } from '@unicsmcr/hs_auth_client';
-import { ApplicantService } from '../../../../src/services';
-import { Cache } from '../../../../src/util/cache';
+import { RequestAuthentication } from '../../../../src/util';
+import { User } from '@unicsmcr/hs_auth_client';
+import { RouterInterface } from '../../../../src/routes';
 
 // Ensure the last import is the inversify container as we need all everything bound
 // before we create the container
 import container from '../../../../src/inversify.config';
 
-let mockCache: Cache;
-let mockSettingLoader: SettingLoader;
-let mockApplicantService: ApplicantService;
 let requestAuth: RequestAuthentication;
 
-const requestUser = {
+const requestUser: User = {
 	name: 'Test',
 	email: 'test@test.com',
-	authId: '010101',
-	authLevel: AuthLevel.Organiser
+	id: '010101'
 };
 
 beforeAll(() => {
 	setupTestingEnvironment();
-	mockCache = mock(Cache);
-	mockSettingLoader = mock(SettingLoader);
-	mockApplicantService = mock(ApplicantService);
-
-	container.rebind(Cache).toConstantValue(instance(mockCache));
-	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
-	container.rebind(ApplicantService).toConstantValue(instance(mockApplicantService));
-
-	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall((app: Express) => {
-		app.locals.settings = {
-			shortName: 'Hackathon',
-			fullName: 'Hackathon',
-			applicationsOpen: new Date().toString(),
-			applicationsClose: new Date(Date.now() + (10800 * 1000)).toString() // 3 hours from now
-		};
-	});
-
-	requestAuth = container.get(RequestAuthentication);
 });
 
-let reqMock: Request = mock<Request>();
-let resMock: Response = mock<Response>();
-let nextFunctionMock: jest.Mock<NextFunction> = jest.fn();
+let reqMock: Request;
+let resMock: Response;
+let nextFunctionMock: jest.Mock<NextFunction>;
 beforeEach(() => {
 	reqMock = mock<Request>();
 	resMock = mock<Response>();
 	nextFunctionMock = jest.fn();
 });
 
-describe('Check Auth Level tests', () => {
-	describe('Auth level valid', () => {
-		test('Test organiser is authenticated as such, not redirected', () => {
-			// Setup the user in the request
-			reqMock.user = { ...requestUser, authLevel: AuthLevel.Organiser };
-
-			// Make the function call to check the users authentication level
-			requestAuth.checkIsOrganiser(reqMock, resMock, nextFunctionMock);
-
-			expect(resMock.locals.isOrganiser).toBeTruthy();
-			expect(resMock.locals.isVolunteer).toBeTruthy();
-			expect(nextFunctionMock.mock.calls.length).toBe(1);
-		});
-
-		test('Test volunteer is authenticated as such, not redirected', () => {
-			// Setup the user in the request
-			reqMock.user = { ...requestUser, authLevel: AuthLevel.Volunteer };
-
-			// Make the function call to check the users authentication level
-			requestAuth.checkIsVolunteer(reqMock, resMock, nextFunctionMock);
-
-			expect(resMock.locals.isOrganiser).toBeFalsy();
-			expect(resMock.locals.isVolunteer).toBeTruthy();
-			expect(nextFunctionMock.mock.calls.length).toBe(1);
-		});
-
-		test('Test attendee is authenticated as such, not redirected', () => {
-			// Setup the user in the request
-			reqMock.user = { ...requestUser, authLevel: AuthLevel.Attendee };
-
-			// Make the function call to check the users authentication level
-			requestAuth.checkIsAttendee(reqMock, resMock, nextFunctionMock);
-
-			expect(resMock.locals.isOrganiser).toBeFalsy();
-			expect(resMock.locals.isVolunteer).toBeFalsy();
-			expect(resMock.locals.isAttendee).toBeTruthy();
-			expect(nextFunctionMock.mock.calls.length).toBe(1);
-		});
+describe('WithAuthMiddleware tests', () => {
+	beforeEach(() => {
+		requestAuth = container.get(RequestAuthentication);
+	});
+	afterEach(() => {
+		mockOpHandler.mockReset();
 	});
 
-	describe('Auth level invalid', () => {
-		test('Test request as attendee fails when lower auth level', () => {
-			// Setup the user in the request
-			reqMock.user = { ...requestUser, authLevel: AuthLevel.Unverified };
-			resMock.redirect = jest.fn();
+	const mockRouter: RouterInterface = {
+		getPathRoot: jest.fn(() => '/test'),
+		register: undefined
+	};
+	const mockOpHandler = jest.fn(async () => Promise.resolve());
 
-			// Make the function call to check the users authentication level
-			requestAuth.checkIsAttendee(reqMock, resMock, nextFunctionMock);
+	test('User authenticated with valid permissions', async () => {
+		// Mock the hs_auth API calls
+		requestAuth.authApi.getCurrentUser = jest.fn(() => Promise.resolve(requestUser));
+		requestAuth.authApi.getAuthorizedResources = jest.fn(() => Promise.resolve(['hs:hs_test']));
 
-			expect(resMock.locals.isOrganiser).toBeFalsy();
-			expect(resMock.locals.isVolunteer).toBeFalsy();
-			expect(resMock.locals.isAttendee).toBeFalsy();
-			expect(nextFunctionMock.mock.calls.length).toBe(0);
-			expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
-		});
-
-		test('Test request as volunteer fails when lower auth level', () => {
-			// Setup the user in the request
-			reqMock.user = { ...requestUser, authLevel: AuthLevel.Attendee };
-			resMock.redirect = jest.fn();
-
-			// Make the function call to check the users authentication level
-			requestAuth.checkIsVolunteer(reqMock, resMock, nextFunctionMock);
-
-			expect(resMock.locals.isOrganiser).toBeFalsy();
-			expect(resMock.locals.isVolunteer).toBeFalsy();
-			expect(resMock.locals.isAttendee).toBeFalsy();
-			expect(nextFunctionMock.mock.calls.length).toBe(0);
-			expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
-		});
-
-		test('Test request as organiser fails when lower auth level', () => {
-			// Setup the user in the request
-			reqMock.user = { ...requestUser, authLevel: AuthLevel.Volunteer };
-			resMock.redirect = jest.fn();
-
-			// Make the function call to check the users authentication level
-			requestAuth.checkIsOrganiser(reqMock, resMock, nextFunctionMock);
-
-			expect(resMock.locals.isOrganiser).toBeFalsy();
-			expect(resMock.locals.isVolunteer).toBeFalsy();
-			expect(resMock.locals.isAttendee).toBeFalsy();
-			expect(nextFunctionMock.mock.calls.length).toBe(0);
-			expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
-		});
-	});
-
-	describe('User not defined in check auth level', () => {
-		test('Test request redirected when user not valid', () => {
-			// Setup the user in the request
-			reqMock.user = undefined;
-			resMock.redirect = jest.fn();
-
-			// Make the function call to check the users authentication level
-			requestAuth.checkIsOrganiser(reqMock, resMock, nextFunctionMock);
-
-			expect(resMock.locals.isOrganiser).toBeFalsy();
-			expect(resMock.locals.isVolunteer).toBeFalsy();
-			expect(resMock.locals.isAttendee).toBeFalsy();
-			expect(nextFunctionMock.mock.calls.length).toBe(0);
-			expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
-		});
-	});
-});
-
-jest.mock('@unicsmcr/hs_auth_client');
-describe('Check logged in tests', () => {
-	const mockGetCurrentUserRequest = authUserReq as jest.Mock;
-
-	test('User logged in and auth level verfied with valid request', async () => {
-		// Test setup cookies and mock passport and hs_auth API
-		mockGetCurrentUserRequest.mockImplementation(() => Promise.resolve(requestUser));
+		// Test setup cookies and mock passport
 		reqMock.cookies['Authorization'] = 'test_cookie';
 		requestAuth.passportSetup(mock<Express>());
 
-		await requestAuth.checkLoggedIn(reqMock, resMock, nextFunctionMock);
+		await requestAuth.withAuthMiddleware(mockRouter, mockOpHandler)(reqMock, resMock, nextFunctionMock);
+
 		expect(reqMock.user).toBe(requestUser);
-		expect(mockGetCurrentUserRequest).toHaveBeenCalledTimes(1);
+		expect(mockOpHandler).toHaveBeenCalledTimes(1);
+		expect(requestAuth.authApi.getCurrentUser as jest.Mock).toHaveBeenCalledTimes(1);
+		expect(requestAuth.authApi.getAuthorizedResources as jest.Mock).toHaveBeenCalledTimes(1);
 	});
 
 	test('User redirected when user is not authenticated', async () => {
-		// Test setup for creating mock implementation of getCurrentUser API request
-		const getCurrentUserRejectError = new Error('MockFuncError');
-		mockGetCurrentUserRequest.mockRejectedValue(getCurrentUserRejectError);
+		// Mock the hs_auth API calls
+		requestAuth.authApi.getCurrentUser = jest.fn(() => Promise.resolve(requestUser));
+		requestAuth.authApi.getAuthorizedResources = jest.fn(() => Promise.resolve([]));
 
 		// Test setup for creating a mock of the redirect function we can spy on
 		resMock.redirect = jest.fn();
+		requestAuth.passportSetup(mock<Express>());
 
 		// Perform the test
-		requestAuth.passportSetup(mock<Express>());
-		await requestAuth.checkLoggedIn(reqMock, resMock, nextFunctionMock);
+		await requestAuth.withAuthMiddleware(mockRouter, mockOpHandler)(reqMock, resMock, nextFunctionMock);
 
 		// Verify that the auth request failed and we are redirected to login
-		await expect(mockGetCurrentUserRequest).rejects.toBe(getCurrentUserRejectError);
 		expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
-		expect(resMock.locals.authLevel).toBeFalsy();
 	});
 
-	afterAll(() => {
-		jest.unmock('@unicsmcr/hs_auth_client');
+	test('User redirected when user auth API call fails with error', async () => {
+		// Mock the hs_auth API calls
+		requestAuth.authApi.getCurrentUser = jest.fn(() => Promise.reject());
+		requestAuth.authApi.getAuthorizedResources = jest.fn(() => Promise.resolve(['hs:hs_test']));
+
+		// Test setup for creating a mock of the redirect function we can spy on
+		resMock.redirect = jest.fn();
+		requestAuth.passportSetup(mock<Express>());
+
+		// Perform the test
+		await requestAuth.withAuthMiddleware(mockRouter, mockOpHandler)(reqMock, resMock, nextFunctionMock);
+
+		// Verify that the auth request failed and we are redirected to login
+		expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
 	});
 });

@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { App } from '../../../src/app';
-import { Express, NextFunction } from 'express';
-import { setupTestingEnvironment, getTestDatabaseOptions } from '../../util/testUtils';
+import { Express } from 'express';
+import { setupTestingEnvironment, getTestDatabaseOptions, mockRequestAuthentication } from '../../util/testUtils';
 import { HttpResponseCode } from '../../../src/util/errorHandling';
 import { instance, mock, when, reset, anything, objectContaining, verify } from 'ts-mockito';
 import { Cache } from '../../../src/util/cache';
@@ -10,7 +10,6 @@ import { Sections } from '../../../src/models/sections';
 import { Applicant } from '../../../src/models/db';
 import { RequestAuthentication } from '../../../src/util/auth';
 import { SettingLoader } from '../../../src/util/fs/loader';
-import { AuthLevel } from '@unicsmcr/hs_auth_client';
 import { ApplicantStatus } from '../../../src/services/applications/applicantStatus';
 
 import container from '../../../src/inversify.config';
@@ -57,8 +56,7 @@ testApplicant.hearAbout = 'Other';
 const requestUser = {
 	name: 'Test',
 	email: 'test@test.com',
-	id: '01010111',
-	authLevel: AuthLevel.Organiser
+	id: '01010111'
 };
 
 const getUniqueApplicant = (): [any, Applicant] => {
@@ -78,7 +76,7 @@ beforeAll(async () => {
 	setupTestingEnvironment();
 	mockCache = mock(Cache);
 	mockApplicantService = mock(ApplicantService);
-	mockRequestAuth = mock(RequestAuthentication);
+	mockRequestAuth = mockRequestAuthentication(requestUser);
 	mockSettingLoader = mock(SettingLoader);
 
 	container.rebind(RequestAuthentication).toConstantValue(instance(mockRequestAuth));
@@ -86,21 +84,6 @@ beforeAll(async () => {
 	container.rebind(ApplicantService).toConstantValue(instance(mockApplicantService));
 	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
 
-	when(mockRequestAuth.passportSetup).thenReturn(() => null);
-	when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
-		req.user = requestUser;
-		next();
-		return Promise.resolve();
-	});
-	when(mockRequestAuth.checkIsOrganiser).thenReturn((req, res, next: NextFunction) => {
-		next();
-	});
-	when(mockRequestAuth.checkIsVolunteer).thenReturn((req, res, next: NextFunction) => {
-		next();
-	});
-	when(mockRequestAuth.checkIsAttendee).thenReturn((req, res, next: NextFunction) => {
-		next();
-	});
 	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall((app: Express) => {
 		app.locals.settings = {
 			shortName: 'Hackathon',
