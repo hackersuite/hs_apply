@@ -13,7 +13,7 @@ export interface RequestAuthenticationInterface {
 	passportSetup(app: Express): void;
 	withAuthMiddleware(req: Request, res: Response, next: NextFunction): Promise<void>;
 	handleUnauthorized(req: Request, res: Response): void;
-	getAuthToken(req: Request): string;
+	getUserAuthToken(req: Request): string;
 }
 
 type AuthMiddlewareFunction<T> = (req: Request, res: Response, next: NextFunction) => Promise<T>;
@@ -91,7 +91,7 @@ export class RequestAuthentication {
 			const userAuth = this.authenticate(req, res);
 
 			const requestedUri = this.getUriFromRequest(router, operationHandler, req);
-			const resourceAuth = this.authApi.getAuthorizedResources(this.getAuthToken(req), [requestedUri]);
+			const resourceAuth = this.authApi.getAuthorizedResources(this.getUserAuthToken(req), [requestedUri]);
 
 			try {
 				const [user, permissions] = await Promise.all([userAuth, resourceAuth]);
@@ -112,10 +112,11 @@ export class RequestAuthentication {
 		res.redirect(`${getConfig().hs.authUrl}/login?${queryParam}`);
 	}
 
-	public getAuthToken(req: Request): string {
+	public getUserAuthToken(req: Request): string {
 		return req.cookies[this.cookieName];
 	}
 
+	// TODO: Add arguments to the URI (See https://github.com/unicsmcr/hs_apply/issues/75)
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	private getUriFromRequest(router: RouterInterface, operationHandler: ExpressOpHandlerFunction, _req: Request): string {
 		const routerName = Reflect.getPrototypeOf(router).constructor.name.replace('Router', '');

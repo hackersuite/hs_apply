@@ -132,8 +132,7 @@ export class AdminController implements AdminControllerInterface {
 	public async manage(req: Request, res: Response, next: NextFunction): Promise<void> {
 		let authUsersResult: User[];
 		try {
-			const authToken = this._requestAuth.getAuthToken(req);
-			authUsersResult = await this._requestAuth.authApi.getUsers(authToken);
+			authUsersResult = await this._requestAuth.authApi.getUsers(this._requestAuth.getUserAuthToken(req));
 		} catch (err) {
 			next(err);
 			return;
@@ -193,8 +192,7 @@ export class AdminController implements AdminControllerInterface {
 
 		let authUsersResult: User[];
 		try {
-			const authToken = this._requestAuth.getAuthToken(req);
-			authUsersResult = await this._requestAuth.authApi.getUsers(authToken);
+			authUsersResult = await this._requestAuth.authApi.getUsers(this._requestAuth.getUserAuthToken(req));
 		} catch (err) {
 			res.send('Failed to get the users authentication info!');
 			return;

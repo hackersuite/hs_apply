@@ -200,8 +200,7 @@ export class InviteController implements InviteControllerInterface {
 			return;
 		}
 
-		const authToken = this._requestAuth.getAuthToken(req);
-		const authUsersResult = await this._requestAuth.authApi.getUsers(authToken);
+		const authUsersResult = await this._requestAuth.authApi.getUsers(this._requestAuth.getUserAuthToken(req));
 
 		// Mapping like in the admin overvire page for ease of use
 		const authUsers: Record<string, User> = {};
