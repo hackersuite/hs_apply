@@ -1,6 +1,6 @@
 {
-  "name": "hs-application",
-  "version": "0.0.1",
+  "name": "hs-apply",
+  "version": "1.0.0-beta.0",
   "description": "Application system for hackathons",
   "main": "app.ts",
   "engines": {
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "GitHub",
-    "url": "https://github.com/unicsmcr/hs_application/tree/master"
+    "url": "https://github.com/unicsmcr/hs_apply/tree/master"
   },
   "keywords": [
     "hackathon",
