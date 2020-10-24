@@ -31,7 +31,7 @@ services:
       - internal_hackathon
     volumes:
       - db_store:/var/lib/mysql
-      - ../database/:/docker-entrypoint-initdb.d/:ro
+      - ./database/:/docker-entrypoint-initdb.d
 
 # The volume for the database is persistent across launches
 volumes:
