@@ -1,11 +1,10 @@
 import request from 'supertest';
 import { App } from '../../../src/app';
-import { Express, NextFunction } from 'express';
-import { setupTestingEnvironment, getTestDatabaseOptions } from '../../util/testUtils';
+import { Express } from 'express';
+import { setupTestingEnvironment, getTestDatabaseOptions, mockRequestAuthentication } from '../../util/testUtils';
 import { HttpResponseCode } from '../../../src/util/errorHandling';
 import { instance, mock, when, anything, reset, verify } from 'ts-mockito';
-import { RequestAuthentication, SettingLoader, logger } from '../../../src/util';
-import { AuthLevel } from '@unicsmcr/hs_auth_client';
+import { RequestAuthentication, SettingLoader } from '../../../src/util';
 import { ApplicantService, ReviewService } from '../../../src/services';
 import { Applicant } from '../../../src/models/db';
 
@@ -34,13 +33,12 @@ testApplicant1.hearAbout = 'Other';
 const requestUser = {
 	name: 'Test',
 	email: 'test@test.com',
-	id: '010eee101',
-	authLevel: AuthLevel.Organiser
+	id: '010eee101'
 };
 
 beforeAll(async () => {
 	setupTestingEnvironment();
-	mockRequestAuth = mock(RequestAuthentication);
+	mockRequestAuth = mockRequestAuthentication(requestUser);
 	mockSettingLoader = mock(SettingLoader);
 	mockApplicantService = mock(ApplicantService);
 	mockReviewService = mock(ReviewService);
@@ -50,21 +48,6 @@ beforeAll(async () => {
 	container.rebind(ApplicantService).toConstantValue(instance(mockApplicantService));
 	container.rebind(ReviewService).toConstantValue(instance(mockReviewService));
 
-	when(mockRequestAuth.passportSetup).thenReturn(() => null);
-	when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
-		req.user = requestUser;
-		next();
-		return Promise.resolve();
-	});
-	when(mockRequestAuth.checkIsOrganiser).thenReturn((req, res, next: NextFunction) => {
-		next();
-	});
-	when(mockRequestAuth.checkIsVolunteer).thenReturn((req, res, next: NextFunction) => {
-		next();
-	});
-	when(mockRequestAuth.checkIsAttendee).thenReturn((req, res, next: NextFunction) => {
-		next();
-	});
 	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall((app: Express) => {
 		app.locals.settings = {
 			shortName: 'Hackathon',
@@ -98,30 +81,6 @@ describe('Review page tests', () => {
 
 		// Check that we get a OK (200) response code
 		expect(response.status).toBe(HttpResponseCode.OK);
-	});
-
-	// TODO: Add auth tests
-	test.skip('Test review page inaccessible to attendees', async () => {
-		// Setup test authentication as Attendee
-		when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
-			req.user = { ...requestUser, authLevel: AuthLevel.Attendee };
-			logger.info(req.user);
-			next();
-			return Promise.resolve();
-		});
-		when(mockRequestAuth.checkIsVolunteer).thenReturn((req, res, next: NextFunction) => {
-			if ((req.user as typeof requestUser).authLevel < AuthLevel.Volunteer) {
-				res.redirect('/test');
-				return;
-			}
-			next();
-		});
-
-		// Perform the request along /review
-		const response = await request(bApp).get('/review');
-
-		// Check that we get a REDIRECT (302) response code
-		expect(response.status).toBe(HttpResponseCode.REDIRECT);
 	});
 });
 

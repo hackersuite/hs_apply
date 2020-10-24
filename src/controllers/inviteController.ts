@@ -1,11 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
+import autoBind from 'auto-bind';
 import { provide } from 'inversify-binding-decorators';
 import { EmailService, ApplicantService } from '../services';
 import { Applicant } from '../models/db';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
 import { HttpResponseCode } from '../util/errorHandling';
-import { getUsers, User } from '@unicsmcr/hs_auth_client';
+import { User } from '@unicsmcr/hs_auth_client';
 import { HackathonSettingsInterface } from '../settings';
+import { RequestAuthentication } from '../util';
 
 export interface InviteControllerInterface {
 	send: (req: Request, res: Response, next: NextFunction) => void;
@@ -19,13 +21,18 @@ export interface InviteControllerInterface {
 export class InviteController implements InviteControllerInterface {
 	private readonly _emailService: EmailService;
 	private readonly _applicantService: ApplicantService;
+	private readonly _requestAuth: RequestAuthentication;
 
 	public constructor(
 		applicantService: ApplicantService,
-		emailService: EmailService
+		emailService: EmailService,
+		requestAuth: RequestAuthentication
 	) {
 		this._applicantService = applicantService;
 		this._emailService = emailService;
+		this._requestAuth = requestAuth;
+
+		autoBind(this);
 	}
 
 	private readonly sendInvite = async (req: Request, applicant: Applicant, name: string, email: string): Promise<boolean> => {
@@ -183,7 +190,7 @@ export class InviteController implements InviteControllerInterface {
 		}
 	};
 
-	public batchSend = async (req: Request, res: Response): Promise<void> => {
+	public async batchSend(req: Request, res: Response): Promise<void> {
 		const emailType: string = req.body.emailType;
 		const users: string = req.body.users;
 		if (!users || !emailType) {
@@ -193,7 +200,7 @@ export class InviteController implements InviteControllerInterface {
 			return;
 		}
 
-		const authUsersResult = await getUsers(req.cookies['Authorization']);
+		const authUsersResult = await this._requestAuth.authApi.getUsers(this._requestAuth.getUserAuthToken(req));
 
 		// Mapping like in the admin overvire page for ease of use
 		const authUsers: Record<string, User> = {};
@@ -225,9 +232,9 @@ export class InviteController implements InviteControllerInterface {
 			})
 		);
 		res.send(results);
-	};
+	}
 
-	public send = async (req: Request, res: Response): Promise<void> => {
+	public async send(req: Request, res: Response): Promise<void> {
 		const reqUser = req.user as User;
 
 		let applicant: Applicant;
@@ -251,9 +258,9 @@ export class InviteController implements InviteControllerInterface {
 				message: 'Applicant cannot be invited yet!'
 			});
 		}
-	};
+	}
 
-	public confirm = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+	public async confirm(req: Request, res: Response, next: NextFunction): Promise<void> {
 		const reqUser = req.user as User;
 		let applicant: Applicant;
 		try {
@@ -284,5 +291,5 @@ export class InviteController implements InviteControllerInterface {
 		}
 
 		res.render('pages/notify', { message: notifyMessage });
-	};
+	}
 }

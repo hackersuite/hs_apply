@@ -1,12 +1,11 @@
 import request from 'supertest';
 import { App } from '../../src/app';
-import { Express, NextFunction } from 'express';
-import { getTestDatabaseOptions, setupTestingEnvironment } from '../util/testUtils';
+import { Express } from 'express';
+import { getTestDatabaseOptions, setupTestingEnvironment, mockRequestAuthentication } from '../util/testUtils';
 import { HttpResponseCode } from '../../src/util/errorHandling';
 import { Applicant } from '../../src/models/db';
 import { RequestAuthentication } from '../../src/util/auth';
 import { SettingLoader } from '../../src/util/fs';
-import { AuthLevel } from '@unicsmcr/hs_auth_client';
 import { mock, instance, when, anything } from 'ts-mockito';
 import { Repository } from 'typeorm';
 import { ApplicantRepository } from '../../src/repositories';
@@ -55,34 +54,19 @@ testApplicant.hearAbout = 'IDK';
 const requestUser = {
 	name: 'Test',
 	email: 'test@test.com',
-	id: '010101',
-	authLevel: AuthLevel.Organiser
+	id: '010101'
 };
 
 beforeAll(async () => {
 	setupTestingEnvironment();
 
-	mockRequestAuth = mock(RequestAuthentication);
+	mockRequestAuth = mockRequestAuthentication(requestUser);
 	mockSettingLoader = mock(SettingLoader);
 
 	container.rebind(RequestAuthentication).toConstantValue(instance(mockRequestAuth));
 	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
 
-	when(mockRequestAuth.passportSetup).thenReturn(() => null);
-	when(mockRequestAuth.checkLoggedIn).thenReturn((req, res, next: NextFunction) => {
-		req.user = requestUser;
-		next();
-		return Promise.resolve();
-	});
-	when(mockRequestAuth.checkIsOrganiser).thenReturn((req, res, next: NextFunction) => {
-		next();
-	});
-	when(mockRequestAuth.checkIsVolunteer).thenReturn((req, res, next: NextFunction) => {
-		next();
-	});
-	when(mockRequestAuth.checkIsAttendee).thenReturn((req, res, next: NextFunction) => {
-		next();
-	});
+
 	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall((app: Express) => {
 		app.locals.settings = {
 			shortName: 'Hackathon',

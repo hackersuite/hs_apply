@@ -23,20 +23,16 @@ export class InviteRouter implements RouterInterface {
 
 		router.post(
 			'/batchSend',
-			this._requestAuth.checkLoggedIn,
-			this._requestAuth.checkIsOrganiser,
-			this._inviteController.batchSend.bind(this._inviteController)
+			this._requestAuth.withAuthMiddleware(this, this._inviteController.batchSend)
 		);
 
 		router.put(
 			'/:id([a-f0-9-]+)/send',
-			this._requestAuth.checkLoggedIn,
-			this._requestAuth.checkIsOrganiser,
-			this._inviteController.send.bind(this._inviteController)
+			this._requestAuth.withAuthMiddleware(this, this._inviteController.send)
 		);
 
 		router.get('/:id([a-f0-9-]+)/confirm',
-			this._inviteController.confirm.bind(this._inviteController));
+			this._inviteController.confirm);
 
 		return router;
 	};

@@ -21,9 +21,7 @@ export class DashboardRouter implements RouterInterface {
 	public register = (): Router => {
 		const router: Router = Router();
 
-		router.use(this._requestAuth.checkLoggedIn);
-
-		router.get('/', this._dashboardController.dashboard.bind(this._dashboardController));
+		router.get('/', this._requestAuth.withAuthMiddleware(this, this._dashboardController.dashboard));
 
 		return router;
 	};

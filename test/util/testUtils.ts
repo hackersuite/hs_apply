@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { Request, Response, NextFunction } from 'express';
 import { Connection, createConnections, getConnection, ConnectionOptions } from 'typeorm';
 import { getConfig, Environment } from '../../src/util/config';
+import { mock, when, anything } from 'ts-mockito';
+import { RequestAuthentication, SettingLoader } from '../../src/util';
+import { User } from '@unicsmcr/hs_auth_client';
 
 export function getTestDatabaseOptions(entities?: (string | Function)[], name?: string): ConnectionOptions[] {
 	return [
@@ -52,6 +56,7 @@ export function initEnv(): void {
 
 	process.env.AUTH_URL = 'localhost:auth';
 	process.env.APPLICATION_URL = 'localhost:applications';
+	process.env.HS_AUTH_SERVICE_TOKEN = '';
 
 	process.env.GOOGLE_ANALYTICS_ID = '';
 	process.env.DROPBOX_API_TOKEN = 'api_key';
@@ -74,4 +79,29 @@ export function mockTransactions(): void {
 
 export function unmockTransactions(): void {
 	jest.unmock('typeorm-transactional-cls-hooked');
+}
+
+export function mockSettingsLoader() {
+	const mockSettingLoader = mock(SettingLoader);
+	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall(app => {
+		app.locals.settings = {
+			shortName: 'Hackathon',
+			fullName: 'Hackathon',
+			applicationsOpen: new Date().toString(),
+			applicationsClose: new Date(Date.now() + (10800 * 1000)).toString() // 3 hours from now
+		};
+	});
+	return mockSettingLoader;
+}
+
+export function mockRequestAuthentication(requestUser: User): RequestAuthentication {
+	const mockRequestAuth = mock(RequestAuthentication);
+	when(mockRequestAuth.passportSetup).thenReturn(() => null);
+	when(mockRequestAuth.withAuthMiddleware(anything(), anything()))
+		.thenCall((router, operationHandler) =>
+			(req: Request, res: Response, next: NextFunction) => {
+				req.user = requestUser;
+				operationHandler(req, res, next);
+			});
+	return mockRequestAuth;
 }

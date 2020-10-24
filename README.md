@@ -3,20 +3,20 @@
 Applications system for Hackathons.
 
 <p align="center">
-  <a href="https://github.com/unicsmcr/hs_application/actions?query=workflow%3ATests" alt="Build Status">
-    <img src="https://github.com/unicsmcr/hs_application/workflows/Tests/badge.svg" />
+  <a href="https://github.com/unicsmcr/hs_apply/actions?query=workflow%3ATests" alt="Build Status">
+    <img src="https://github.com/unicsmcr/hs_apply/workflows/Tests/badge.svg" />
   </a>
 
-  <a href="https://github.com/unicsmcr/hs_application/actions?query=workflow%3ALint" alt="Build Status">
-    <img src="https://github.com/unicsmcr/hs_application/workflows/Lint/badge.svg" />
+  <a href="https://github.com/unicsmcr/hs_apply/actions?query=workflow%3ALint" alt="Build Status">
+    <img src="https://github.com/unicsmcr/hs_apply/workflows/Lint/badge.svg" />
   </a>
 
-  <a href="https://codecov.io/gh/unicsmcr/hs_application" alt="Coverage">
-    <img src="https://codecov.io/gh/unicsmcr/hs_application/branch/master/graph/badge.svg" />
+  <a href="https://codecov.io/gh/unicsmcr/hs_apply" alt="Coverage">
+    <img src="https://codecov.io/gh/unicsmcr/hs_apply/branch/master/graph/badge.svg" />
   </a>
 
-  <a href="https://github.com/unicsmcr/hs_application/blob/master/LICENSE" alt="License">
-    <img src="https://img.shields.io/github/license/unicsmcr/hs_application.svg" />
+  <a href="https://github.com/unicsmcr/hs_apply/blob/master/LICENSE" alt="License">
+    <img src="https://img.shields.io/github/license/unicsmcr/hs_apply.svg" />
   </a>
 </p>
 
@@ -32,8 +32,8 @@ Applications system for Hackathons.
 Run the following commands in the console:
 
 ```
-$ git clone https://github.com/unicsmcr/hs_application.git
-$ cd hs_application
+$ git clone https://github.com/unicsmcr/hs_apply.git
+$ cd hs_apply
 $ cp .env.example .env
 ```
 

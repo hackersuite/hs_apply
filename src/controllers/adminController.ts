@@ -1,4 +1,5 @@
 import fs from 'fs';
+import autoBind from 'auto-bind';
 
 import { Request, Response, NextFunction } from 'express';
 import { Cache } from '../util/cache';
@@ -6,9 +7,9 @@ import { provide } from 'inversify-binding-decorators';
 import { ApplicantService } from '../services';
 import { Applicant } from '../models/db';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
-import { getUsers, User } from '@unicsmcr/hs_auth_client';
+import { User } from '@unicsmcr/hs_auth_client';
 import { CloudStorageService } from '../services/cloudStorage/cloudStorageService';
-import { createWriteableStream, WriteableStreamCallback, CleanupCallback, logger } from '../util';
+import { createWriteableStream, WriteableStreamCallback, CleanupCallback, logger, RequestAuthentication } from '../util';
 import { HttpResponseCode } from '../util/errorHandling';
 import { PassThrough } from 'stream';
 
@@ -25,8 +26,10 @@ export class AdminController implements AdminControllerInterface {
 	private readonly _applicantService: ApplicantService;
 	private readonly _cloudStorageService: CloudStorageService;
 	private readonly _cache: Cache;
+	private readonly _requestAuth: RequestAuthentication;
 
 	public constructor(
+		requestAuth: RequestAuthentication,
 		applicantService: ApplicantService,
 		cloudStorageService: CloudStorageService,
 		cache: Cache
@@ -34,9 +37,12 @@ export class AdminController implements AdminControllerInterface {
 		this._cache = cache;
 		this._applicantService = applicantService;
 		this._cloudStorageService = cloudStorageService;
+		this._requestAuth = requestAuth;
+
+		autoBind(this);
 	}
 
-	public overview = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+	public async overview(_req: Request, res: Response, next: NextFunction): Promise<void> {
 		let applications: Partial<Applicant>[]; let totalApplications: number;
 		try {
 			[applications, totalApplications] = await this._applicantService.getAllAndCountSelection(
@@ -121,12 +127,12 @@ export class AdminController implements AdminControllerInterface {
 			applicationUniversity: university,
 			applicationStatus: appStatus
 		});
-	};
+	}
 
-	public manage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+	public async manage(req: Request, res: Response, next: NextFunction): Promise<void> {
 		let authUsersResult: User[];
 		try {
-			authUsersResult = await getUsers(req.cookies['Authorization']);
+			authUsersResult = await this._requestAuth.authApi.getUsers(this._requestAuth.getUserAuthToken(req));
 		} catch (err) {
 			next(err);
 			return;
@@ -161,16 +167,16 @@ export class AdminController implements AdminControllerInterface {
 			applicationRows: columnNames,
 			applications: combinedApplications
 		});
-	};
+	}
 
-	public manageApplication = async (req: Request, res: Response): Promise<void> => {
+	public async manageApplication(req: Request, res: Response): Promise<void> {
 		const specifiedApplicant: Applicant = await this._applicantService.findOne(req.url.split('/')[2]);
 		res.render('pages/manageApplication', {
 			applicant: specifiedApplicant
 		});
-	};
+	}
 
-	public downloadCSV = async (req: Request, res: Response): Promise<void> => {
+	public async downloadCSV(req: Request, res: Response): Promise<void> {
 		let allApplicants: Partial<Applicant>[];
 		try {
 			const allApplicantsAndCount = await this._applicantService.getAllAndCountSelection(
@@ -186,7 +192,7 @@ export class AdminController implements AdminControllerInterface {
 
 		let authUsersResult: User[];
 		try {
-			authUsersResult = await getUsers(req.cookies['Authorization']);
+			authUsersResult = await this._requestAuth.authApi.getUsers(this._requestAuth.getUserAuthToken(req));
 		} catch (err) {
 			res.send('Failed to get the users authentication info!');
 			return;
@@ -214,11 +220,11 @@ export class AdminController implements AdminControllerInterface {
 		csvStream.pipe(res).on('error', err => {
 			logger.error(`File transfer failed! ${err.message}`);
 		});
-	};
+	}
 
 	private readonly escapeForCSV = (input: string): string => input ? input.replace(/"/g, '') : '';
 
-	public downloadAllCVsFromDropbox = async (req: Request, res: Response): Promise<void> => {
+	public async downloadAllCVsFromDropbox(req: Request, res: Response): Promise<void> {
 		const downloadFileName = 'dropbox-cv.zip';
 
 		// Create the callback function that is executed once the stream is closed
@@ -241,5 +247,5 @@ export class AdminController implements AdminControllerInterface {
 			stream.destroy(new Error(err.message));
 			res.status(HttpResponseCode.INTERNAL_ERROR).send(err.message);
 		}
-	};
+	}
 }

@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
+import { provide } from 'inversify-binding-decorators';
+import autoBind from 'auto-bind';
 import { Cache } from '../util/cache';
 import { Sections } from '../models/sections';
 import { ApplicantService, PartialApplicantService } from '../services';
-import { provide } from 'inversify-binding-decorators';
 import { Applicant } from '../models/db';
 import { HttpResponseCode } from '../util/errorHandling';
 import { User } from '@unicsmcr/hs_auth_client';
@@ -37,9 +38,11 @@ export class ApplicationController implements ApplicationControllerInterface {
 		this._cache = cache;
 		this._applicantService = applicantService;
 		this._partialApplicantService = partialApplicantService;
+
+		autoBind(this);
 	}
 
-	public apply = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+	public async apply(req: Request, res: Response, next: NextFunction): Promise<void> {
 		const authID = (req.user as User).id;
 
 		// Check if the user has started an application using the current auth ID
@@ -67,16 +70,20 @@ export class ApplicationController implements ApplicationControllerInterface {
 		const cachedSections: Array<Sections> = this._cache.getAll(Sections.name);
 		const sections = cachedSections[0].sections;
 		res.render('pages/apply', { sections, partialApplication });
-	};
+	}
 
-	public updatePartialApplication = async (req: Request, res: Response): Promise<void> => {
+	public async updatePartialApplication(req: Request, res: Response): Promise<void> {
 		// The application is not yet complete, but save the partial application for the applicant
-		await this._partialApplicantService.save((req.user as User).id, req.body);
+		try {
+			await this._partialApplicantService.save((req.user as User).id, req.body);
+		} catch (err) {
+			res.send('Failed.');
+		}
 
 		res.send('Success!');
-	};
+	}
 
-	public submitApplication = async (req: Request, res: Response): Promise<void> => {
+	public async submitApplication(req: Request, res: Response): Promise<void> {
 		const reqUser: User = req.user as User;
 
 		const applicationFields: any = req.body;
@@ -123,9 +130,9 @@ export class ApplicationController implements ApplicationControllerInterface {
 		res.send({
 			message: 'Application recieved!'
 		});
-	};
+	}
 
-	public cancel = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+	public async cancel(req: Request, res: Response, next: NextFunction): Promise<void> {
 		let application: Applicant;
 		try {
 			application = await this._applicantService.findOne((req.user as User).id, 'authId');
@@ -151,13 +158,9 @@ export class ApplicationController implements ApplicationControllerInterface {
 		}
 
 		res.redirect('/');
-	};
-
-	private isNumeric(n: any): boolean {
-		return !isNaN(parseFloat(n)) && isFinite(n);
 	}
 
-	public checkin = async (req: Request, res: Response): Promise<void> => {
+	public async checkin(req: Request, res: Response): Promise<void> {
 		const checkinID: string = req.params.id;
 		let application: Applicant;
 		try {
@@ -190,5 +193,9 @@ export class ApplicationController implements ApplicationControllerInterface {
 		res.send({
 			message: 'Hacker checked in!'
 		});
-	};
+	}
+
+	private isNumeric(n: any): boolean {
+		return !isNaN(parseFloat(n)) && isFinite(n);
+	}
 }

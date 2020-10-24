@@ -19,6 +19,7 @@ export interface EnvConfig {
 	hs: {
 		applicationUrl: string;
 		authUrl: string;
+		serviceToken: string;
 	};
 	googleAnalyticsId: string;
 	dropboxToken: string;
@@ -44,7 +45,8 @@ export function load(source: Record<string, string | undefined> = process.env): 
 		},
 		hs: {
 			applicationUrl: getEnv(source, 'APPLICATION_URL'),
-			authUrl: getEnv(source, 'AUTH_URL')
+			authUrl: getEnv(source, 'AUTH_URL'),
+			serviceToken: getEnv(source, 'HS_AUTH_SERVICE_TOKEN')
 		},
 		googleAnalyticsId: getEnv(source, 'GOOGLE_ANALYTICS_ID'),
 		dropboxToken: getEnv(source, 'DROPBOX_API_TOKEN'),
