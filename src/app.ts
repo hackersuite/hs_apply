@@ -92,6 +92,9 @@ export class App {
    * @param app The app to set up the middleware for
    */
 	private readonly middlewareSetup = (app: Express): void => {
+		// Request logging
+		app.use(reqLogger);
+
 		app.use((req, res, next) => {
 			if (req.get('X-Forwarded-Proto') !== 'https' && getConfig().useSSL) {
 				res.redirect(`https://${req.headers.host ?? ''}${req.url}`);
@@ -115,9 +118,6 @@ export class App {
    * @param app The app to set up the middleware for
    */
 	private readonly devMiddlewareSetup = (app: Express): void => {
-		// Request logging
-		app.use(reqLogger);
-
 		// Disable browser caching
 		app.use((req: Request, res: Response, next: NextFunction) => {
 			res.setHeader('Surrogate-Control', 'no-store');
@@ -137,7 +137,7 @@ export class App {
 			password: getConfig().db.password,
 			database: getConfig().db.database,
 			entities: [`${__dirname}/models/db/**/*{.js,.ts}`],
-			synchronize: true // Note: Unsafe in production, use migrations instead
+			synchronize: getConfig().environment === Environment.Dev // Note: Unsafe in production, use migrations instead
 		}
 	];
 }
