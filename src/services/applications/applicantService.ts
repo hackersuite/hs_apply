@@ -1,6 +1,5 @@
 import { provide } from 'inversify-binding-decorators';
 import { Applicant } from '../../models/db/applicant';
-import { ApplicantRepository } from '../../repositories';
 import { ObjectID, DeleteResult, Repository } from 'typeorm';
 import { validateOrReject } from 'class-validator';
 import { Review } from '../../models/db';
@@ -8,6 +7,7 @@ import { ApplicantStatus } from './applicantStatus';
 import { logger } from '../../util';
 import { CloudStorageService } from '../cloudStorage';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { InjectedRepository } from '../../repositories';
 
 type ApplicationID = string | number | Date | ObjectID;
 
@@ -24,16 +24,17 @@ export interface ApplicantServiceInterface {
 	getKRandomToReview(reviewerID: string, chooseFromK: number): Promise<Applicant[]>;
 }
 
+type InjectableRepository<T> = (type: any) => Repository<T>;
 @provide(ApplicantService)
 export class ApplicantService implements ApplicantServiceInterface {
 	private readonly _applicantRepository: Repository<Applicant>;
 	private readonly _cloudStorageService: CloudStorageService;
 
 	public constructor(
-		applicantRepository: ApplicantRepository,
+		applicantRepository: InjectedRepository<Applicant>,
 		cloudStorageService: CloudStorageService
 	) {
-		this._applicantRepository = applicantRepository.getRepository();
+		this._applicantRepository = applicantRepository.getRepository(Applicant);
 		this._cloudStorageService = cloudStorageService;
 	}
 
