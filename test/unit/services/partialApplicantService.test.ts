@@ -3,7 +3,7 @@ setupTestingEnvironment();
 
 import { when, mock, instance, reset, resetCalls, anything } from 'ts-mockito';
 import { PartialApplicantService } from '../../../src/services';
-import { PartialApplicantRepository } from '../../../src/repositories';
+import { InjectedRepository } from '../../../src/repositories';
 import { Repository, DeleteResult } from 'typeorm';
 import { PartialApplicant } from '../../../src/models/db';
 
@@ -26,10 +26,10 @@ class StubPartialApplicationRepository extends Repository<PartialApplicant> {}
 
 beforeAll(() => {
 	// Mock out the partial applicant repository
-	const stubPartialApplicantRepository: PartialApplicantRepository = mock(PartialApplicantRepository);
+	const stubRepository: InjectedRepository<PartialApplicant> = mock(InjectedRepository);
 	mockPartialApplicantRepository = mock(StubPartialApplicationRepository);
-	when(stubPartialApplicantRepository.getRepository()).thenReturn(instance(mockPartialApplicantRepository));
-	container.rebind(PartialApplicantRepository).toConstantValue(instance(stubPartialApplicantRepository));
+	when(stubRepository.getRepository(PartialApplicant)).thenReturn(instance(mockPartialApplicantRepository));
+	container.rebind(InjectedRepository).toConstantValue(instance(stubRepository));
 });
 
 beforeEach(() => {

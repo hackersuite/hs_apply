@@ -8,9 +8,10 @@ import { RequestAuthentication } from '../../src/util/auth';
 import { SettingLoader } from '../../src/util/fs';
 import { mock, instance, when, anything } from 'ts-mockito';
 import { Repository } from 'typeorm';
-import { ApplicantRepository } from '../../src/repositories';
+import { InjectedRepository } from '../../src/repositories';
 
 import container from '../../src/inversify.config';
+import { logger } from '../../src/util';
 
 let bApp: Express;
 let applicantRepository: Repository<Applicant>;
@@ -78,7 +79,7 @@ beforeAll(async () => {
 
 	bApp = await new App().buildApp(getTestDatabaseOptions());
 	// After the application has been built and db connection established -- get the applicant repository
-	applicantRepository = container.get<ApplicantRepository>(ApplicantRepository).getRepository();
+	applicantRepository = container.get(InjectedRepository).getRepository(Applicant);
 });
 
 beforeEach(() => {
