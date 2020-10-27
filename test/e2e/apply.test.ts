@@ -11,7 +11,6 @@ import { Repository } from 'typeorm';
 import { InjectedRepository } from '../../src/repositories';
 
 import container from '../../src/inversify.config';
-import { logger } from '../../src/util';
 
 let bApp: Express;
 let applicantRepository: Repository<Applicant>;
