@@ -1,6 +1,7 @@
 version: "2.1"
 services:
   hs_application:
+    container_name: hs_application
     image: hs_application:latest
     depends_on:
       mysql_db:
@@ -11,7 +12,7 @@ services:
     ports:
       - "${PORT}:${PORT}"
     networks:
-      - internal
+      - internal_hackathon
       - hacker_suite
 
   mysql_db:
@@ -31,6 +32,7 @@ services:
       - internal_hackathon
     volumes:
       - db_store:/var/lib/mysql
+      - ./database/:/docker-entrypoint-initdb.d
 
 # The volume for the database is persistent across launches
 volumes:

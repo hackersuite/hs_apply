@@ -67,13 +67,13 @@ else
 	docker-compose -f $(prod_docker_compose_file) logs -f
 endif
 
-# prints the logs only from the go app
+# prints the logs only from the app
 logs-app:
-	docker-compose logs -f hs_application
+	docker logs hs_application
 
 # prints the logs only from the database
 logs-db:
-	docker-compose logs -f mysql_db
+	docker logs mysql_db
 
 # shuts down the containers
 down:
