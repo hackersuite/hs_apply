@@ -137,7 +137,7 @@ export class App {
 			password: getConfig().db.password,
 			database: getConfig().db.database,
 			entities: [`${__dirname}/models/db/**/*{.js,.ts}`],
-			synchronize: true // Note: Unsafe in production, use migrations instead
+			synchronize: getConfig().environment === Environment.Dev // Note: Unsafe in production, use migrations instead
 		}
 	];
 }

@@ -1,6 +1,7 @@
 version: "2.1"
 services:
   hs_application:
+    container_name: hs_application
     image: hs_application:latest
     depends_on:
       mysql_db:
