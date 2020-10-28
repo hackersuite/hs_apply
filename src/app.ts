@@ -137,6 +137,9 @@ export class App {
 			password: getConfig().db.password,
 			database: getConfig().db.database,
 			entities: [`${__dirname}/models/db/**/*{.js,.ts}`],
+			extra: {
+				charset: 'utf8mb4_unicode_ci'
+			},
 			synchronize: getConfig().environment === Environment.Dev // Note: Unsafe in production, use migrations instead
 		}
 	];
