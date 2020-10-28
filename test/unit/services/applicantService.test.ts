@@ -3,7 +3,7 @@ setupTestingEnvironment();
 
 import { when, mock, instance, verify, anything, objectContaining, reset, resetCalls } from 'ts-mockito';
 import { ApplicantService } from '../../../src/services';
-import { ApplicantRepository } from '../../../src/repositories';
+import { InjectedRepository } from '../../../src/repositories';
 import { Repository, DeleteResult } from 'typeorm';
 import { Applicant } from '../../../src/models/db';
 
@@ -70,10 +70,10 @@ let mockApplicantRepository: Repository<Applicant>;
 class StubApplicationRepository extends Repository<Applicant> {}
 
 beforeAll(() => {
-	const stubApplicantRepository: ApplicantRepository = mock(ApplicantRepository);
+	const stubRepository: InjectedRepository<Applicant> = mock(InjectedRepository);
 	mockApplicantRepository = mock(StubApplicationRepository);
-	when(stubApplicantRepository.getRepository()).thenReturn(instance(mockApplicantRepository));
-	container.rebind(ApplicantRepository).toConstantValue(instance(stubApplicantRepository));
+	when(stubRepository.getRepository(Applicant)).thenReturn(instance(mockApplicantRepository));
+	container.rebind(InjectedRepository).toConstantValue(instance(stubRepository));
 
 	// Mock the POST Axios request for the cloud service requests
 	axiosMock.post.mockResolvedValue({ data: successResponse });

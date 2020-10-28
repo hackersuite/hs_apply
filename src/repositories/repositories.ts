@@ -1,25 +1,31 @@
-import { Applicant, Review, PartialApplicant } from '../models/db';
 import { provide } from 'inversify-binding-decorators';
-import { TransactionRepository } from './transactionRepository';
-import { Repository } from 'typeorm';
+import { Repository, ObjectLiteral, EntityManager, ObjectType } from 'typeorm';
+import { decorate, injectable } from 'inversify';
+import { getEntityManagerOrTransactionManager } from 'typeorm-transactional-cls-hooked';
 
-@provide(ApplicantRepository)
-export class ApplicantRepository extends TransactionRepository<Applicant> {
-	public getRepository(): Repository<Applicant> {
-		return super.manager.getRepository(Applicant);
+// First decorate the TypeORM base class repository with the injectable() annotation to prevent this error:
+// Error: Missing required @injectable annotation in: Repository
+decorate(injectable(), Repository);
+
+@injectable()
+class TransactionRepository<Entity extends ObjectLiteral> extends Repository<Entity> {
+	private _connectionName = 'default';
+	private _manager: EntityManager | undefined;
+
+	public set manager(manager: EntityManager) {
+		this._manager = manager;
+		this._connectionName = manager.connection.name;
+	}
+
+	// Always get the entityManager from the cls namespace if active, otherwise, use the original or getManager(connectionName)
+	public get manager(): EntityManager {
+		return getEntityManagerOrTransactionManager(this._connectionName, this._manager);
 	}
 }
 
-@provide(PartialApplicantRepository)
-export class PartialApplicantRepository extends TransactionRepository<PartialApplicant> {
-	public getRepository(): Repository<PartialApplicant> {
-		return super.manager.getRepository(PartialApplicant);
-	}
-}
-
-@provide(ReviewRepository)
-export class ReviewRepository extends TransactionRepository<Review> {
-	public getRepository(): Repository<Review> {
-		return super.manager.getRepository(Review);
+@provide(InjectedRepository)
+export class InjectedRepository<T> extends TransactionRepository<T> {
+	public getRepository(type: ObjectType<T>): Repository<T> {
+		return super.manager.getRepository(type.name);
 	}
 }

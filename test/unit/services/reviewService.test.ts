@@ -1,6 +1,6 @@
 import { when, mock, instance, reset, resetCalls, objectContaining } from 'ts-mockito';
 import { ApplicantService, ReviewService } from '../../../src/services';
-import { ReviewRepository } from '../../../src/repositories';
+import { InjectedRepository } from '../../../src/repositories';
 import { Repository } from 'typeorm';
 import { Applicant, Review } from '../../../src/models/db';
 
@@ -39,10 +39,10 @@ let mockReviewRepository: Repository<Review>;
 class StubReviewRepository extends Repository<Review> {}
 
 beforeAll(() => {
-	const stubReviewRepository: ReviewRepository = mock(ReviewRepository);
+	const stubRepository: InjectedRepository<Review> = mock(InjectedRepository);
 	mockReviewRepository = mock(StubReviewRepository);
-	when(stubReviewRepository.getRepository()).thenReturn(instance(mockReviewRepository));
-	container.rebind(ReviewRepository).toConstantValue(instance(stubReviewRepository));
+	when(stubRepository.getRepository(Review)).thenReturn(instance(mockReviewRepository));
+	container.rebind(InjectedRepository).toConstantValue(instance(stubRepository));
 
 	mockApplicantService = mock(ApplicantService);
 	container.rebind(ApplicantService).toConstantValue(instance(mockApplicantService));

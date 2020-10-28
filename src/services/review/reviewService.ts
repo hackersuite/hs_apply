@@ -1,7 +1,7 @@
 import { provide } from 'inversify-binding-decorators';
 import { Repository } from 'typeorm';
 import { Review, Applicant } from '../../models/db';
-import { ReviewRepository } from '../../repositories/repositories';
+import { InjectedRepository } from '../../repositories/repositories';
 import { ApplicantService } from '../applications/applicantService';
 
 export interface ReviewServiceInterface {
@@ -19,10 +19,10 @@ export class ReviewService implements ReviewServiceInterface {
 
 	public constructor(
 		applicantService: ApplicantService,
-		reviewRepository: ReviewRepository
+		reviewRepository: InjectedRepository<Review>
 	) {
 		this._applicantService = applicantService;
-		this._reviewRepository = reviewRepository.getRepository();
+		this._reviewRepository = reviewRepository.getRepository(Review);
 	}
 
 	public getAll = async (columns?: (keyof Review)[]): Promise<Review[]> => {
