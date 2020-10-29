@@ -1,15 +1,16 @@
 import 'reflect-metadata';
 
 // Need to load the .env file BEFORE loading the ORM config
+import { Environment, getConfig } from './util/config';
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
+getConfig(process.env);
 
 import config from './ormconfig';
 
 import { initializeTransactionalContext } from 'typeorm-transactional-cls-hooked';
 initializeTransactionalContext(); // Initialize cls-hooked
 
-import { Environment, getConfig } from './util/config';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
