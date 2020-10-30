@@ -1,12 +1,16 @@
 import 'reflect-metadata';
 
+// Need to load the .env file BEFORE loading the ORM config
+import { Environment, getConfig } from './util/config';
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
+getConfig(process.env);
+
+import config from './ormconfig';
 
 import { initializeTransactionalContext } from 'typeorm-transactional-cls-hooked';
 initializeTransactionalContext(); // Initialize cls-hooked
 
-import { Environment, getConfig } from './util/config';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
@@ -44,9 +48,15 @@ export class App {
 		const databaseConnectionSettings: ConnectionOptions[] = connectionOptions ?? this.createDatabaseSettings();
 
 		const connections = await createConnections(databaseConnectionSettings);
-		connections.forEach(element => {
-			logger.info(`Connection to database (${element.name}) established.`);
-		});
+		for (const connection of connections) {
+			logger.info(`Connection to database (${connection.name}) established.`);
+			try {
+				await connection.runMigrations();
+			} catch (err) {
+				logger.error(err);
+				throw new Error('Failed to run migrations');
+			}
+		}
 
 		// Set up passport for authentication
 		// Also add the logout route
@@ -128,19 +138,5 @@ export class App {
 		});
 	};
 
-	private readonly createDatabaseSettings = (): ConnectionOptions[] => [
-		{
-			type: 'mysql',
-			host: getConfig().db.host,
-			port: getConfig().db.port,
-			username: getConfig().db.user,
-			password: getConfig().db.password,
-			database: getConfig().db.database,
-			entities: [`${__dirname}/models/db/**/*{.js,.ts}`],
-			extra: {
-				charset: 'utf8mb4_unicode_ci'
-			},
-			synchronize: getConfig().environment === Environment.Dev // Note: Unsafe in production, use migrations instead
-		}
-	];
+	private readonly createDatabaseSettings = (): ConnectionOptions[] => [config];
 }
