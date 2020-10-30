@@ -52,7 +52,9 @@ test('App should start in production environment', async () => {
  * Testing error handling with incorrect settings
  */
 test('App should throw error with invalid settings', async () => {
-	process.env.DB_HOST = 'invalidhost';
-	await expect(new App().buildApp()).rejects.toThrow();
+	const testOptions = getTestDatabaseOptions();
+	Object.assign(testOptions[0], { host: 'invalidhost' });
+
+	await expect(new App().buildApp(testOptions)).rejects.toThrow();
 	expect(getConnection().isConnected).toBeFalsy();
 });

@@ -5,5 +5,5 @@ module.exports = {
 		'project': 'tsconfig.eslint.json'
 	},
 	'extends': '@unicsmcr',
-	'ignorePatterns': ["src/public/**/*.js"],
+	'ignorePatterns': ["src/public/**/*", "src/migrations"],
 }
