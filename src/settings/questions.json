@@ -220,7 +220,7 @@
         },
         {
           "questionName": "country",
-          "questionText": "What country are you traveling from?",
+          "questionText": "In what country are you currently residing?",
           "answerType": "dropdown",
           "answerOptions": [
             "Afghanistan",
@@ -471,7 +471,7 @@
         },
         {
           "questionName": "city",
-          "questionText": "What city are you traveling from?",
+          "questionText": "What city are you living in?",
           "answerType": "short",
           "required": true
         },
@@ -537,7 +537,7 @@
         },
         {
           "questionName": "whyChooseHacker",
-          "questionText": "Why do you want to come and why should we choose you?",
+          "questionText": "Why do you want to come?",
           "answerType": "long",
           "maxLength": 800,
           "required": false
