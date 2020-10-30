@@ -93,7 +93,7 @@ export class Applicant {
 	public hardwareRequests?: string;
 
 	@Column('varchar')
-	@IsNotEmpty({ message: 'The applicants dietary requirement is required' })
+	// @IsNotEmpty({ message: 'The applicants dietary requirement is required' })
 	@ApplicationMapped({ hasOther: true })
 	public dietaryRequirements!: string;
 

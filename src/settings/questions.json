@@ -548,13 +548,6 @@
           "answerType": "long",
           "maxLength": 800,
           "required": false
-        },
-        {
-          "questionName": "hardwareRequests",
-          "questionText": "What hardware would you like to have available at the hackathon?",
-          "answerType": "long",
-          "maxLength": 800,
-          "required": false
         }
       ]
     },
@@ -572,20 +565,6 @@
             "Twitter"
           ],
           "required": false
-        },
-        {
-          "questionName": "dietaryRequirements",
-          "questionText": "Dietary Requirements",
-          "answerType": "radio",
-          "answerOptions": [
-            "None",
-            "Vegan",
-            "Vegetarian",
-            "Lactose-free",
-            "Gluten Free",
-            "Halal"
-          ],
-          "required": true
         },
         {
           "questionName": "tShirtSize",
