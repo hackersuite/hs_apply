@@ -6,6 +6,7 @@ import { Applicant } from '../models/db';
 import { ApplicantService } from '../services';
 import { User } from '@unicsmcr/hs_auth_client';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
+import { CommonController } from './commonController';
 
 export interface DashboardControllerInterface {
 	dashboard: (req: Request, res: Response, next: NextFunction) => void;
@@ -15,7 +16,7 @@ export interface DashboardControllerInterface {
  * A controller for dashboard methods
  */
 @provide(DashboardController)
-export class DashboardController implements DashboardControllerInterface {
+export class DashboardController extends CommonController implements DashboardControllerInterface {
 	private readonly _cache: Cache;
 	private readonly _applicantService: ApplicantService;
 
@@ -23,6 +24,7 @@ export class DashboardController implements DashboardControllerInterface {
 		cache: Cache,
 		applicantService: ApplicantService
 	) {
+		super();
 		this._cache = cache;
 		this._applicantService = applicantService;
 
