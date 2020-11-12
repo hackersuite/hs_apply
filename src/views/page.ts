@@ -1,38 +1,18 @@
-import { injectable } from 'inversify';
-import autoBind from 'auto-bind';
+import { PageComponent, navbar } from './components';
 
-interface Page {
-	components?: any;
+export interface Page {
+	path: string;
+	components: PageComponent[];
 }
 
-@injectable()
-export class PageProvider {
-	private readonly pages: Map<string, Page>;
-	public constructor() {
-		autoBind(this);
+export const dashboard: Page = { path: 'pages/dashboard', components: [navbar]	};
 
-		this.pages = this.buildPages();
-	}
+export const apply: Page = { path: 'pages/apply', components: [navbar]	};
 
-	public get(view: string): Page|undefined {
-		return this.pages.get(view);
-	}
+export const adminManage: Page = { path: 'pages/admin/adminManage', components: [navbar]	};
+export const adminOverview: Page = { path: 'pages/admin/adminOverview', components: [navbar]	};
+export const manageApplication: Page = { path: 'pages/manageApplication', components: [navbar]	};
 
-	private buildPages(): Map<string, Page> {
-		const pages = new Map<string, Page>();
+export const notify: Page = { path: 'pages/notify', components: [navbar]	};
 
-		pages.set('pages/dashboard', { components: {}	});
-
-		pages.set('pages/apply', { components: {}	});
-
-		pages.set('pages/admin/adminManage', { components: {}	});
-		pages.set('pages/manageApplication', { components: {}	});
-		pages.set('pages/admin/adminOverview', { components: {}	});
-
-		pages.set('pages/notify', { components: {}	});
-
-		pages.set('pages/review/review', { components: {}	});
-
-		return pages;
-	}
-}
+export const review: Page = { path: 'pages/review/review', components: [navbar]	};

@@ -7,6 +7,7 @@ import { ApplicantService } from '../services';
 import { User } from '@unicsmcr/hs_auth_client';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
 import { CommonController } from './commonController';
+import * as pages from '../views/page';
 
 export interface DashboardControllerInterface {
 	dashboard: (req: Request, res: Response, next: NextFunction) => void;
@@ -50,7 +51,7 @@ export class DashboardController extends CommonController implements DashboardCo
 		const currentTime: number = new Date().getTime();
 		const applicationsOpen: boolean = currentTime >= applicationsOpenTime && currentTime <= applicationsCloseTime;
 
-		res.render('pages/dashboard', {
+		void super.renderPage(req, res, pages.dashboard, {
 			applicationStatus: applicationStatus,
 			applicantName: (req.user as User).name,
 			applicationsOpen: applicationsOpen

@@ -1,3 +1,6 @@
+<% if (components['navbar']) { %>
+<% var navbar = components['navbar'] %>
+
 <link rel="stylesheet" href="/css/navbar.css">
 <div class="sidebar" data-color="azure" data-background-color="black" data-image="/img/sidebar.jpg">
   <div class="logo">
@@ -7,7 +10,7 @@
   </div>
   <div class="sidebar-wrapper">
     <ul class="nav">
-      <% if (locals._locals.authLevel >= 4) { %>
+      <% if (navbar.includes('Admin:overview') || navbar.includes('Admin:manage')) { %>
         <li class="nav-item" data-nav="group">
           <a class="nav-link" data-toggle="collapse" href="#adminCollapse" aria-expanded="false" aria-controls="#adminCollapse">
             <i class="material-icons">lock</i>
@@ -15,24 +18,27 @@
           </a>
           <div class="collapse" id="adminCollapse">
             <ul class="nav">
-              <% if (locals._locals.authLevel == 4) { %>
+              <% if (navbar.includes('Admin:overview')) { %>
               <li id="admin-overview" class="nav-item">
                 <a class="nav-link" href="/admin/overview">
                   <p> Overview </p>
                 </a>
               </li>
               <% } %>
+
+              <% if (navbar.includes('Admin:manage')) { %>
               <li id="admin-manage" class="nav-item">
                 <a class="nav-link" href="/admin/manage">
                   <p>Manage</p>
                 </a>
               </li>
+              <% } %>
             </ul>
           </div>
         </li>
       <% } %>
 
-      <% if (locals._locals.authLevel >= 3) { %>
+      <% if (navbar.includes('Review:review')) { %>
         <li class="nav-item" data-nav="group">
           <a class="nav-link" data-toggle="collapse" href="#reviewCollapse" aria-expanded="false" aria-controls="#reviewCollapse">
             <i class="material-icons">gavel</i>
@@ -40,7 +46,7 @@
           </a>
           <div class="collapse" id="reviewCollapse">
             <ul class="nav">
-              <% if (locals._locals.authLevel == 4) { %>
+              <% if (navbar.includes('Review:overview')) { %>
               <li id="review-overview" class="nav-item">
                 <a class="nav-link" href="/review/overview">
                   <p>Overview</p>
@@ -113,3 +119,4 @@
   </div>
 </nav>
 <!-- End Navbar -->
+<% } %>

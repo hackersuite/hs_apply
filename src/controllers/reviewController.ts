@@ -7,6 +7,8 @@ import { HttpResponseCode } from '../util/errorHandling';
 import { User } from '@unicsmcr/hs_auth_client';
 import { reviewApplicationMapping } from '../util';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
+import * as pages from '../views/page';
+import { CommonController } from './commonController';
 
 export interface ReviewControllerInterface {
 	submit: (req: Request, res: Response) => Promise<void>;
@@ -18,7 +20,7 @@ export interface ReviewControllerInterface {
  * A controller for review methods
  */
 @provide(ReviewController)
-export class ReviewController implements ReviewControllerInterface {
+export class ReviewController extends CommonController implements ReviewControllerInterface {
 	private readonly _reviewService: ReviewService;
 	private readonly _applicantService: ApplicantService;
 
@@ -26,15 +28,15 @@ export class ReviewController implements ReviewControllerInterface {
 		reviewService: ReviewService,
 		applicantService: ApplicantService
 	) {
+		super();
 		this._reviewService = reviewService;
 		this._applicantService = applicantService;
 
 		autoBind(this);
 	}
 
-	public async reviewPage(req: Request, res: Response): Promise<void> {
-		res.render('pages/review/review');
-		return Promise.resolve();
+	public reviewPage(req: Request, res: Response): Promise<void> {
+		return super.renderPage(req, res, pages.review, {});
 	}
 
 	public async nextReview(req: Request, res: Response): Promise<void> {
