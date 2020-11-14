@@ -9,5 +9,8 @@
   "contactEmail": "help@greatunihack.com",
   "facebookLink": "unicsmanchester",
   "instagramLink": "unics_uom",
-  "twitterLink": "unics_uom"
+  "twitterLink": "unics_uom",
+  "config": {
+    "minimumReviews": 1
+  }
 }

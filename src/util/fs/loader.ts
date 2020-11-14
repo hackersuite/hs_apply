@@ -35,16 +35,15 @@ export class SettingLoader implements SettingLoaderInterface {
    */
 	// TODO: Improve this function by not awaiting both loads seperately
 	public async loadApplicationSettings(app: Express): Promise<void> {
-		logger.info('Loading hackathon application questions...');
-		const sections: Array<ApplicationSectionInterface>|undefined = await this.loadSettingsFile('questions.json', 'sections');
+		const sectionsLoad: Promise<Array<ApplicationSectionInterface>|undefined> = this.loadSettingsFile('questions.json', 'sections');
+		const settingsLoad: Promise<HackathonSettingsInterface|undefined> = this.loadSettingsFile('hackathon.json');
+
+		const [sections, settings] = await Promise.all([sectionsLoad, settingsLoad]);
 		if (sections) {
 			const applicationSections: Sections = new Sections(sections);
 			this.cache.set(Sections.name, applicationSections);
 			logger.info('Loaded application questions');
 		}
-
-		logger.info('Loading hackathon application settings...');
-		const settings: HackathonSettingsInterface|undefined = await this.loadSettingsFile('hackathon.json');
 		if (settings) {
 			// Add the hackathon settings to the cache and add them to app locals
 			const hackathonSettings: HackathonSettings = new HackathonSettings(settings);
@@ -59,6 +58,7 @@ export class SettingLoader implements SettingLoaderInterface {
 				applicationsOpen: new Date().toString(),
 				applicationsClose: new Date(Date.now() + (10800 * 1000)).toString() // 3 hours from now
 			};
+			logger.warn('Failed to load hackathon settings file. Default values have been set instead');
 		}
 	}
 

@@ -10,4 +10,9 @@ export interface HackathonSettingsInterface {
 	facebookLink: string;
 	instagramLink: string;
 	twitterLink: string;
+	config: ApplicationConfig;
+}
+
+export interface ApplicationConfig {
+	minimumReviews: number;
 }
