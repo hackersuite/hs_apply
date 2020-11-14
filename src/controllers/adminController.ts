@@ -174,7 +174,7 @@ export class AdminController extends CommonController implements AdminController
 
 	public async manageApplication(req: Request, res: Response): Promise<void> {
 		const specifiedApplicant: Applicant = await this._applicantService.findOne(req.url.split('/')[2]);
-		res.render('pages/manageApplication', {
+		void super.renderPage(req, res, pages.manageApplication, {
 			applicant: specifiedApplicant
 		});
 	}
