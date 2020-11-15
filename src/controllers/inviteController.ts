@@ -7,6 +7,8 @@ import { ApplicantStatus } from '../services/applications/applicantStatus';
 import { HttpResponseCode } from '../util/errorHandling';
 import { User } from '@unicsmcr/hs_auth_client';
 import { RequestAuthentication } from '../util';
+import * as pages from '../views/page';
+import { CommonController } from './commonController';
 
 export interface InviteControllerInterface {
 	send: (req: Request, res: Response, next: NextFunction) => void;
@@ -17,7 +19,7 @@ export interface InviteControllerInterface {
  * A controller for dashboard methods
  */
 @provide(InviteController)
-export class InviteController implements InviteControllerInterface {
+export class InviteController extends CommonController implements InviteControllerInterface {
 	private readonly _emailService: EmailService;
 	private readonly _applicantService: ApplicantService;
 	private readonly _requestAuth: RequestAuthentication;
@@ -27,6 +29,7 @@ export class InviteController implements InviteControllerInterface {
 		emailService: EmailService,
 		requestAuth: RequestAuthentication
 	) {
+		super();
 		this._applicantService = applicantService;
 		this._emailService = emailService;
 		this._requestAuth = requestAuth;
@@ -213,6 +216,8 @@ export class InviteController implements InviteControllerInterface {
 			notifyMessage = 'An error occured! Please contact us for help';
 		}
 
-		res.render('pages/notify', { message: notifyMessage });
+		void super.renderPage(req, res, pages.notify, {
+			message: notifyMessage
+		});
 	}
 }

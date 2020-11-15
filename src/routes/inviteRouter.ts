@@ -32,7 +32,7 @@ export class InviteRouter implements RouterInterface {
 		);
 
 		router.get('/:id([a-f0-9-]+)/confirm',
-			this._inviteController.confirm);
+			this._requestAuth.withAuthMiddleware(this, this._inviteController.confirm));
 
 		return router;
 	};
