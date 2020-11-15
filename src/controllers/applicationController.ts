@@ -9,6 +9,8 @@ import { HttpResponseCode } from '../util/errorHandling';
 import { User } from '@unicsmcr/hs_auth_client';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
 import { applicationMapping } from '../util/decorator';
+import { CommonController } from './commonController';
+import * as pages from '../views/page';
 
 export interface ApplicationControllerInterface {
 	apply: (req: Request, res: Response, next: NextFunction) => void;
@@ -22,7 +24,7 @@ export interface ApplicationControllerInterface {
  * A controller for application methods
  */
 @provide(ApplicationController)
-export class ApplicationController implements ApplicationControllerInterface {
+export class ApplicationController extends CommonController implements ApplicationControllerInterface {
 	private readonly _cache: Cache;
 	private readonly _applicantService: ApplicantService;
 	private readonly _partialApplicantService: PartialApplicantService;
@@ -35,6 +37,7 @@ export class ApplicationController implements ApplicationControllerInterface {
 		applicantService: ApplicantService,
 		partialApplicantService: PartialApplicantService
 	) {
+		super();
 		this._cache = cache;
 		this._applicantService = applicantService;
 		this._partialApplicantService = partialApplicantService;
@@ -69,7 +72,8 @@ export class ApplicationController implements ApplicationControllerInterface {
 
 		const cachedSections: Array<Sections> = this._cache.getAll(Sections.name);
 		const sections = cachedSections[0].sections;
-		res.render('pages/apply', { sections, partialApplication });
+
+		void super.renderPage(req, res, pages.apply, { sections, partialApplication });
 	}
 
 	public async updatePartialApplication(req: Request, res: Response): Promise<void> {

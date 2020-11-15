@@ -1,15 +1,15 @@
 import { Cacheable } from '../util/cache';
-import { HackathonSettingsInterface } from '../settings';
+import { AppConfig } from '../settings';
 
-export class HackathonSettings implements Cacheable {
+export class HackathonConfig implements Cacheable {
 	public id: number;
-	public settings: HackathonSettingsInterface;
+	public config: AppConfig;
 
 	// The lifetime of this object in the cache is infinite
 	public expiresIn = -1;
 
-	public constructor(settings: HackathonSettingsInterface) {
+	public constructor(config: AppConfig) {
 		this.id = 0;
-		this.settings = settings;
+		this.config = config;
 	}
 }

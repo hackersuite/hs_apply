@@ -12,6 +12,8 @@ import { CloudStorageService } from '../services/cloudStorage/cloudStorageServic
 import { createWriteableStream, WriteableStreamCallback, CleanupCallback, logger, RequestAuthentication } from '../util';
 import { HttpResponseCode } from '../util/errorHandling';
 import { PassThrough } from 'stream';
+import { CommonController } from './commonController';
+import * as pages from '../views/page';
 
 export interface AdminControllerInterface {
 	overview: (req: Request, res: Response, next: NextFunction) => void;
@@ -22,7 +24,7 @@ export interface AdminControllerInterface {
  * A controller for admin methods
  */
 @provide(AdminController)
-export class AdminController implements AdminControllerInterface {
+export class AdminController extends CommonController implements AdminControllerInterface {
 	private readonly _applicantService: ApplicantService;
 	private readonly _cloudStorageService: CloudStorageService;
 	private readonly _cache: Cache;
@@ -34,6 +36,7 @@ export class AdminController implements AdminControllerInterface {
 		cloudStorageService: CloudStorageService,
 		cache: Cache
 	) {
+		super();
 		this._cache = cache;
 		this._applicantService = applicantService;
 		this._cloudStorageService = cloudStorageService;
@@ -117,7 +120,7 @@ export class AdminController implements AdminControllerInterface {
 			appStatus[applicationStatusValue] = 1 + (appStatus[applicationStatusValue] || 0);
 		});
 
-		res.render('pages/admin/adminOverview', {
+		void super.renderPage(_req, res, pages.adminOverview, {
 			totalApplications,
 			applicationTimes: createdAtTimes,
 			applicationGenders: genders,
@@ -163,7 +166,7 @@ export class AdminController implements AdminControllerInterface {
 			});
 		});
 
-		res.render('pages/admin/adminManage', {
+		void super.renderPage(req, res, pages.adminManage, {
 			applicationRows: columnNames,
 			applications: combinedApplications
 		});
@@ -171,7 +174,7 @@ export class AdminController implements AdminControllerInterface {
 
 	public async manageApplication(req: Request, res: Response): Promise<void> {
 		const specifiedApplicant: Applicant = await this._applicantService.findOne(req.url.split('/')[2]);
-		res.render('pages/manageApplication', {
+		void super.renderPage(req, res, pages.manageApplication, {
 			applicant: specifiedApplicant
 		});
 	}

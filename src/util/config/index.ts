@@ -23,7 +23,13 @@ export interface EnvConfig {
 	};
 	googleAnalyticsId: string;
 	dropboxToken: string;
-	sendgridToken: string;
+	email: {
+		sendgridToken: string;
+		smtpUsername: string;
+		smtpPassword: string;
+		smtpHost: string;
+		smtpPort: number;
+	};
 }
 
 export function load(source: Record<string, string | undefined> = process.env): EnvConfig {
@@ -50,7 +56,13 @@ export function load(source: Record<string, string | undefined> = process.env): 
 		},
 		googleAnalyticsId: getEnv(source, 'GOOGLE_ANALYTICS_ID'),
 		dropboxToken: getEnv(source, 'DROPBOX_API_TOKEN'),
-		sendgridToken: getEnv(source, 'SENDGRID_API_TOKEN')
+		email: {
+			sendgridToken: getEnv(source, 'SENDGRID_API_TOKEN'),
+			smtpUsername: getEnv(source, 'SMTP_USERNAME'),
+			smtpPassword: getEnv(source, 'SMTP_PASSWORD'),
+			smtpHost: getEnv(source, 'SMTP_HOST'),
+			smtpPort: intoNumber(getEnv(source, 'SMTP_PORT'))
+		}
 	};
 }
 

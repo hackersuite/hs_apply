@@ -18,23 +18,24 @@
                                           are receiving this because you applied to <%- locals.settings.fullName %>.</span><br>
                                       <span class="apple-link" style="color:#999999;font-size:12px;text-align:center;"> If
                                           you think this is a mistake, please send us an email
-                                          at <a href="mailto:<%- locals.settings.contactEmail %>"><%- locals.settings.contactEmail %></span>
+                                          at <a href="mailto:<%- locals.settings.email.contactEmail %>"><%- locals.settings.email.contactEmail %></span>
                                       <table style="padding-top: 20px" cellpadding="0" cellspacing="0" border="0"
                                           align="center">
+                                          <% var social = locals.settings.social; %>
                                           <tr>
-                                              <% if (settings.facebookLink) { %>
+                                              <% if (social.facebookHandle) { %>
                                               <td style="padding: 0px 5px;">
-                                                  <a role="social-icon-link" href="https://facebook.com/<%- settings.facebookLink %>"
+                                                  <a role="social-icon-link" href="https://facebook.com/<%- social.facebookHandle %>"
                                                       target="_blank" border="0" alt="Facebook" title="Facebook"
                                                       style="border-radius: 5px; -webkit-border-radius:5px; -moz-border-radius:5px; -ms-border-radius:5px; -o-border-radius:5px; color: black; display: inline-block; outline: none; text-decoration:none; border: none; font-family: Helvetica, arial, sans-serif;">
                                                       Facebook
                                                   </a>
                                               </td>
                                               <% } %>
-                                              <%- locals.settings.facebookLink && locals.settings.twitterLink ? "-" : "" %>
-                                              <% if (settings.twitterLink) { %>
+                                              <%- social.facebookHandle && social.twitterHandle ? "-" : "" %>
+                                              <% if (social.twitterHandle) { %>
                                               <td style="padding: 0px 5px;"><a role="social-icon-link"
-                                                      href="https://twitter.com/<%- settings.twitterLink %>" target="_blank" border="0"
+                                                      href="https://twitter.com/<%- social.twitterHandle %>" target="_blank" border="0"
                                                       alt="Twitter" title="Twitter"
                                                       style="border-radius: 5px; -webkit-border-radius:5px; -moz-border-radius:5px; -ms-border-radius:5px; -o-border-radius:5px; color: black; display: inline-block; outline: none; text-decoration:none; border: none; font-family: Helvetica, arial, sans-serif;">
                                                       Twitter

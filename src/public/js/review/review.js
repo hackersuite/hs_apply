@@ -2,7 +2,7 @@ const applicationQuestionTemplate = '<p><strong>#questionText</strong>: #questio
 const applicationCreateTimeTemplate = `
 <div class="card-footer">
   <div class="stats">
-    <i class="material-icons">access_time</i> #createDate
+    <i class="material-icons">access_time</i> Created At: #createDate
   </div>
 </div>`;
 
@@ -66,7 +66,9 @@ function makeGroupQuestionString(application, group) {
 }
 
 function makeGroupScoreInputString(group) {
-  return applicationFormQuestionTemplate.replace(/#scoreName/g, group);
+  return applicationFormQuestionTemplate
+    .replace(/#scoreLabel/g, group.reviewText || group)
+    .replace(/#scoreInput/g, group.propertyName || group)
 }
 
 function makeReviewCountString(count) {

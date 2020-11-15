@@ -36,12 +36,19 @@ export interface ReviewApplicationOptions {
    * Set to false to include as extra information for the review
    */
 	isSeparateScore?: boolean;
+
+	reviewText?: string;
+}
+
+export interface ReviewEntry {
+	propertyName: string;
+	reviewText: string;
 }
 
 export type ApplicationQuestions = Map<string, ApplicationMappingOptions>;
 
 export const applicationMapping: ApplicationQuestions = new Map();
-export const reviewApplicationMapping: Map<string, string[]> = new Map();
+export const reviewApplicationMapping: Map<string, ReviewEntry[]> = new Map();
 /**
  * Maps the applicant property to the application in a post request
  *
@@ -54,10 +61,14 @@ export function ApplicationMapped(options?: ApplicationMappingOptions) {
 			const groupKey = options.reviewed.group ?? (options.reviewed.isSeparateScore ? 'ungrouped' : 'extra');
 
 			const currentGroupArray = reviewApplicationMapping.get(groupKey);
+			const reviewEntry: ReviewEntry = {
+				propertyName,
+				reviewText: options.reviewed.reviewText ?? propertyName
+			};
 			if (currentGroupArray === undefined) {
-				reviewApplicationMapping.set(groupKey, [propertyName]);
+				reviewApplicationMapping.set(groupKey, [reviewEntry]);
 			} else {
-				currentGroupArray.push(propertyName);
+				currentGroupArray.push(reviewEntry);
 				reviewApplicationMapping.set(groupKey, currentGroupArray);
 			}
 		}
