@@ -5,12 +5,17 @@
   "hackathonURL": "https://apply.greatunihack.com",
   "applicationsOpen": "2019-09-30T16:00:00",
   "applicationsClose": "2029-11-01T20:00:00",
-  "mainEmail": "noreply@greatunihack.com",
-  "contactEmail": "help@greatunihack.com",
-  "facebookLink": "unicsmanchester",
-  "instagramLink": "unics_uom",
-  "twitterLink": "unics_uom",
-  "config": {
+  "review": {
     "minimumReviews": 1
+  },
+  "email": {
+    "emailProvider": "smtp",
+    "mainEmail": "noreply@greatunihack.com",
+    "contactEmail": "help@greatunihack.com"
+  },
+  "social": {
+    "facebookHandle": "unicsmanchester",
+    "instagramHandle": "unics_uom",
+    "twitterHandle": "unics_uom"
   }
 }

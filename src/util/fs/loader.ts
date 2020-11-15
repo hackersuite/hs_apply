@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { Express } from 'express';
-import { ApplicationSectionInterface, HackathonSettingsInterface } from '../../settings';
-import { Sections, HackathonSettings } from '../../models';
+import { ApplicationSectionInterface, AppConfig } from '../../settings';
+import { Sections, HackathonConfig } from '../../models';
 import { Cache } from '../cache';
 import { promisify } from 'util';
 import { provide } from 'inversify-binding-decorators';
@@ -36,7 +36,7 @@ export class SettingLoader implements SettingLoaderInterface {
 	// TODO: Improve this function by not awaiting both loads seperately
 	public async loadApplicationSettings(app: Express): Promise<void> {
 		const sectionsLoad: Promise<Array<ApplicationSectionInterface>|undefined> = this.loadSettingsFile('questions.json', 'sections');
-		const settingsLoad: Promise<HackathonSettingsInterface|undefined> = this.loadSettingsFile('hackathon.json');
+		const settingsLoad: Promise<AppConfig|undefined> = this.loadSettingsFile('hackathon.json');
 
 		const [sections, settings] = await Promise.all([sectionsLoad, settingsLoad]);
 		if (sections) {
@@ -46,10 +46,10 @@ export class SettingLoader implements SettingLoaderInterface {
 		}
 		if (settings) {
 			// Add the hackathon settings to the cache and add them to app locals
-			const hackathonSettings: HackathonSettings = new HackathonSettings(settings);
-			this.cache.set(HackathonSettings.name, hackathonSettings);
-			app.locals.settings = hackathonSettings.settings;
-			logger.info(hackathonSettings.settings, 'Loaded hackathon settings');
+			const hackathonSettings: HackathonConfig = new HackathonConfig(settings);
+			this.cache.set(HackathonConfig.name, hackathonSettings);
+			app.locals.settings = hackathonSettings.config;
+			logger.info(hackathonSettings.config, 'Loaded hackathon settings');
 		} else {
 			// We couldn't load the hackathon settings so set some defaults
 			app.locals.settings = {
