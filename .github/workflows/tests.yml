@@ -19,6 +19,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm i -g codeclimate-test-reporter
+    - run: cp .env.example .env
     - run: make ci
     - run: bash <(curl -s https://codecov.io/bash)
       env:

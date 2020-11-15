@@ -1,6 +1,6 @@
 import { provide } from 'inversify-binding-decorators';
 import { PartialApplicant } from '../../models/db/applicant';
-import { PartialApplicantRepository } from '../../repositories';
+import { InjectedRepository } from '../../repositories';
 import { ObjectID, Repository, DeleteResult } from 'typeorm';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 
@@ -17,9 +17,9 @@ export class PartialApplicantService implements PartialApplicantServiceInterface
 	private readonly _partialApplicantRepository: Repository<PartialApplicant>;
 
 	public constructor(
-		partialApplicantRepository: PartialApplicantRepository
+		partialApplicantRepository: InjectedRepository<PartialApplicant>
 	) {
-		this._partialApplicantRepository = partialApplicantRepository.getRepository();
+		this._partialApplicantRepository = partialApplicantRepository.getRepository(PartialApplicant);
 	}
 
 	@Transactional()
