@@ -6,6 +6,7 @@ import { provide } from 'inversify-binding-decorators';
 import { Applicant } from '../../models/db';
 import { AuthApi } from '@unicsmcr/hs_auth_client';
 import { getConfig } from '../../util/config';
+import { RequestAuthentication } from '../../util';
 
 export interface EmailServiceInterface {
 	sendEmail(from: string, recipient: string, subject: string, template: string, locals: any): Promise<boolean>;
@@ -29,15 +30,17 @@ export class EmailService {
 	private readonly _emailService: EmailServiceInterface;
 	private readonly _authApi: AuthApi;
 
-	public constructor(cache: Cache, authApi: AuthApi) {
+	public constructor(cache: Cache, requestAuth: RequestAuthentication) {
 		this._config = cache.getAll<HackathonConfig>(HackathonConfig.name)[0].config;
-		this._authApi = authApi;
+		this._authApi = requestAuth.authApi;
 
 		switch (this._config.email.emailProvider) {
 			case EmailProvider.SENDGRID:
 				this._emailService = new SendgridEmailService();
+				break;
 			case EmailProvider.SMTP:
 				this._emailService = new SMTPEmailService();
+				break;
 			default:
 				throw new Error(`Invalid email service provider: ${this._config.email.emailProvider as string}`);
 		}

@@ -139,6 +139,7 @@ export class ReviewController extends CommonController implements ReviewControll
 				});
 			} catch (err) {
 				logger.error('failed to send invite');
+				logger.error(err);
 				res.status(HttpResponseCode.INTERNAL_ERROR).send({
 					message: 'Failed to send invite to user'
 				});
