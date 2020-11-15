@@ -2,6 +2,7 @@ import EmailTemplate from 'email-templates';
 import { createTransport, SentMessageInfo } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import { EmailServiceInterface } from './emailService';
+import { getConfig } from '../../util/config';
 
 export class SMTPEmailService implements EmailServiceInterface {
 	public async sendEmail(
@@ -12,12 +13,12 @@ export class SMTPEmailService implements EmailServiceInterface {
 		locals: any
 	): Promise<any> {
 		const transport: Mail = createTransport({
-			host: 'smtp.ethereal.email',
-			port: 587,
-			secure: false, // true for 465, false for other ports
+			host: getConfig().email.smtpHost,
+			port: getConfig().email.smtpPort,
+			secure: getConfig().email.smtpPort === 465, // true for 465, false for other ports
 			auth: {
-				user: '', // generated ethereal user
-				pass: '' // generated ethereal password
+				user: getConfig().email.smtpUsername,
+				pass: getConfig().email.smtpPassword
 			}
 		});
 

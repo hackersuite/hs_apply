@@ -13,8 +13,8 @@ export class SendgridEmailService implements EmailServiceInterface {
 		template: string,
 		locals: any
 	): Promise<boolean> {
-		if (!getConfig().sendgridToken) { throw new Error('Failed to send email via Sendgrid, check sendgrid env settings'); }
-		sgMail.setApiKey(getConfig().sendgridToken);
+		if (!getConfig().email.sendgridToken) { throw new Error('Failed to send email via Sendgrid, check sendgrid env settings'); }
+		sgMail.setApiKey(getConfig().email.sendgridToken);
 
 		const msgOptions = {
 			from: from,
