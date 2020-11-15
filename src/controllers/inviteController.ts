@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import autoBind from 'auto-bind';
 import { provide } from 'inversify-binding-decorators';
-import { EmailService, ApplicantService } from '../services';
+import { EmailService, ApplicantService, EmailType } from '../services';
 import { Applicant } from '../models/db';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
 import { HttpResponseCode } from '../util/errorHandling';
 import { User } from '@unicsmcr/hs_auth_client';
-import { HackathonSettingsInterface } from '../settings';
 import { RequestAuthentication } from '../util';
 
 export interface InviteControllerInterface {
@@ -35,34 +34,14 @@ export class InviteController implements InviteControllerInterface {
 		autoBind(this);
 	}
 
-	private readonly sendInvite = async (req: Request, applicant: Applicant, name: string, email: string): Promise<boolean> => {
+	private readonly sendInvite = async (req: Request, applicant: Applicant): Promise<boolean> => {
 		if (
 			applicant.applicationStatus === ApplicantStatus.Applied ||
       applicant.applicationStatus === ApplicantStatus.Reviewed
 		) {
-			const settings = req.app.locals.settings as HackathonSettingsInterface;
-			const subject = `[${settings.shortName}] You've been accepted!`;
-			const confirmLink = `${settings.hackathonURL}/invite/${applicant.id}/confirm`;
-			const hackathonLogoURL = `${settings.hackathonURL}/img/logo.png`;
-
 			try {
 				// Send the email to the user
-				const result: boolean = await this._emailService.sendEmail(
-					req.app.locals.settings.mainEmail,
-					email,
-					subject,
-					'invited',
-					{
-						subject: subject,
-						settings: req.app.locals.settings,
-						confirmLink: confirmLink,
-						hackathonLogoURL: hackathonLogoURL,
-						applicant: {
-							id: applicant.id,
-							name: name
-						}
-					}
-				);
+				const result: boolean = await this._emailService.sendEmail(applicant, EmailType.INVITE);
 
 				if (result) {
 					// Create the accept deadline 5 days in the future
@@ -83,32 +62,14 @@ export class InviteController implements InviteControllerInterface {
 		}
 	};
 
-	private readonly sendReject = async (req: Request, applicant: Applicant, name: string, email: string): Promise<boolean> => {
+	private readonly sendReject = async (req: Request, applicant: Applicant): Promise<boolean> => {
 		if (
 			applicant.applicationStatus === ApplicantStatus.Applied ||
       applicant.applicationStatus === ApplicantStatus.Reviewed
 		) {
-			const settings = req.app.locals.settings as HackathonSettingsInterface;
-			const subject = `[${settings.shortName}] Application Update`;
-			const hackathonLogoURL = `${settings.hackathonURL}/img/logo.png`;
-
 			try {
 				// Send the email to the user
-				const result: boolean = await this._emailService.sendEmail(
-					req.app.locals.settings.mainEmail,
-					email,
-					subject,
-					'rejected',
-					{
-						subject: subject,
-						settings: req.app.locals.settings,
-						hackathonLogoURL: hackathonLogoURL,
-						applicant: {
-							id: applicant.id,
-							name: name
-						}
-					}
-				);
+				const result: boolean = await this._emailService.sendEmail(applicant, EmailType.REJECT);
 
 				if (result) {
 					// Set the applicant state to be rejected
@@ -126,29 +87,11 @@ export class InviteController implements InviteControllerInterface {
 		}
 	};
 
-	private readonly sendDetails = async (req: Request, applicant: Applicant, name: string, email: string): Promise<boolean> => {
+	private readonly sendDetails = async (req: Request, applicant: Applicant): Promise<boolean> => {
 		if (applicant.applicationStatus === ApplicantStatus.Confirmed) {
-			const settings = req.app.locals.settings as HackathonSettingsInterface;
-			const subject = `[${settings.shortName}] Important Information`;
-			const hackathonLogoURL = `${settings.hackathonURL}/img/logo.png`;
-
 			try {
 				// Send the email to the user
-				const result: boolean = await this._emailService.sendEmail(
-					`${settings.shortName} <${settings.mainEmail}>`,
-					email,
-					subject,
-					'details',
-					{
-						subject: subject,
-						settings: req.app.locals.settings,
-						hackathonLogoURL: hackathonLogoURL,
-						applicant: {
-							id: applicant.id,
-							name: name
-						}
-					}
-				);
+				const result: boolean = await this._emailService.sendEmail(applicant, EmailType.DETAILS);
 				return result;
 			} catch (err) {
 				return false;
@@ -158,29 +101,11 @@ export class InviteController implements InviteControllerInterface {
 		}
 	};
 
-	private readonly sendFeedback = async (req: Request, applicant: Applicant, name: string, email: string): Promise<boolean> => {
+	private readonly sendFeedback = async (req: Request, applicant: Applicant): Promise<boolean> => {
 		if (applicant.applicationStatus === ApplicantStatus.Confirmed) {
-			const settings = req.app.locals.settings as HackathonSettingsInterface;
-			const subject = `[${settings.shortName}] Feedback`;
-			const hackathonLogoURL = `${settings.hackathonURL}/img/logo.png`;
-
 			try {
 				// Send the email to the user
-				const result: boolean = await this._emailService.sendEmail(
-					`${settings.shortName} <${settings.mainEmail}>`,
-					email,
-					subject,
-					'feedback',
-					{
-						subject: subject,
-						settings: req.app.locals.settings,
-						hackathonLogoURL: hackathonLogoURL,
-						applicant: {
-							id: applicant.id,
-							name: name
-						}
-					}
-				);
+				const result: boolean = await this._emailService.sendEmail(applicant, EmailType.FEEDBACK);
 				return result;
 			} catch (err) {
 				return false;
@@ -214,16 +139,16 @@ export class InviteController implements InviteControllerInterface {
 			userIds.map(async (id: string) => {
 				if (!id || id.length === 0) return { status: 'rejected', err: 'Not defined id' };
 				const applicant: Applicant = await this._applicantService.findOne(id);
-				const authUser: any = authUsers[applicant.authId!];
+				// const authUser: any = authUsers[applicant.authId!];
 				try {
 					if (emailType === 'invite') {
-						await this.sendInvite(req, applicant, authUser.name, authUser.email);
+						await this.sendInvite(req, applicant);
 					} else if (emailType === 'reject') {
-						await this.sendReject(req, applicant, authUser.name, authUser.email);
+						await this.sendReject(req, applicant);
 					} else if (emailType === 'details') {
-						await this.sendDetails(req, applicant, authUser.name, authUser.email);
+						await this.sendDetails(req, applicant);
 					} else if (emailType === 'feedback') {
-						await this.sendFeedback(req, applicant, authUser.name, authUser.email);
+						await this.sendFeedback(req, applicant);
 					}
 				} catch (err) {
 					return { status: 'rejected', err: 'Failed to send email.' };
@@ -235,8 +160,6 @@ export class InviteController implements InviteControllerInterface {
 	}
 
 	public async send(req: Request, res: Response): Promise<void> {
-		const reqUser = req.user as User;
-
 		let applicant: Applicant;
 		try {
 			applicant = await this._applicantService.findOne(req.params.id, 'id');
@@ -248,7 +171,7 @@ export class InviteController implements InviteControllerInterface {
 		}
 
 		// Check that the chosen user can be invited
-		const result: boolean = await this.sendInvite(req, applicant, reqUser.name, reqUser.email);
+		const result: boolean = await this.sendInvite(req, applicant);
 		if (result) {
 			res.send({
 				message: 'Sent invite successfully!'

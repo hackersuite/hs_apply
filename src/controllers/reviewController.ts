@@ -1,14 +1,17 @@
 import { Request, Response } from 'express';
 import autoBind from 'auto-bind';
 import { provide } from 'inversify-binding-decorators';
-import { ReviewService, ApplicantService } from '../services';
+import { ReviewService, ApplicantService, EmailService, EmailType } from '../services';
 import { Applicant, Review } from '../models/db';
 import { HttpResponseCode } from '../util/errorHandling';
 import { User } from '@unicsmcr/hs_auth_client';
-import { reviewApplicationMapping } from '../util';
+import { reviewApplicationMapping, logger } from '../util';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
 import * as pages from '../views/page';
 import { CommonController } from './commonController';
+import { Cache } from '../util/cache';
+import { HackathonConfig } from '../models';
+import { AppConfig } from '../settings';
 
 export interface ReviewControllerInterface {
 	submit: (req: Request, res: Response) => Promise<void>;
@@ -23,14 +26,20 @@ export interface ReviewControllerInterface {
 export class ReviewController extends CommonController implements ReviewControllerInterface {
 	private readonly _reviewService: ReviewService;
 	private readonly _applicantService: ApplicantService;
+	private readonly _emailService: EmailService;
+	private readonly hackathonSettings: AppConfig;
 
 	public constructor(
 		reviewService: ReviewService,
-		applicantService: ApplicantService
+		applicantService: ApplicantService,
+		emailService: EmailService,
+		cache: Cache
 	) {
 		super();
 		this._reviewService = reviewService;
 		this._applicantService = applicantService;
+		this._emailService = emailService;
+		this.hackathonSettings = cache.getAll<HackathonConfig>(HackathonConfig.name)[0].config;
 
 		autoBind(this);
 	}
@@ -113,6 +122,28 @@ export class ReviewController extends CommonController implements ReviewControll
 				message: 'Failed to save application review'
 			});
 			return;
+		}
+		reviewCountForApplicant++;
+
+		const minimumReviews = this.hackathonSettings.review.minimumReviews;
+		if (reviewCountForApplicant >= minimumReviews) {
+			try {
+				await this._emailService.sendEmail(application, EmailType.INVITE);
+
+				const acceptDeadline = new Date();
+				acceptDeadline.setDate(acceptDeadline.getDate() + 5);
+				await this._applicantService.save({
+					...application,
+					inviteAcceptDeadline: acceptDeadline,
+					applicationStatus: ApplicantStatus.Invited
+				});
+			} catch (err) {
+				logger.error('failed to send invite');
+				res.status(HttpResponseCode.INTERNAL_ERROR).send({
+					message: 'Failed to send invite to user'
+				});
+				return;
+			}
 		}
 
 		res.send({ message: 'Saved review' });
