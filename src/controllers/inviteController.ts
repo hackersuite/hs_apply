@@ -165,7 +165,7 @@ export class InviteController extends CommonController implements InviteControll
 	public async send(req: Request, res: Response): Promise<void> {
 		let applicant: Applicant;
 		try {
-			applicant = await this._applicantService.findOne(req.params.id, 'id');
+			applicant = await this._applicantService.findOne(req.params.id, 'authId');
 		} catch (err) {
 			res.status(HttpResponseCode.BAD_REQUEST).send({
 				message: 'Failed to send invite'
