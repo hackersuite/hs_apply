@@ -116,13 +116,14 @@ export class RequestAuthentication {
 		return req.cookies[this.cookieName];
 	}
 
-	// TODO: Add arguments to the URI (See https://github.com/unicsmcr/hs_apply/issues/75)
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	private getUriFromRequest(router: RouterInterface, operationHandler: ExpressOpHandlerFunction, _req: Request): string {
+	private getUriFromRequest(router: RouterInterface, operationHandler: ExpressOpHandlerFunction, req: Request): string {
 		const routerName = Reflect.getPrototypeOf(router).constructor.name.replace('Router', '');
 		const opHandlerParts = operationHandler.name.split(' ');
 		const opHandlerName = opHandlerParts[opHandlerParts.length - 1];
 
-		return this.authApi.newUri(`${routerName}:${opHandlerName}`);
+		const requestParams = Object.entries(req.params);
+		const args = requestParams.length > 0 ? new Map(requestParams) : undefined;
+
+		return this.authApi.newUri(`${routerName}:${opHandlerName}`, args);
 	}
 }

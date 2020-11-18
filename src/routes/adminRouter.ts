@@ -33,7 +33,7 @@ export class AdminRouter implements RouterInterface {
 			this._requestAuth.withAuthMiddleware(this, this._adminController.downloadAllCVsFromDropbox)
 		);
 
-		router.get('/manage/[a-z0-9-]+',
+		router.get('/manage/:id([a-z0-9-]+)',
 			this._requestAuth.withAuthMiddleware(this, this._adminController.manageApplication));
 
 		return router;
