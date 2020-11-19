@@ -8,6 +8,7 @@ import { EmailService } from '../../../src/services';
 import { User } from '@unicsmcr/hs_auth_client';
 import { NextFunction, Request, Response } from 'express';
 import { Cache } from '../../../src/util/cache';
+import { DeepPartial } from 'typeorm';
 
 export function setupCommonMocks() {
 	mockFrontendRenderer();
@@ -42,15 +43,19 @@ export function mockSettingsLoader({ applicationsOpen = true } = {}): SettingLoa
 	return mockSettingLoader;
 }
 
-export function mockHackathonConfigCache(): Cache {
+export function mockHackathonConfigCache(extendedConfig: DeepPartial<AppConfig> = {}): Cache {
 	const mockCache = mock(Cache);
-	const config = {
+	const testConfig = {
 		config: {
 			email: { emailProvider: 'sendgrid' },
 			review: {}
 		}
 	};
-	when(mockCache.getAll<HackathonConfig>(HackathonConfig.name)).thenCall(() => [config]);
+	if (Object.entries(extendedConfig).length > 0) {
+		Object.assign(testConfig, { config: extendedConfig });
+	}
+
+	when(mockCache.getAll<HackathonConfig>(HackathonConfig.name)).thenCall(() => [testConfig]);
 
 	return mockCache;
 }
