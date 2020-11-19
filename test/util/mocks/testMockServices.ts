@@ -17,8 +17,8 @@ export function setupCommonMocks() {
 
 export function mockFrontendRenderer(): void {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	jest.spyOn(CommonController.prototype, 'renderPage').mockImplementationOnce((req, res, page, options) => {
-		res.status(HttpResponseCode.OK).send();
+	jest.spyOn<any, any>(CommonController.prototype, 'renderPage').mockImplementationOnce((req, res, page, options) => {
+		(res as Response).status(HttpResponseCode.OK).send();
 		return Promise.resolve();
 	});
 }

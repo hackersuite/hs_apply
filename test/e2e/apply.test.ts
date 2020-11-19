@@ -1,6 +1,5 @@
 import { getTestDatabaseOptions } from '../util';
 import { mockFrontendRenderer, mockRequestAuthentication, mockSettingsLoader, mockHackathonConfigCache } from '../util/mocks';
-mockFrontendRenderer();
 
 import request from 'supertest';
 import { App } from '../../src/app';
@@ -63,6 +62,7 @@ const requestUser = {
 };
 
 beforeAll(async () => {
+	mockFrontendRenderer();
 	mockRequestAuth = mockRequestAuthentication(requestUser);
 	mockSettingLoader = mockSettingsLoader();
 	mockCache = mockHackathonConfigCache();
