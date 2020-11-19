@@ -1,6 +1,6 @@
 import { mock } from 'ts-mockito';
 import { Express, NextFunction, Request, Response } from 'express';
-import { setupTestingEnvironment } from '../../../util';
+import { initEnv } from '../../../util';
 import { RequestAuthentication } from '../../../../src/util';
 import { User } from '@unicsmcr/hs_auth_client';
 import { RouterInterface } from '../../../../src/routes';
@@ -18,7 +18,7 @@ const requestUser: User = {
 };
 
 beforeAll(() => {
-	setupTestingEnvironment();
+	initEnv();
 });
 
 let reqMock: Request;

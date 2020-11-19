@@ -1,15 +1,18 @@
+import { getTestDatabaseOptions } from '../util';
+import { mockFrontendRenderer, mockRequestAuthentication, mockSettingsLoader, mockHackathonConfigCache, mockEmailService } from '../util/mocks';
+
 import request from 'supertest';
 import { App } from '../../src/app';
 import { Express } from 'express';
-import { setupTestingEnvironment, getTestDatabaseOptions, mockRequestAuthentication } from '../util/testUtils';
 import { HttpResponseCode } from '../../src/util/errorHandling';
 import { Applicant, Review } from '../../src/models/db';
 import { RequestAuthentication } from '../../src/util/auth';
 import { SettingLoader } from '../../src/util/fs';
-import { mock, instance, when, anything, objectContaining } from 'ts-mockito';
+import { mock, instance, when, objectContaining } from 'ts-mockito';
 import { Repository } from 'typeorm';
 import { InjectedRepository } from '../../src/repositories';
-import { ApplicantService } from '../../src/services';
+import { ApplicantService, EmailService } from '../../src/services';
+import { Cache } from '../../src/util/cache';
 
 import container from '../../src/inversify.config';
 
@@ -17,7 +20,9 @@ let bApp: Express;
 let reviewRepository: Repository<Review>;
 let mockRequestAuth: RequestAuthentication;
 let mockSettingLoader: SettingLoader;
+let mockCache: Cache;
 let mockApplicantService: ApplicantService;
+let mockEService: EmailService;
 
 const newReviewRequest: any = {
 	applicationID: '',
@@ -46,26 +51,20 @@ const requestUser = {
 };
 
 beforeAll(async () => {
-	setupTestingEnvironment();
-
+	mockFrontendRenderer();
 	mockRequestAuth = mockRequestAuthentication(requestUser);
-	mockSettingLoader = mock(SettingLoader);
+	mockSettingLoader = mockSettingsLoader();
+	mockCache = mockHackathonConfigCache();
+	mockEService = mockEmailService();
 	mockApplicantService = mock(ApplicantService);
 
 	container.rebind(RequestAuthentication).toConstantValue(instance(mockRequestAuth));
 	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
+	container.rebind(Cache).toConstantValue(instance(mockCache));
+	container.rebind(EmailService).toConstantValue(instance(mockEService));
 	container.rebind(ApplicantService).toConstantValue(instance(mockApplicantService));
 
-	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall((app: Express) => {
-		app.locals.settings = {
-			shortName: 'Hackathon',
-			fullName: 'Hackathon',
-			applicationsOpen: new Date().toString(),
-			applicationsClose: new Date(Date.now() + (10800 * 1000)).toString() // 3 hours from now
-		};
-	});
 	when(mockApplicantService.findOne(objectContaining({ id: '' }))).thenReturn(Promise.resolve(testApplicant));
-
 
 	bApp = await new App().buildApp(getTestDatabaseOptions());
 	// After the application has been built and db connection established -- get the applicant repository

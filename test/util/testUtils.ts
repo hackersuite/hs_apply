@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Request, Response, NextFunction } from 'express';
 import { Connection, createConnections, getConnection, ConnectionOptions } from 'typeorm';
 import { getConfig, Environment } from '../../src/util/config';
-import { mock, when, anything } from 'ts-mockito';
-import { RequestAuthentication, SettingLoader } from '../../src/util';
-import { User } from '@unicsmcr/hs_auth_client';
 
 export function getTestDatabaseOptions(entities?: (string | Function)[], name?: string): ConnectionOptions[] {
 	return [
@@ -61,10 +57,14 @@ export function initEnv(): void {
 	process.env.GOOGLE_ANALYTICS_ID = '';
 	process.env.DROPBOX_API_TOKEN = 'api_key';
 	process.env.SENDGRID_API_TOKEN = '';
+	process.env.SMTP_HOST = '';
+	process.env.SMTP_PORT = '587';
+	process.env.SMTP_USERNAME = '';
+	process.env.SMTP_PASSWORD = '';
 	getConfig(process.env, true);
 }
 
-export function setupTestingEnvironment(): void {
+export function setupTestEnvironment() {
 	initEnv();
 	mockTransactions();
 }
@@ -79,29 +79,4 @@ export function mockTransactions(): void {
 
 export function unmockTransactions(): void {
 	jest.unmock('typeorm-transactional-cls-hooked');
-}
-
-export function mockSettingsLoader() {
-	const mockSettingLoader = mock(SettingLoader);
-	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall(app => {
-		app.locals.settings = {
-			shortName: 'Hackathon',
-			fullName: 'Hackathon',
-			applicationsOpen: new Date().toString(),
-			applicationsClose: new Date(Date.now() + (10800 * 1000)).toString() // 3 hours from now
-		};
-	});
-	return mockSettingLoader;
-}
-
-export function mockRequestAuthentication(requestUser: User): RequestAuthentication {
-	const mockRequestAuth = mock(RequestAuthentication);
-	when(mockRequestAuth.passportSetup).thenReturn(() => null);
-	when(mockRequestAuth.withAuthMiddleware(anything(), anything()))
-		.thenCall((router, operationHandler) =>
-			(req: Request, res: Response, next: NextFunction) => {
-				req.user = requestUser;
-				operationHandler(req, res, next);
-			});
-	return mockRequestAuth;
 }

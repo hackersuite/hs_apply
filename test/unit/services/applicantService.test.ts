@@ -1,17 +1,20 @@
-import { setupTestingEnvironment, initEnv, updateEnv } from '../../util';
-setupTestingEnvironment();
-
-import { when, mock, instance, verify, anything, objectContaining, reset, resetCalls } from 'ts-mockito';
-import { ApplicantService } from '../../../src/services';
-import { InjectedRepository } from '../../../src/repositories';
-import { Repository, DeleteResult } from 'typeorm';
-import { Applicant } from '../../../src/models/db';
-
-import container from '../../../src/inversify.config';
+import { setupTestEnvironment, initEnv, updateEnv } from '../../util';
+setupTestEnvironment();
+import { setupCommonMocks } from '../../util/mocks';
+setupCommonMocks();
 
 // We use jest to mock out axios requests since we sometimes call the dropbox api
 import axios from 'axios';
 jest.mock('axios');
+
+import { when, mock, instance, verify, anything, objectContaining, reset, resetCalls } from 'ts-mockito';
+import { InjectedRepository } from '../../../src/repositories';
+import { Repository, DeleteResult } from 'typeorm';
+import { Applicant } from '../../../src/models/db';
+import { ApplicantService } from '../../../src/services';
+
+import container from '../../../src/inversify.config';
+
 const axiosMock = axios as jest.Mocked<typeof axios>;
 const successResponse = 'Success';
 
