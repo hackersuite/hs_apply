@@ -6,7 +6,7 @@ import { provide } from 'inversify-binding-decorators';
 import { Applicant } from '../../models/db';
 import { AuthApi } from '@unicsmcr/hs_auth_client';
 import { getConfig } from '../../util/config';
-import { RequestAuthentication } from '../../util';
+import { RequestAuthentication, logger } from '../../util';
 
 export interface EmailServiceInterface {
 	sendEmail(from: string, recipient: string, subject: string, template: string, locals: any): Promise<boolean>;
@@ -51,7 +51,8 @@ export class EmailService {
 		try {
 			authUser = await this._authApi.getUser(getConfig().hs.serviceToken, recipient.authId!);
 		} catch (err) {
-			return false;
+			logger.error(err);
+			throw new Error(`Failed to get user when sending email`);
 		}
 
 		let settings;
