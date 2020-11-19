@@ -1,21 +1,26 @@
+import { getTestDatabaseOptions } from '../util';
+import { mockFrontendRenderer, mockRequestAuthentication, mockSettingsLoader, mockHackathonConfigCache } from '../util/mocks';
+mockFrontendRenderer();
+
 import request from 'supertest';
 import { App } from '../../src/app';
 import { Express } from 'express';
-import { getTestDatabaseOptions, setupTestingEnvironment, mockRequestAuthentication } from '../util/testUtils';
 import { HttpResponseCode } from '../../src/util/errorHandling';
 import { Applicant } from '../../src/models/db';
 import { RequestAuthentication } from '../../src/util/auth';
 import { SettingLoader } from '../../src/util/fs';
-import { mock, instance, when, anything } from 'ts-mockito';
+import { instance } from 'ts-mockito';
 import { Repository } from 'typeorm';
 import { InjectedRepository } from '../../src/repositories';
 
 import container from '../../src/inversify.config';
+import { Cache } from '../../src/util/cache';
 
 let bApp: Express;
 let applicantRepository: Repository<Applicant>;
 let mockRequestAuth: RequestAuthentication;
 let mockSettingLoader: SettingLoader;
+let mockCache: Cache;
 
 const newApplicantRequest: any = {
 	age: 20,
@@ -58,23 +63,13 @@ const requestUser = {
 };
 
 beforeAll(async () => {
-	setupTestingEnvironment();
-
 	mockRequestAuth = mockRequestAuthentication(requestUser);
-	mockSettingLoader = mock(SettingLoader);
+	mockSettingLoader = mockSettingsLoader();
+	mockCache = mockHackathonConfigCache();
 
 	container.rebind(RequestAuthentication).toConstantValue(instance(mockRequestAuth));
 	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
-
-
-	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall((app: Express) => {
-		app.locals.settings = {
-			shortName: 'Hackathon',
-			fullName: 'Hackathon',
-			applicationsOpen: new Date().toString(),
-			applicationsClose: new Date(Date.now() + (10800 * 1000)).toString() // 3 hours from now
-		};
-	});
+	container.rebind(Cache).toConstantValue(instance(mockCache));
 
 	bApp = await new App().buildApp(getTestDatabaseOptions());
 	// After the application has been built and db connection established -- get the applicant repository
@@ -99,8 +94,8 @@ test('Test 404 page provided when invalid URL', async () => {
 	expect(response.status).toBe(HttpResponseCode.NOT_FOUND);
 });
 
-test('Test applicant created with valid request', async () => {
-	// Perform the request along .../apply
+test('Test application created with valid request', async () => {
+	// Perform the request along /apply
 	const response = await request(bApp)
 		.post('/apply')
 		.send(newApplicantRequest);

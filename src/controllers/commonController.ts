@@ -14,7 +14,7 @@ export abstract class CommonController {
 		autoBind(this);
 	}
 
-	protected async renderPage(req: Request, res: Response, page: Page, options: any): Promise<void> {
+	public async renderPage(req: Request, res: Response, page: Page, options: any): Promise<void> {
 		let authorizedURIs: string[];
 
 		if (page.components.length !== 0) {

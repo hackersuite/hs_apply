@@ -17,7 +17,11 @@ const fixture1: [Record<string, string>, EnvConfig] = [
 		HS_AUTH_SERVICE_TOKEN: '',
 		GOOGLE_ANALYTICS_ID: 'analyticsId',
 		DROPBOX_API_TOKEN: '',
-		SENDGRID_API_TOKEN: 'token'
+		SENDGRID_API_TOKEN: 'token',
+		SMTP_HOST: '',
+		SMTP_PORT: '587',
+		SMTP_USERNAME: '',
+		SMTP_PASSWORD: ''
 	},
 	{
 		port: 8000,
@@ -37,7 +41,13 @@ const fixture1: [Record<string, string>, EnvConfig] = [
 		},
 		googleAnalyticsId: 'analyticsId',
 		dropboxToken: '',
-		sendgridToken: 'token'
+		email: {
+			sendgridToken: 'token',
+			smtpHost: '',
+			smtpPort: 587,
+			smtpUsername: '',
+			smtpPassword: ''
+		}
 	}
 ];
 
@@ -57,7 +67,11 @@ const fixture2: [Record<string, string>, EnvConfig] = [
 		HS_AUTH_SERVICE_TOKEN: '',
 		GOOGLE_ANALYTICS_ID: '',
 		DROPBOX_API_TOKEN: '',
-		SENDGRID_API_TOKEN: ''
+		SENDGRID_API_TOKEN: '',
+		SMTP_HOST: '',
+		SMTP_PORT: '587',
+		SMTP_USERNAME: '',
+		SMTP_PASSWORD: ''
 	},
 	{
 		port: 8000,
@@ -77,7 +91,13 @@ const fixture2: [Record<string, string>, EnvConfig] = [
 		},
 		googleAnalyticsId: '',
 		dropboxToken: '',
-		sendgridToken: ''
+		email: {
+			sendgridToken: '',
+			smtpHost: '',
+			smtpPort: 587,
+			smtpUsername: '',
+			smtpPassword: ''
+		}
 	}
 ];
 

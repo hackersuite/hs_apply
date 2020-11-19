@@ -1,9 +1,10 @@
+import { getTestDatabaseOptions, initEnv } from '../../util/testUtils';
+import { mockFrontendRenderer, mockRequestAuthentication, mockHackathonConfigCache, mockSettingsLoader } from '../../util/mocks';
 import request from 'supertest';
 import { App } from '../../../src/app';
 import { Express } from 'express';
-import { setupTestingEnvironment, getTestDatabaseOptions, mockRequestAuthentication } from '../../util/testUtils';
 import { HttpResponseCode } from '../../../src/util/errorHandling';
-import { instance, mock, reset, when, anything } from 'ts-mockito';
+import { instance } from 'ts-mockito';
 import { Cache } from '../../../src/util/cache';
 import { RequestAuthentication, SettingLoader } from '../../../src/util';
 
@@ -21,23 +22,16 @@ const requestUser = {
 };
 
 beforeAll(async () => {
-	setupTestingEnvironment();
-	mockCache = mock(Cache);
+	initEnv();
+	mockFrontendRenderer();
+
+	mockCache = mockHackathonConfigCache();
 	mockRequestAuth = mockRequestAuthentication(requestUser);
-	mockSettingLoader = mock(SettingLoader);
+	mockSettingLoader = mockSettingsLoader();
 
 	container.rebind(RequestAuthentication).toConstantValue(instance(mockRequestAuth));
 	container.rebind(Cache).toConstantValue(instance(mockCache));
 	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
-
-	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall((app: Express) => {
-		app.locals.settings = {
-			shortName: 'Hackathon',
-			fullName: 'Hackathon',
-			applicationsOpen: new Date().toString(),
-			applicationsClose: new Date(Date.now() + (10800 * 1000)).toString() // 3 hours from now
-		};
-	});
 
 	bApp = await new App().buildApp(getTestDatabaseOptions());
 });
@@ -48,9 +42,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-	// Reset the mocks
-	reset(mockCache);
-
 	// Restore to last snapshot so each unit test takes a clean copy of the container
 	container.restore();
 });

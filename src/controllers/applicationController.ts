@@ -125,6 +125,7 @@ export class ApplicationController extends CommonController implements Applicati
 			// Remove the partial application
 			await this._partialApplicantService.remove(reqUser.id);
 		} catch (errors) {
+			console.log(errors);
 			res.status(HttpResponseCode.BAD_REQUEST).send({
 				error: true,
 				message: 'Could not create application!'

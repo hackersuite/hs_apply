@@ -1,21 +1,24 @@
+import { initEnv, getTestDatabaseOptions } from '../../util';
+import { mockRequestAuthentication, mockSettingsLoader, mockEmailService, mockHackathonConfigCache, mockFrontendRenderer } from '../../util/mocks';
+
 import request from 'supertest';
-import { App } from '../../../src/app';
 import { Express } from 'express';
-import { setupTestingEnvironment, getTestDatabaseOptions, mockRequestAuthentication } from '../../util/testUtils';
 import { HttpResponseCode } from '../../../src/util/errorHandling';
-import { instance, mock, when, reset, anything, objectContaining, verify } from 'ts-mockito';
+import { instance, mock, when, reset, objectContaining, verify } from 'ts-mockito';
 import { Cache } from '../../../src/util/cache';
-import { ApplicantService } from '../../../src/services';
+import { ApplicantService, EmailService } from '../../../src/services';
 import { Sections } from '../../../src/models/sections';
 import { Applicant } from '../../../src/models/db';
 import { RequestAuthentication } from '../../../src/util/auth';
 import { SettingLoader } from '../../../src/util/fs/loader';
 import { ApplicantStatus } from '../../../src/services/applications/applicantStatus';
+import { App } from '../../../src/app';
 
 import container from '../../../src/inversify.config';
 
 let bApp: Express;
 let mockCache: Cache;
+let mockEService: EmailService;
 let mockApplicantService: ApplicantService;
 let mockRequestAuth: RequestAuthentication;
 let mockSettingLoader: SettingLoader;
@@ -73,25 +76,20 @@ const getUniqueApplicant = (): [any, Applicant] => {
 };
 
 beforeAll(async () => {
-	setupTestingEnvironment();
-	mockCache = mock(Cache);
-	mockApplicantService = mock(ApplicantService);
+	initEnv();
+	mockFrontendRenderer();
+
+	mockCache = mockHackathonConfigCache();
 	mockRequestAuth = mockRequestAuthentication(requestUser);
-	mockSettingLoader = mock(SettingLoader);
+	mockSettingLoader = mockSettingsLoader({ applicationsOpen: false });
+	mockEService = mockEmailService();
+	mockApplicantService = mock(ApplicantService);
 
-	container.rebind(RequestAuthentication).toConstantValue(instance(mockRequestAuth));
 	container.rebind(Cache).toConstantValue(instance(mockCache));
-	container.rebind(ApplicantService).toConstantValue(instance(mockApplicantService));
+	container.rebind(RequestAuthentication).toConstantValue(instance(mockRequestAuth));
 	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
-
-	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall((app: Express) => {
-		app.locals.settings = {
-			shortName: 'Hackathon',
-			fullName: 'Hackathon',
-			applicationsOpen: new Date().toString(),
-			applicationsClose: new Date().toString()
-		};
-	});
+	container.rebind(EmailService).toConstantValue(instance(mockEService));
+	container.rebind(ApplicantService).toConstantValue(instance(mockApplicantService));
 
 	bApp = await new App().buildApp(getTestDatabaseOptions());
 });
@@ -103,7 +101,6 @@ beforeEach(() => {
 
 afterEach(() => {
 	// Reset the mocks
-	reset(mockCache);
 	reset(mockApplicantService);
 
 	// Restore to last snapshot so each unit test takes a clean copy of the application container

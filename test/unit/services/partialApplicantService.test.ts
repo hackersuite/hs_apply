@@ -1,5 +1,7 @@
-import { setupTestingEnvironment } from '../../util';
-setupTestingEnvironment();
+import { setupTestEnvironment } from '../../util';
+setupTestEnvironment();
+import { setupCommonMocks } from '../../util/mocks';
+setupCommonMocks();
 
 import { when, mock, instance, reset, resetCalls, anything } from 'ts-mockito';
 import { PartialApplicantService } from '../../../src/services';
