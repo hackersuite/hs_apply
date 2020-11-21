@@ -3,8 +3,8 @@
   "fullName": "GreatUniHack 2020",
   "rootDomain": "greatunihack.com",
   "hackathonURL": "https://apply.greatunihack.com",
-  "applicationsOpen": "2020-10-31T12:00:00",
-  "applicationsClose": "2020-11-23T20:00:00",
+  "applicationsOpen": "2020-10-31T12:00:00+00:00",
+  "applicationsClose": "2020-11-27T20:00:00+00:00",
   "review": {
     "minimumReviews": 1
   },
