@@ -39,6 +39,6 @@ export abstract class CommonController {
 	}
 
 	private handleUnauthorizedFrontend(res: Response): void {
-		res.render('views/');
+		res.render('views/notify', { message: 'Something went wrong' });
 	}
 }
