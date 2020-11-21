@@ -168,7 +168,7 @@ export class ApplicationController extends CommonController implements Applicati
 		const checkinID: string = req.params.id;
 		let application: Applicant;
 		try {
-			application = await this._applicantService.findOne(checkinID);
+			application = await this._applicantService.findOne(checkinID, 'authId');
 		} catch (err) {
 			res.status(HttpResponseCode.BAD_REQUEST).send({
 				message: 'Hacker could not be checked in'
