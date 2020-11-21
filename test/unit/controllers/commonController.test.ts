@@ -99,6 +99,6 @@ describe('renderPage tests', () => {
 
 		expect(requestAuth.authApi.getAuthorizedResources).toBeCalled();
 		expect(requestAuth.getUserAuthToken).toBeCalled();
-		expect((resMock.render as jest.Mock)).toBeCalledWith('views/notify', expect.objectContaining({ message: 'Something went wrong' }));
+		expect((resMock.render as jest.Mock)).toBeCalledWith('views/notify', expect.objectContaining({ message: expect.stringContaining('permission') }));
 	});
 });
