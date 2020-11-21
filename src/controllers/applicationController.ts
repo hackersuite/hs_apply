@@ -6,11 +6,13 @@ import { Sections } from '../models/sections';
 import { ApplicantService, PartialApplicantService } from '../services';
 import { Applicant } from '../models/db';
 import { HttpResponseCode } from '../util/errorHandling';
-import { User } from '@unicsmcr/hs_auth_client';
+import { User, AuthApi } from '@unicsmcr/hs_auth_client';
 import { ApplicantStatus } from '../services/applications/applicantStatus';
 import { applicationMapping } from '../util/decorator';
 import { CommonController } from './commonController';
 import * as pages from '../views/page';
+import { RequestAuthentication, logger } from '../util';
+import { getConfig } from '../util/config';
 
 export interface ApplicationControllerInterface {
 	apply: (req: Request, res: Response, next: NextFunction) => void;
@@ -28,6 +30,7 @@ export class ApplicationController extends CommonController implements Applicati
 	private readonly _cache: Cache;
 	private readonly _applicantService: ApplicantService;
 	private readonly _partialApplicantService: PartialApplicantService;
+	private readonly _authApi: AuthApi;
 
 	// TODO: Issue #10. Refactor error messages into something consistant across the project
 	private readonly applicantNotFound = 'Applicant does not exist';
@@ -35,12 +38,14 @@ export class ApplicationController extends CommonController implements Applicati
 	public constructor(
 		cache: Cache,
 		applicantService: ApplicantService,
-		partialApplicantService: PartialApplicantService
+		partialApplicantService: PartialApplicantService,
+		requestAuth: RequestAuthentication
 	) {
 		super();
 		this._cache = cache;
 		this._applicantService = applicantService;
 		this._partialApplicantService = partialApplicantService;
+		this._authApi = requestAuth.authApi;
 
 		autoBind(this);
 	}
@@ -168,7 +173,7 @@ export class ApplicationController extends CommonController implements Applicati
 		const checkinID: string = req.params.id;
 		let application: Applicant;
 		try {
-			application = await this._applicantService.findOne(checkinID);
+			application = await this._applicantService.findOne(checkinID, 'authId');
 		} catch (err) {
 			res.status(HttpResponseCode.BAD_REQUEST).send({
 				message: 'Hacker could not be checked in'
@@ -190,6 +195,16 @@ export class ApplicationController extends CommonController implements Applicati
 		} else {
 			res.status(HttpResponseCode.BAD_REQUEST).send({
 				message: 'Hacker cannot be accepted! Please notify organiser!'
+			});
+			return;
+		}
+
+		try {
+			await this._authApi.setRole(getConfig().hs.serviceToken, 'attendee', application.authId!);
+		} catch (err) {
+			logger.error(err);
+			res.status(HttpResponseCode.BAD_REQUEST).send({
+				message: 'Failed to update applicant permissions'
 			});
 			return;
 		}
