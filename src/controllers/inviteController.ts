@@ -16,7 +16,7 @@ export interface InviteControllerInterface {
 }
 
 export enum ConfirmMessageEnum {
-	Invalid = 'The invite is on longer valid.',
+	Invalid = 'The invite is no longer valid.',
 	Expired = 'This invite has expired, we\'re sorry you have missed the deadline.',
 	Confirmed = 'Thank you! Your attendence has been confirmed!',
 	Error = 'An error occured, please try again or contact us for help'
