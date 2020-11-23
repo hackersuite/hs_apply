@@ -15,6 +15,19 @@ export interface InviteControllerInterface {
 	confirm: (req: Request, res: Response, next: NextFunction) => void;
 }
 
+export enum ConfirmMessageEnum {
+	Invalid = 'The invite is no longer valid.',
+	Expired = 'This invite has expired, we\'re sorry you have missed the deadline.',
+	Confirmed = 'Thank you! Your attendence has been confirmed!',
+	Error = 'An error occured, please try again or contact us for help'
+}
+
+export enum SendMessageEnum {
+	Failed = 'Applicant cannot be invited yet',
+	Success = 'Sent invite successfully!',
+	Error = 'Failed to send invite'
+}
+
 /**
  * A controller for dashboard methods
  */
@@ -168,7 +181,7 @@ export class InviteController extends CommonController implements InviteControll
 			applicant = await this._applicantService.findOne(req.params.id, 'id');
 		} catch (err) {
 			res.status(HttpResponseCode.BAD_REQUEST).send({
-				message: 'Failed to send invite'
+				message: SendMessageEnum.Error
 			});
 			return;
 		}
@@ -177,11 +190,11 @@ export class InviteController extends CommonController implements InviteControll
 		const result: boolean = await this.sendInvite(req, applicant);
 		if (result) {
 			res.send({
-				message: 'Sent invite successfully!'
+				message: SendMessageEnum.Success
 			});
 		} else {
 			res.send({
-				message: 'Applicant cannot be invited yet!'
+				message: SendMessageEnum.Failed
 			});
 		}
 	}
@@ -197,23 +210,23 @@ export class InviteController extends CommonController implements InviteControll
 
 		let notifyMessage: string;
 		if (applicant.applicationStatus >= ApplicantStatus.Confirmed) {
-			notifyMessage = 'The invite is on longer valid.';
+			notifyMessage = ConfirmMessageEnum.Invalid;
 		} else if (applicant.inviteAcceptDeadline && applicant.inviteAcceptDeadline.getTime() <= new Date().getTime()) {
 			// Check that the invite deadline has not expired
-			notifyMessage = "This invite has expired, we're sorry you have missed the deadline.";
+			notifyMessage = ConfirmMessageEnum.Expired;
 			applicant.applicationStatus = ApplicantStatus.Rejected;
 		} else if (reqUser.id === applicant.authId && applicant.applicationStatus === ApplicantStatus.Invited) {
 			// Check that the logged in user can be invited
-			notifyMessage = 'Thank you! Your attendence has been confirmed!';
+			notifyMessage = ConfirmMessageEnum.Confirmed;
 			applicant.applicationStatus = ApplicantStatus.Confirmed;
 		} else {
-			notifyMessage = 'An error occured, please try again or contact us for help';
+			notifyMessage = ConfirmMessageEnum.Error;
 		}
 
 		try {
 			await this._applicantService.save(applicant);
 		} catch (err) {
-			notifyMessage = 'An error occured! Please contact us for help';
+			notifyMessage = ConfirmMessageEnum.Error;
 		}
 
 		void super.renderPage(req, res, pages.notify, {
