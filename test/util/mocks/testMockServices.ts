@@ -16,10 +16,10 @@ export function setupCommonMocks() {
 	mockHackathonConfigCache();
 }
 
-export function mockFrontendRenderer(): void {
+export function mockFrontendRenderer(): jest.SpyInstance {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	jest.spyOn<any, any>(CommonController.prototype, 'renderPage').mockImplementationOnce((req, res, page, options) => {
-		(res as Response).status(HttpResponseCode.OK).send();
+	return jest.spyOn<any, any>(CommonController.prototype, 'renderPage').mockImplementationOnce((req, res, page, options) => {
+		(res as Response).sendStatus(HttpResponseCode.OK);
 		return Promise.resolve();
 	});
 }

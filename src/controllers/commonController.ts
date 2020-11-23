@@ -39,6 +39,6 @@ export abstract class CommonController {
 	}
 
 	private handleUnauthorizedFrontend(res: Response): void {
-		res.render('views/');
+		res.render('views/notify', { components: {}, message: 'You do not have permission to access this page' });
 	}
 }
