@@ -183,7 +183,7 @@ export class AdminController extends CommonController implements AdminController
 		let allApplicants: Partial<Applicant>[];
 		try {
 			const allApplicantsAndCount = await this._applicantService.getAllAndCountSelection(
-				['id', 'authId', 'whyChooseHacker', 'skills', 'pastProjects', 'degree', 'createdAt'],
+				['id', 'authId', 'whyChooseHacker', 'skills', 'pastProjects', 'degree', 'createdAt', 'applicationStatus'],
 				'createdAt',
 				'ASC'
 			);
@@ -210,11 +210,11 @@ export class AdminController extends CommonController implements AdminController
 		let csvContents = '';
 		allApplicants.forEach(application => {
 			// UID, TID, WhyChoose?, Proj, Skills, Degree
-			const team: string = authUsers[application.authId!].team ?? '';
+			// const team: string = authUsers[application.authId!].team ?? '';
 			application.whyChooseHacker = this.escapeForCSV(application.whyChooseHacker!);
 			application.pastProjects = this.escapeForCSV(application.pastProjects!);
 			application.skills = this.escapeForCSV(application.skills!);
-			csvContents += `${application.createdAt!.toISOString()},${application.id!},${team},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree!}"\n`;
+			csvContents += `${application.createdAt!.toISOString()},${application.id!},${authUsers[application.authId!].name},${authUsers[application.authId!].email},${application.applicationStatus},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree!}"\n`;
 		});
 		const csvStream = new PassThrough();
 		csvStream.end(Buffer.from(csvContents));
