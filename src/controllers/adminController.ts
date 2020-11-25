@@ -214,7 +214,7 @@ export class AdminController extends CommonController implements AdminController
 			application.whyChooseHacker = this.escapeForCSV(application.whyChooseHacker!);
 			application.pastProjects = this.escapeForCSV(application.pastProjects!);
 			application.skills = this.escapeForCSV(application.skills!);
-			csvContents += `${application.createdAt!.toISOString()},${application.id!},${authUsers[application.authId!].name},${authUsers[application.authId!].email},${application.applicationStatus},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree!}"\n`;
+			csvContents += `${application.createdAt!.toISOString()},${application.id!},"${authUsers[application.authId!].name}",${authUsers[application.authId!].email},${application.applicationStatus},"${application.whyChooseHacker}","${application.pastProjects}","${application.skills}","${application.degree!}"\n`;
 		});
 		const csvStream = new PassThrough();
 		csvStream.end(Buffer.from(csvContents));
