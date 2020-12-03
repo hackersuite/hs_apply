@@ -121,8 +121,22 @@ export class RequestAuthentication {
 		const opHandlerParts = operationHandler.name.split(' ');
 		const opHandlerName = opHandlerParts[opHandlerParts.length - 1];
 
-		const requestParams = Object.entries(req.params);
-		const args = requestParams.length > 0 ? new Map(requestParams) : undefined;
+		const args = new Map();
+
+		// Request path parameters
+		for (const [key, val] of Object.entries(req.params)) {
+			args.set(`path_${key}`, val);
+		}
+
+		// Request form parameters
+		for (const [key, val] of Object.entries(req.query)) {
+			args.set(`query_${key}`, val);
+		}
+
+		// Request form parameters
+		for (const [key, val] of Object.entries(req.body)) {
+			args.set(`postForm_${key}`, val);
+		}
 
 		return this.authApi.newUri(`${routerName}:${opHandlerName}`, args);
 	}
