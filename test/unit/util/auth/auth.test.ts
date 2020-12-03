@@ -92,4 +92,25 @@ describe('WithAuthMiddleware tests', () => {
 		// Verify that the auth request failed and we are redirected to login
 		expect((resMock.redirect as jest.Mock).mock.calls.length).toBe(1);
 	});
+
+	test('URI generated correctly with URI params when included in request', async () => {
+		// Mock the hs_auth API calls
+		requestAuth.authApi.getCurrentUser = jest.fn(() => Promise.resolve(requestUser));
+		requestAuth.authApi.getAuthorizedResources = jest.fn(() => Promise.resolve(['hs:hs_test']));
+
+		// Test setup cookies and mock passport
+		reqMock.cookies['Authorization'] = 'test_cookie';
+		reqMock.params = { test1: '1' };
+		reqMock.query = { test2: '2' };
+		reqMock.body = { test3: '3' };
+		requestAuth.passportSetup(mock<Express>());
+
+		await requestAuth.withAuthMiddleware(mockRouter, mockOpHandler)(reqMock, resMock, nextFunctionMock);
+
+		expect(reqMock.user).toBe(requestUser);
+		expect(mockOpHandler).toHaveBeenCalledTimes(1);
+		expect(requestAuth.authApi.getCurrentUser as jest.Mock).toHaveBeenCalledTimes(1);
+		expect(requestAuth.authApi.getAuthorizedResources as jest.Mock)
+			.toBeCalledWith('test_cookie', ['hs:hs_apply:Object:mockConstructor?path_test1=1&query_test2=2&postForm_test3=3']);
+	});
 });
