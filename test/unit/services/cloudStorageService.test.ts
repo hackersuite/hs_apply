@@ -1,4 +1,8 @@
-import { setupTestingEnvironment } from '../../util';
+import { setupTestEnvironment } from '../../util';
+setupTestEnvironment();
+import { setupCommonMocks } from '../../util/mocks';
+setupCommonMocks();
+
 import { CloudStorageService } from '../../../src/services';
 import axios from 'axios';
 import { createWriteStream as writeStreamFunc } from 'fs';
@@ -10,10 +14,6 @@ let storageService: CloudStorageService;
 
 const failResponseAPIErr = new Error('Failed to make Dropbox API Request');
 const failResponseServiceErr = new Error('File name is not valid to delete');
-
-beforeAll(() => {
-	setupTestingEnvironment();
-});
 
 beforeEach(() => {
 	// Create a snapshot so each unit test can modify it without breaking other unit tests

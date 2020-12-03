@@ -1,18 +1,22 @@
+import { initEnv, getTestDatabaseOptions } from '../../util/testUtils';
+import { mockFrontendRenderer, mockRequestAuthentication, mockSettingsLoader, mockHackathonConfigCache } from '../../util/mocks';
+
 import request from 'supertest';
 import { App } from '../../../src/app';
 import { Express } from 'express';
-import { setupTestingEnvironment, getTestDatabaseOptions, mockRequestAuthentication } from '../../util/testUtils';
 import { HttpResponseCode } from '../../../src/util/errorHandling';
-import { instance, mock, when, anything, reset, verify } from 'ts-mockito';
+import { instance, mock, when, reset, verify } from 'ts-mockito';
 import { RequestAuthentication, SettingLoader } from '../../../src/util';
 import { ApplicantService, ReviewService } from '../../../src/services';
 import { Applicant } from '../../../src/models/db';
+import { Cache } from '../../../src/util/cache';
 
 import container from '../../../src/inversify.config';
 
 let bApp: Express;
 let mockRequestAuth: RequestAuthentication;
 let mockSettingLoader: SettingLoader;
+let mockCache: Cache;
 let mockApplicantService: ApplicantService;
 let mockReviewService: ReviewService;
 
@@ -37,25 +41,20 @@ const requestUser = {
 };
 
 beforeAll(async () => {
-	setupTestingEnvironment();
+	initEnv();
+	mockFrontendRenderer();
+
 	mockRequestAuth = mockRequestAuthentication(requestUser);
-	mockSettingLoader = mock(SettingLoader);
+	mockSettingLoader = mockSettingsLoader();
+	mockCache = mockHackathonConfigCache();
 	mockApplicantService = mock(ApplicantService);
 	mockReviewService = mock(ReviewService);
 
 	container.rebind(RequestAuthentication).toConstantValue(instance(mockRequestAuth));
 	container.rebind(SettingLoader).toConstantValue(instance(mockSettingLoader));
+	container.rebind(Cache).toConstantValue(instance(mockCache));
 	container.rebind(ApplicantService).toConstantValue(instance(mockApplicantService));
 	container.rebind(ReviewService).toConstantValue(instance(mockReviewService));
-
-	when(mockSettingLoader.loadApplicationSettings(anything())).thenCall((app: Express) => {
-		app.locals.settings = {
-			shortName: 'Hackathon',
-			fullName: 'Hackathon',
-			applicationsOpen: new Date().toString(),
-			applicationsClose: new Date(Date.now() + (10800 * 1000)).toString() // 3 hours from now
-		};
-	});
 
 	bApp = await new App().buildApp(getTestDatabaseOptions());
 });

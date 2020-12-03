@@ -1,3 +1,8 @@
+import { setupTestEnvironment } from '../../util';
+setupTestEnvironment();
+import { setupCommonMocks } from '../../util/mocks';
+setupCommonMocks();
+
 import { when, mock, instance, reset, resetCalls, objectContaining } from 'ts-mockito';
 import { ApplicantService, ReviewService } from '../../../src/services';
 import { InjectedRepository } from '../../../src/repositories';
