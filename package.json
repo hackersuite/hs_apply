@@ -58,7 +58,7 @@
     "passport-cookie": "^1.0.6",
     "pino-http": "^5.1.0",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.18",
+    "typeorm": "^0.2.25",
     "typeorm-transactional-cls-hooked": "^0.1.12",
     "typescript": "^3.9.3"
   },
