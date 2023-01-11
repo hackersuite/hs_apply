@@ -42,7 +42,7 @@
     "@unicsmcr/pino-http-print": "^2.1.0",
     "auto-bind": "^4.0.0",
     "axios": "^0.19.2",
-    "class-validator": "^0.10.0",
+    "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.4",
     "dotenv": "^8.1.0",
     "ejs": "^2.6.2",
